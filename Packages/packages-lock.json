@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.alexeytaranov.serializereferencedropdown": {
+      "version": "0.3.3",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
+    },
     "com.unity.2d.animation": {
       "version": "7.0.9",
       "depth": 1,
