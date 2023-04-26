@@ -1,10 +1,7 @@
 ﻿namespace ZBase.Foundation.Mvvm
 {
-    public interface IDataContext { }
-
-    public interface IDataContext<T> : IDataContext
-        where T : class, IObservableObject
+    public interface IDataContext
     {
-        public T ViewModel { get => default; }
+        public IObservableObject ViewModel { get => default; }
     }
 }
