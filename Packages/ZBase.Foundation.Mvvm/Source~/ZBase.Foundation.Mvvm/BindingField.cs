@@ -27,4 +27,14 @@ namespace ZBase.Foundation.Mvvm
     {
         public string Label { get; set; }
     }
+
+    public sealed class BindingFieldFallbackAttribute : Attribute
+    {
+        public string Name { get; }
+
+        public BindingFieldFallbackAttribute(string name)
+        {
+            Name = name;
+        }
+    }
 }

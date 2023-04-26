@@ -23,6 +23,10 @@ namespace ZBase.Foundation.Mvvm
 
         public List<MemberRef> Members { get; }
 
+        public Dictionary<string, IPropertySymbol> NotifyPropertyChangedForMap { get; }
+
+        public Dictionary<string, IMethodSymbol> NotifyCanExecuteChangedForMap { get; }
+
         public ObservablePropertyDeclaration(ClassDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
         {
             var typeSymbol = semanticModel.GetDeclaredSymbol(candidate, token);
@@ -30,6 +34,8 @@ namespace ZBase.Foundation.Mvvm
             Syntax = candidate;
             FullyQualifiedName = typeSymbol.ToFullName();
             Members = new List<MemberRef>();
+            NotifyPropertyChangedForMap = new Dictionary<string, IPropertySymbol>();
+            NotifyCanExecuteChangedForMap = new Dictionary<string, IMethodSymbol>();
 
             var implementInterface = false;
 
@@ -53,6 +59,8 @@ namespace ZBase.Foundation.Mvvm
             }
 
             var members = typeSymbol.GetMembers();
+            var notifyPropertyChangedForSet = new HashSet<string>();
+            var notifyCanExecuteChangedForSet = new HashSet<string>();
 
             foreach (var member in members)
             {
@@ -75,6 +83,7 @@ namespace ZBase.Foundation.Mvvm
                 )
                 {
                     memberRef.NotifyPropertyChangedFor = propName;
+                    notifyPropertyChangedForSet.Add(propName);
                 }
 
                 var notifyCanExecuteChangedFor = field.GetAttribute(NOTIFY_CAN_EXECUTE_CHANGED_FOR_ATTRIBUTE);
@@ -90,11 +99,37 @@ namespace ZBase.Foundation.Mvvm
                         if (arg.Value is string commandName)
                         {
                             memberRef.NotifyCanExecuteChangedFor.Add(commandName);
+                            notifyCanExecuteChangedForSet.Add(commandName);
                         }
                     }
                 }
 
                 Members.Add(memberRef);
+            }
+
+            foreach (var member in members)
+            {
+                if (member is IPropertySymbol property)
+                {
+                    if (notifyPropertyChangedForSet.Contains(property.Name))
+                    {
+                        NotifyPropertyChangedForMap[property.Name] = property;
+                    }
+
+                    continue;
+                }
+                
+                if (member is IMethodSymbol method)
+                {
+                    var commandName = $"{method.Name}Command";
+
+                    if (notifyCanExecuteChangedForSet.Contains(commandName))
+                    {
+                        NotifyCanExecuteChangedForMap[commandName] = method;
+                    }
+
+                    continue;
+                }
             }
 
             IsValid = Members.Count > 0;
@@ -106,7 +141,7 @@ namespace ZBase.Foundation.Mvvm
 
             public string NotifyPropertyChangedFor { get; set; }
 
-            public List<string> NotifyCanExecuteChangedFor { get; } = new();
+            public HashSet<string> NotifyCanExecuteChangedFor { get; } = new();
         }
     }
 }

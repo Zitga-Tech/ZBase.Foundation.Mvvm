@@ -72,6 +72,24 @@ namespace MvvmTests
         {
             _canvasGroup.blocksRaycasts = value;
         }
+
+        [BindingFieldFallback(nameof(OnUpdateAlpha))]
+        private void OnUpdateAlpha(object value)
+        {
+
+        }
+
+        [BindingFieldFallback(nameof(OnUpdateInteractable))]
+        private void OnUpdateInteractable(object value)
+        {
+
+        }
+
+        [BindingFieldFallback(nameof(OnUpdateBlockRaycasts))]
+        private void OnUpdateBlockRaycasts(object value)
+        {
+
+        }
     }
 }
 
@@ -81,21 +99,27 @@ namespace MvvmTests
     {
         private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<AgeChangeEventArgs> _ageChanging;
         private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<AgeChangeEventArgs> _ageChanged;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<PropertyChangeEventArgs<int>> _ageValueChanging;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<int>> _ageValueChanged;
-
         private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<FirstNameChangeEventArgs> _firstNameChanging;
         private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<FirstNameChangeEventArgs> _firstNameChanged;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<PropertyChangeEventArgs<string>> _firstNameValueChanging;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<string>> _firstNameValueChanged;
-
         private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<LastNameChangeEventArgs> _lastNameChanging;
         private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<LastNameChangeEventArgs> _lastNameChanged;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<FullNameChangeEventArgs> _fullNameChanged;
+
+        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<PropertyChangeEventArgs<int>> _ageValueChanging;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<int>> _ageValueChanged;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<PropertyChangeEventArgs<string>> _firstNameValueChanging;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<string>> _firstNameValueChanged;
         private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<PropertyChangeEventArgs<string>> _lastNameValueChanging;
         private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<string>> _lastNameValueChanged;
-
-        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<FullNameChangeEventArgs> _fullNameChanged;
         private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<string>> _fullNameValueChanged;
+
+        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<PropertyChangeEventArgs<object>> _ageObjectChanging;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<object>> _ageObjectChanged;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<PropertyChangeEventArgs<object>> _firstNameObjectChanging;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<object>> _firstNameObjectChanged;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<PropertyChangeEventArgs<object>> _lastNameObjectChanging;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<object>> _lastNameObjectChanged;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<object>> _fullNameObjectChanged;
 
         [global::System.CodeDom.Compiler.GeneratedCode("ZBase.Foundation.Mvvm.ObservablePropertyGenerator", "1.0.0")]
         [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
@@ -111,12 +135,14 @@ namespace MvvmTests
                     OnChanging(ageChangeEventArgs);
                     OnPropertyChanging(this._ageChanging, ageChangeEventArgs);
                     OnPropertyChanging(this._ageValueChanging, ageChangeEventArgs);
+                    OnPropertyChanging(this._ageObjectChanging, ageChangeEventArgs);
 
                     this._age = value;
 
                     OnChanged(ageChangeEventArgs);
                     OnPropertyChanged(this._ageChanged, ageChangeEventArgs);
                     OnPropertyChanged(this._ageValueChanged, ageChangeEventArgs);
+                    OnPropertyChanged(this._ageObjectChanged, ageChangeEventArgs);
                 }
             }
         }
@@ -135,16 +161,19 @@ namespace MvvmTests
                     OnChanging(firstNameChangeEventArgs);
                     OnPropertyChanging(this._firstNameChanging, firstNameChangeEventArgs);
                     OnPropertyChanging(this._firstNameValueChanging, firstNameChangeEventArgs);
+                    OnPropertyChanging(this._firstNameObjectChanging, firstNameChangeEventArgs);
 
                     this._firstName = value;
 
                     OnChanged(firstNameChangeEventArgs);
                     OnPropertyChanged(this._firstNameChanged, firstNameChangeEventArgs);
                     OnPropertyChanged(this._firstNameValueChanged, firstNameChangeEventArgs);
+                    OnPropertyChanged(this._firstNameObjectChanged, firstNameChangeEventArgs);
 
                     var fullNameChangeEventArgs = new FullNameChangeEventArgs(this, this.FullName);
                     OnPropertyChanged(this._fullNameChanged, fullNameChangeEventArgs);
                     OnPropertyChanged(this._fullNameValueChanged, fullNameChangeEventArgs);
+                    OnPropertyChanged(this._fullNameObjectChanged, fullNameChangeEventArgs);
                 }
             }
         }
@@ -164,16 +193,19 @@ namespace MvvmTests
                     OnChanging(lastNameChangeEventArgs);
                     OnPropertyChanging(this._lastNameChanging, lastNameChangeEventArgs);
                     OnPropertyChanging(this._lastNameValueChanging, lastNameChangeEventArgs);
+                    OnPropertyChanging(this._lastNameObjectChanging, lastNameChangeEventArgs);
 
                     this._lastName = value;
 
                     OnChanged(lastNameChangeEventArgs);
                     OnPropertyChanged(this._lastNameChanged, lastNameChangeEventArgs);
                     OnPropertyChanged(this._lastNameValueChanged, lastNameChangeEventArgs);
+                    OnPropertyChanged(this._lastNameObjectChanged, lastNameChangeEventArgs);
 
                     var fullNameChangeEventArgs = new FullNameChangeEventArgs(this, this.FullName);
                     OnPropertyChanged(this._fullNameChanged, fullNameChangeEventArgs);
                     OnPropertyChanged(this._fullNameValueChanged, fullNameChangeEventArgs);
+                    OnPropertyChanged(this._fullNameObjectChanged, fullNameChangeEventArgs);
                 }
             }
         }
@@ -392,6 +424,9 @@ namespace MvvmTests
 
             public static implicit operator PropertyChangeEventArgs<int>(AgeChangeEventArgs args)
                 => new PropertyChangeEventArgs<int>(args.Sender, args.PropertyName, args.Value);
+
+            public static implicit operator PropertyChangeEventArgs<object>(AgeChangeEventArgs args)
+                => new PropertyChangeEventArgs<object>(args.Sender, args.PropertyName, args.Value);
         }
 
         public readonly struct FirstNameChangeEventArgs : IPropertyChangeEventArgs
@@ -413,6 +448,9 @@ namespace MvvmTests
 
             public static implicit operator PropertyChangeEventArgs<string>(FirstNameChangeEventArgs args)
                 => new PropertyChangeEventArgs<string>(args.Sender, args.PropertyName, args.Value);
+
+            public static implicit operator PropertyChangeEventArgs<object>(FirstNameChangeEventArgs args)
+                => new PropertyChangeEventArgs<object>(args.Sender, args.PropertyName, args.Value);
         }
 
         public readonly struct LastNameChangeEventArgs : IPropertyChangeEventArgs
@@ -434,6 +472,9 @@ namespace MvvmTests
 
             public static implicit operator PropertyChangeEventArgs<string>(LastNameChangeEventArgs args)
                 => new PropertyChangeEventArgs<string>(args.Sender, args.PropertyName, args.Value);
+
+            public static implicit operator PropertyChangeEventArgs<object>(LastNameChangeEventArgs args)
+                => new PropertyChangeEventArgs<object>(args.Sender, args.PropertyName, args.Value);
         }
 
         public readonly struct FullNameChangeEventArgs : IPropertyChangeEventArgs
@@ -455,6 +496,9 @@ namespace MvvmTests
 
             public static implicit operator PropertyChangeEventArgs<string>(FullNameChangeEventArgs args)
                 => new PropertyChangeEventArgs<string>(args.Sender, args.PropertyName, args.Value);
+
+            public static implicit operator PropertyChangeEventArgs<object>(FullNameChangeEventArgs args)
+                => new PropertyChangeEventArgs<object>(args.Sender, args.PropertyName, args.Value);
         }
     }
 }

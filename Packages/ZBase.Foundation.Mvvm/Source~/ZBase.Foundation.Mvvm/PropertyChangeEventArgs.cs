@@ -12,5 +12,8 @@
             PropertyName = propertyName;
             Value = value;
         }
+
+        public static implicit operator PropertyChangeEventArgs<object>(PropertyChangeEventArgs<T> args)
+            => new PropertyChangeEventArgs<object>(args.Sender, args.PropertyName, args.Value);
     }
 }
