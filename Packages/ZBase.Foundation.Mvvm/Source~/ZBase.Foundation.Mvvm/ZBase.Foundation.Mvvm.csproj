@@ -1,9 +1,25 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
         <LangVersion>9.0</LangVersion>
         <OutputType>Library</OutputType>
+        <AssemblyName>Mvvm</AssemblyName>
     </PropertyGroup>
 
+    <ItemGroup>
+        <PackageReference Include="Unity3D" Version="2.1.2" />
+    </ItemGroup>
+
+    <Target Name="CopySourceFiles" AfterTargets="Build">
+        <ItemGroup>
+            <DataFiles Include="$(ProjectDir)/src/**/*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(DataFiles)" DestinationFolder="$(ProjectDir)../../Mvvm/%(RecursiveDir)" SkipUnchangedFiles="true" Retries="3" RetryDelayMilliseconds="300" />
+    </Target>
+    
+    <Target Name="DeleteSourceFiles" AfterTargets="Build" BeforeTargets="CopySourceFiles">
+        <RemoveDir Directories="$(ProjectDir)../../Mvvm/" />
+    </Target>
+    
 </Project>
