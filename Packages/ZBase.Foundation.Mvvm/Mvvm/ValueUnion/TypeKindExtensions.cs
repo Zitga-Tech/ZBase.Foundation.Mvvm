@@ -10,7 +10,6 @@ namespace ZBase.Foundation.Mvvm
                 TypeCode.Byte => TypeKind.Byte,
                 TypeCode.SByte => TypeKind.SByte,
                 TypeCode.Char => TypeKind.Char,
-                TypeCode.Decimal => TypeKind.Decimal,
                 TypeCode.Double => TypeKind.Double,
                 TypeCode.Single => TypeKind.Float,
                 TypeCode.Int32 => TypeKind.Int,

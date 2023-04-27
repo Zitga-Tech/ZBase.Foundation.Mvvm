@@ -37,7 +37,8 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0",
-    "com.alexeytaranov.serializereferencedropdown": "0.3.3"
+    "com.alexeytaranov.serializereferencedropdown": "0.3.3",
+    "org.nuget.system.runtime.compilerservices.unsafe": "6.0.0"
   },
   "scopedRegistries": [
     {
@@ -45,7 +46,8 @@
       "url": "https://package.openupm.com",
       "scopes": [
         "com.alexeytaranov.serializereferencedropdown",
-        "com.openupm"
+        "com.openupm",
+        "org.nuget.system.runtime.compilerservices.unsafe"
       ]
     }
   ]

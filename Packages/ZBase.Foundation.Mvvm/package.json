@@ -4,5 +4,8 @@
   "version": "1.0.0",
   "unity": "2021.3",
   "documentationUrl": "https://github.com/Zitga-Tech/ZBase.Foundation.Mvvm/blob/main/README.md",
-  "type": "library"
+  "type": "library",
+  "dependencies": {
+    "org.nuget.system.runtime.compilerservices.unsafe": "6.0.0"
+  }
 }

@@ -1,16 +1,21 @@
-﻿using System;
+﻿#pragma warning disable IDE0090 // Use 'new(...)'
+
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace ZBase.Foundation.Mvvm
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <seealso cref="ValueUnionStorage" />
     [StructLayout(LayoutKind.Explicit, Pack = 1)]
-    public readonly struct ValueUnionEnum<TEnum> : IEquatable<ValueUnionEnum<TEnum>>
+    public readonly struct ValueUnionEnum<TEnum>
         where TEnum : unmanaged, System.Enum
     {
         public static readonly EnumUnderlyingTypeKind UnderlyingType = default(TEnum).ToEnumUnderlyingTypeKind();
 
-        [FieldOffset(0)] public readonly ValueUnion Base;
+        [FieldOffset(ValueUnion.META_OFFSET)] public readonly ValueUnion Base;
         [FieldOffset(ValueUnion.FIELD_OFFSET)] public readonly TEnum Enum;
 
         private ValueUnionEnum(in ValueUnion value) : this()
@@ -39,42 +44,53 @@ namespace ZBase.Foundation.Mvvm
             };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator ValueUnionEnum<TEnum>(TEnum value) => new ValueUnionEnum<TEnum>(value);
+        public static implicit operator ValueUnionEnum<TEnum>(TEnum value)
+            => new ValueUnionEnum<TEnum>(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator TEnum(in ValueUnionEnum<TEnum> value) => value.Enum;
+        public static explicit operator TEnum(in ValueUnionEnum<TEnum> value)
+            => value.Enum;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator ValueUnionEnum<TEnum>(in ValueUnion value) => new ValueUnionEnum<TEnum>(value);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(ValueUnionEnum<TEnum> other)
-            => this.Base.Equals(other.Base);
+        public static implicit operator ValueUnionEnum<TEnum>(in ValueUnion value)
+            => new ValueUnionEnum<TEnum>(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TypeEquals(in ValueUnionEnum<TEnum> other)
-            => this.Base.TypeEquals(other.Base);
-
-        public override bool Equals(object obj)
-            => obj is ValueUnionEnum<TEnum> other
-            && Equals(other);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode()
-            => this.Base.GetHashCode();
+            => Base.TypeEquals(other.Base);
 
         public bool TryGetValue(out TEnum dest)
         {
-            if (this.Base.Type == TypeKind.Enum
-                && this.Base.EnumType == UnderlyingType
+            if (Base.Type == TypeKind.Enum
+                && Base.EnumType == UnderlyingType
             )
             {
-                dest = this.Enum;
+                dest = Enum;
                 return true;
             }
 
             dest = default;
             return false;
         }
+
+        public bool TrySetValue(ref TEnum dest)
+        {
+            if (Base.Type == TypeKind.Enum
+                && Base.EnumType == UnderlyingType
+            )
+            {
+                dest = Enum;
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    public static class ValueUnionEnumExtensions
+    {
+        public static ValueUnion AsValueUnion<TEnum>(TEnum value)
+            where TEnum : unmanaged, System.Enum
+            => new ValueUnionEnum<TEnum>(value);
     }
 }
