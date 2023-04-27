@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -11,6 +12,8 @@ namespace ZBase.Foundation.Mvvm
         public const string NAMESPACE = "ZBase.Foundation.Mvvm";
         public const string IOBSERVABLE_OBJECT_NAME = "IObservableObject";
         public const string IOBSERVABLE_OBJECT_INTERFACE = "global::ZBase.Foundation.Mvvm.IObservableObject";
+        public const string FIELD_PREFIX_UNDERSCORE = "_";
+        public const string FIELD_PREFIX_M_UNDERSCORE = "m_";
 
         public static bool IsSyntaxMatch(
               SyntaxNode syntaxNode
@@ -86,6 +89,42 @@ namespace ZBase.Foundation.Mvvm
             }
 
             return null;
+        }
+
+        public static string ToKeyword(this Accessibility accessibility)
+            => accessibility switch {
+                Accessibility.Public => "public",
+                Accessibility.Private => "private",
+                Accessibility.Protected => "protected",
+                Accessibility.Internal => "internal",
+                Accessibility.ProtectedOrInternal => "protected internal",
+                Accessibility.ProtectedAndInternal => "private protected",
+                _ => string.Empty,
+            };
+
+        public static string ToPropertyName(this IFieldSymbol field)
+        {
+            var nameSpan = field.Name.AsSpan();
+            var prefix = FIELD_PREFIX_UNDERSCORE.AsSpan();
+
+            if (nameSpan.StartsWith(prefix))
+            {
+                return ToTitleCase(nameSpan.Slice(1));
+            }
+
+            prefix = FIELD_PREFIX_M_UNDERSCORE.AsSpan();
+
+            if (nameSpan.StartsWith(prefix))
+            {
+                return ToTitleCase(nameSpan.Slice(2));
+            }
+
+            return ToTitleCase(nameSpan);
+        }
+
+        public static string ToTitleCase(in ReadOnlySpan<char> value)
+        {
+            return $"{char.ToUpper(value[0])}{value.Slice(1).ToString()}";
         }
     }
 }

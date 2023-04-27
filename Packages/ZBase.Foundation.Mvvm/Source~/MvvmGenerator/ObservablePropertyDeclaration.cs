@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using ZBase.Foundation.SourceGen;
@@ -17,6 +18,8 @@ namespace ZBase.Foundation.Mvvm
 
         public ClassDeclarationSyntax Syntax { get; }
 
+        public INamedTypeSymbol Symbol { get; }
+
         public string FullyQualifiedName { get; private set; }
 
         public bool IsValid { get; }
@@ -29,10 +32,9 @@ namespace ZBase.Foundation.Mvvm
 
         public ObservablePropertyDeclaration(ClassDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
         {
-            var typeSymbol = semanticModel.GetDeclaredSymbol(candidate, token);
-
             Syntax = candidate;
-            FullyQualifiedName = typeSymbol.ToFullName();
+            Symbol = semanticModel.GetDeclaredSymbol(candidate, token);
+            FullyQualifiedName = Symbol.ToFullName();
             Members = new List<MemberRef>();
             NotifyPropertyChangedForMap = new Dictionary<string, IPropertySymbol>();
             NotifyCanExecuteChangedForMap = new Dictionary<string, IMethodSymbol>();
@@ -58,7 +60,7 @@ namespace ZBase.Foundation.Mvvm
                 return;
             }
 
-            var members = typeSymbol.GetMembers();
+            var members = Symbol.GetMembers();
             var notifyPropertyChangedForSet = new HashSet<string>();
             var notifyCanExecuteChangedForSet = new HashSet<string>();
 
@@ -73,6 +75,7 @@ namespace ZBase.Foundation.Mvvm
 
                 var memberRef = new MemberRef {
                     Member = field,
+                    PropertyName = field.ToPropertyName(),
                 };
 
                 var notifyPropChangedFor = field.GetAttribute(NOTIFY_PROPERTY_CHANGED_FOR_ATTRIBUTE);
@@ -138,6 +141,8 @@ namespace ZBase.Foundation.Mvvm
         public class MemberRef
         {
             public IFieldSymbol Member { get; set; }
+
+            public string PropertyName { get; set; }
 
             public string NotifyPropertyChangedFor { get; set; }
 
