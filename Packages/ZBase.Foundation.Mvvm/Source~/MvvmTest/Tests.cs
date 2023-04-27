@@ -1,30 +1,80 @@
 ﻿#pragma warning disable IDE0044 // Add readonly modifier
 #pragma warning disable IDE0060 // Remove unused parameter
 #pragma warning disable IDE0090 // Use 'new(...)'
+#pragma warning disable CA1822 // Mark members as static
+#pragma warning disable IDE0051 // Remove unused private members
+#pragma warning disable IDE1006 // Naming Styles
 
+using System;
 using System.Runtime.CompilerServices;
 using ZBase.Foundation.Mvvm;
 
 namespace MvvmTests
 {
-    public partial class MyViewModel : IObservableObject
+    public class Program
+    {
+        private PropertyChangeEventListener<Program> _listener;
+
+        public static void Main()
+        {
+            var program = new Program();
+            var model = new MyViewModel();
+
+            program._listener = new PropertyChangeEventListener<Program>(program) {
+                OnEventAction = (instance, args) => instance.Print(args.Value)
+            };
+
+            model.PropertyChanged(MyViewModelPropertyNames.Age, program._listener);
+
+            while (true)
+            {
+                var key = Console.ReadKey();
+
+                switch (key.Key)
+                {
+                    case ConsoleKey.Spacebar:
+                        model.Age += 1;
+                        break;
+
+                    default:
+                        return;
+                }
+            }
+        }
+
+        private void Print(in ValueUnion value)
+        {
+            Console.WriteLine(value);
+        }
+    }
+
+    public partial class TestViewModel : IObservableObject
     {
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(Total))]
+        private int _intValue;
+
+        private int Total { get; }
+    }
+
+    public partial class MyViewModel : IObservableObject
+    {
+        //[ObservableProperty]
         private int _age;
 
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(FullName))]
+        //[ObservableProperty]
+        //[NotifyPropertyChangedFor(nameof(FullName))]
         //[NotifyCanExecuteChangedFor(nameof(GreetUserCommand))]
         private string _firstName;
 
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(FullName))]
+        //[ObservableProperty]
+        //[NotifyPropertyChangedFor(nameof(FullName))]
         //[NotifyCanExecuteChangedFor(nameof(GreetUserCommand))]
         private string _lastName;
 
         public string FullName => $"{_firstName} {_lastName}";
 
-        [RelayCommand]
+        //[RelayCommand]
         private void GreetUser(MyViewModel model)
         {
 
@@ -32,7 +82,7 @@ namespace MvvmTests
 
         private bool Validate() => false;
 
-        [RelayCommand(CanExecute = nameof(Validate))]
+        //[RelayCommand(CanExecute = nameof(Validate))]
         private void DoX(int x)
         {
 
@@ -48,7 +98,6 @@ namespace MvvmTests
     public partial class BinderBase : UnityEngine.MonoBehaviour
     {
         protected IDataContext DataContext { get; private set; }
-
     }
 
     public partial class CanvasGroupBinder : BinderBase
@@ -56,71 +105,65 @@ namespace MvvmTests
         private UnityEngine.CanvasGroup _canvasGroup;
 
         [BindingField]
-        private void OnUpdateAlpha(float value)
+        private void OnUpdateAlpha(in ValueUnion value)
         {
-            _canvasGroup.alpha = value;
+            if (value.TryGetValue(out float alpha))
+            {
+                _canvasGroup.alpha = alpha;
+            }
         }
 
         [BindingField(Label = "interactable")]
-        private void OnUpdateInteractable(bool value)
+        private void OnUpdateInteractable(in ValueUnion value)
         {
-            _canvasGroup.interactable = value;
+            if (value.TryGetValue(out bool interactable))
+            {
+                _canvasGroup.interactable = interactable;
+            }
         }
 
         [BindingField(Label = nameof(UnityEngine.CanvasGroup.blocksRaycasts))]
-        private void OnUpdateBlockRaycasts(bool value)
+        private void OnUpdateBlockRaycasts(in ValueUnion value)
         {
-            _canvasGroup.blocksRaycasts = value;
-        }
-
-        [BindingFieldFallback(nameof(OnUpdateAlpha))]
-        private void OnUpdateAlpha(object value)
-        {
-
-        }
-
-        [BindingFieldFallback(nameof(OnUpdateInteractable))]
-        private void OnUpdateInteractable(object value)
-        {
-
-        }
-
-        [BindingFieldFallback(nameof(OnUpdateBlockRaycasts))]
-        private void OnUpdateBlockRaycasts(object value)
-        {
-
+            if (value.TryGetValue(out bool blocksRaycasts))
+            {
+                _canvasGroup.blocksRaycasts = blocksRaycasts;
+            }
         }
     }
 }
 
 namespace MvvmTests
 {
+    public static partial class MyViewModelPropertyNames
+    {
+        /// <inheritdoc cref="global::MvvmTests.MyViewModel.Age" />
+        [global::System.CodeDom.Compiler.GeneratedCode("ZBase.Foundation.Mvvm.ObservablePropertyGenerator", "1.0.0")]
+        public const string Age = nameof(Age);
+
+        /// <inheritdoc cref="global::MvvmTests.MyViewModel.FirstName" />
+        public const string FirstName = nameof(FirstName);
+
+        /// <inheritdoc cref="global::MvvmTests.MyViewModel.LastName" />
+        public const string LastName = nameof(LastName);
+
+        /// <inheritdoc cref="global::MvvmTests.MyViewModel.FullName" />
+        public const string FullName = nameof(FullName);
+    }
+
     partial class MyViewModel : INotifyPropertyChanging, INotifyPropertyChanged
     {
-        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<AgeChangeEventArgs> _ageChanging;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<AgeChangeEventArgs> _ageChanged;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<FirstNameChangeEventArgs> _firstNameChanging;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<FirstNameChangeEventArgs> _firstNameChanged;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<LastNameChangeEventArgs> _lastNameChanging;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<LastNameChangeEventArgs> _lastNameChanged;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<FullNameChangeEventArgs> _fullNameChanged;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler _ageChanging;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler _firstNameChanging;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler _lastNameChanging;
 
-        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<PropertyChangeEventArgs<int>> _ageValueChanging;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<int>> _ageValueChanged;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<PropertyChangeEventArgs<string>> _firstNameValueChanging;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<string>> _firstNameValueChanged;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<PropertyChangeEventArgs<string>> _lastNameValueChanging;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<string>> _lastNameValueChanged;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<string>> _fullNameValueChanged;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler _ageChanged;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler _firstNameChanged;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler _lastNameChanged;
 
-        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<PropertyChangeEventArgs<object>> _ageObjectChanging;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<object>> _ageObjectChanged;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<PropertyChangeEventArgs<object>> _firstNameObjectChanging;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<object>> _firstNameObjectChanged;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<PropertyChangeEventArgs<object>> _lastNameObjectChanging;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<object>> _lastNameObjectChanged;
-        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<PropertyChangeEventArgs<object>> _fullNameObjectChanged;
+        private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler _fullNameChanged;
 
+        /// <inheritdoc cref="global::MvvmTests.MyViewModel._age" />
         [global::System.CodeDom.Compiler.GeneratedCode("ZBase.Foundation.Mvvm.ObservablePropertyGenerator", "1.0.0")]
         [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public int Age
@@ -130,23 +173,22 @@ namespace MvvmTests
             {
                 if (global::System.Collections.Generic.EqualityComparer<int>.Default.Equals(_age, value) == false)
                 {
-                    var ageChangeEventArgs = new AgeChangeEventArgs(this, value);
+                    var args = new PropertyChangeEventArgs(this, MyViewModelPropertyNames.Age, value);
 
-                    OnChanging(ageChangeEventArgs);
-                    OnPropertyChanging(this._ageChanging, ageChangeEventArgs);
-                    OnPropertyChanging(this._ageValueChanging, ageChangeEventArgs);
-                    OnPropertyChanging(this._ageObjectChanging, ageChangeEventArgs);
+                    if (this._ageChanging != null)
+                        this._ageChanging(args);
 
                     this._age = value;
 
-                    OnChanged(ageChangeEventArgs);
-                    OnPropertyChanged(this._ageChanged, ageChangeEventArgs);
-                    OnPropertyChanged(this._ageValueChanged, ageChangeEventArgs);
-                    OnPropertyChanged(this._ageObjectChanged, ageChangeEventArgs);
+                    OnAgeChanged(value);
+
+                    if (this._ageChanged != null)
+                        this._ageChanged(args);
                 }
             }
         }
 
+        /// <inheritdoc cref="global::MvvmTests.MyViewModel._firstName" />
         [global::System.CodeDom.Compiler.GeneratedCode("ZBase.Foundation.Mvvm.ObservablePropertyGenerator", "1.0.0")]
         [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public string FirstName
@@ -156,28 +198,25 @@ namespace MvvmTests
             {
                 if (global::System.Collections.Generic.EqualityComparer<string>.Default.Equals(_firstName, value) == false)
                 {
-                    var firstNameChangeEventArgs = new FirstNameChangeEventArgs(this, value);
+                    OnFirstNameChanging(value);
 
-                    OnChanging(firstNameChangeEventArgs);
-                    OnPropertyChanging(this._firstNameChanging, firstNameChangeEventArgs);
-                    OnPropertyChanging(this._firstNameValueChanging, firstNameChangeEventArgs);
-                    OnPropertyChanging(this._firstNameObjectChanging, firstNameChangeEventArgs);
+                    if (this._firstNameChanging != null)
+                        this._firstNameChanging(new PropertyChangeEventArgs(this, MyViewModelPropertyNames.FirstName, value));
 
                     this._firstName = value;
 
-                    OnChanged(firstNameChangeEventArgs);
-                    OnPropertyChanged(this._firstNameChanged, firstNameChangeEventArgs);
-                    OnPropertyChanged(this._firstNameValueChanged, firstNameChangeEventArgs);
-                    OnPropertyChanged(this._firstNameObjectChanged, firstNameChangeEventArgs);
+                    OnFirstNameChanged(value);
 
-                    var fullNameChangeEventArgs = new FullNameChangeEventArgs(this, this.FullName);
-                    OnPropertyChanged(this._fullNameChanged, fullNameChangeEventArgs);
-                    OnPropertyChanged(this._fullNameValueChanged, fullNameChangeEventArgs);
-                    OnPropertyChanged(this._fullNameObjectChanged, fullNameChangeEventArgs);
+                    if (this._firstNameChanged != null)
+                        this._firstNameChanged(new PropertyChangeEventArgs(this, MyViewModelPropertyNames.FirstName, value));
+
+                    if (this._fullNameChanged != null)
+                        this._fullNameChanged(new PropertyChangeEventArgs(this, MyViewModelPropertyNames.FullName, this.FullName));
                 }
             }
         }
 
+        /// <inheritdoc cref="global::MvvmTests.MyViewModel._lastName" />
         [global::System.CodeDom.Compiler.GeneratedCode("ZBase.Foundation.Mvvm.ObservablePropertyGenerator", "1.0.0")]
         [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public string LastName
@@ -187,44 +226,39 @@ namespace MvvmTests
             {
                 if (global::System.Collections.Generic.EqualityComparer<string>.Default.Equals(_lastName, value) == false)
                 {
-                    var lastNameChangeEventArgs = new LastNameChangeEventArgs(this, value);
-                    var lastNameValueChangeEventArgs = (PropertyChangeEventArgs<string>)lastNameChangeEventArgs;
+                    OnLastNameChanging(value);
 
-                    OnChanging(lastNameChangeEventArgs);
-                    OnPropertyChanging(this._lastNameChanging, lastNameChangeEventArgs);
-                    OnPropertyChanging(this._lastNameValueChanging, lastNameChangeEventArgs);
-                    OnPropertyChanging(this._lastNameObjectChanging, lastNameChangeEventArgs);
+                    if (this._lastNameChanging != null)
+                        this._lastNameChanging(new PropertyChangeEventArgs(this, MyViewModelPropertyNames.LastName, value));
 
                     this._lastName = value;
 
-                    OnChanged(lastNameChangeEventArgs);
-                    OnPropertyChanged(this._lastNameChanged, lastNameChangeEventArgs);
-                    OnPropertyChanged(this._lastNameValueChanged, lastNameChangeEventArgs);
-                    OnPropertyChanged(this._lastNameObjectChanged, lastNameChangeEventArgs);
+                    OnLastNameChanged(value);
 
-                    var fullNameChangeEventArgs = new FullNameChangeEventArgs(this, this.FullName);
-                    OnPropertyChanged(this._fullNameChanged, fullNameChangeEventArgs);
-                    OnPropertyChanged(this._fullNameValueChanged, fullNameChangeEventArgs);
-                    OnPropertyChanged(this._fullNameObjectChanged, fullNameChangeEventArgs);
+                    if (this._lastNameChanged != null)
+                        this._lastNameChanged(new PropertyChangeEventArgs(this, MyViewModelPropertyNames.LastName, value));
+
+                    if (this._fullNameChanged != null)
+                        this._fullNameChanged(new PropertyChangeEventArgs(this, MyViewModelPropertyNames.FullName, this.FullName));
                 }
             }
         }
 
-        partial void OnChanging(AgeChangeEventArgs args);
+        partial void OnAgeChanging(int value);
 
-        partial void OnChanged(AgeChangeEventArgs args);
+        partial void OnAgeChanged(int value);
 
-        partial void OnChanging(FirstNameChangeEventArgs args);
+        partial void OnFirstNameChanging(string value);
 
-        partial void OnChanged(FirstNameChangeEventArgs args);
+        partial void OnFirstNameChanged(string value);
 
-        partial void OnChanging(LastNameChangeEventArgs args);
+        partial void OnLastNameChanging(string value);
 
-        partial void OnChanged(LastNameChangeEventArgs args);
+        partial void OnLastNameChanged(string value);
 
-        public void PropertyChanging<TInstance, TEventArgs>(string propertyName, PropertyChangeEventListener<TInstance, TEventArgs> listener)
+        /// <inheritdoc cref="global::ZBase.Foundation.Mvvm.INotifyPropertyChanging.PropertyChanging{TInstance}(string, PropertyChangeEventListener{TInstance})" />
+        public void PropertyChanging<TInstance>(string propertyName, PropertyChangeEventListener<TInstance> listener)
             where TInstance : class
-            where TEventArgs : IPropertyChangeEventArgs
         {
             if (propertyName == null)
                 throw new global::System.ArgumentNullException(nameof(propertyName));
@@ -234,57 +268,36 @@ namespace MvvmTests
 
             switch (propertyName)
             {
-                case PropertyNames.Age:
+                case MyViewModelPropertyNames.Age:
                 {
-                    if (listener is PropertyChangeEventListener<TInstance, AgeChangeEventArgs> ageListener)
+                    if (listener is PropertyChangeEventListener<TInstance> ageValueListener)
                     {
-                        _ageChanging += ageListener.OnEvent;
-                        ageListener.OnDetachAction = (listener) => _ageChanging -= listener.OnEvent;
-                        return;
-                    }
-
-                    if (listener is PropertyChangeEventListener<TInstance, PropertyChangeEventArgs<int>> ageValueListener)
-                    {
-                        _ageValueChanging += ageValueListener.OnEvent;
-                        ageValueListener.OnDetachAction = (listener) => _ageValueChanging -= listener.OnEvent;
+                        _ageChanging += ageValueListener.OnEvent;
+                        ageValueListener.OnDetachAction = (listener) => _ageChanging -= listener.OnEvent;
                         return;
                     }
 
                     break;
                 }
 
-                case PropertyNames.FirstName:
+                case MyViewModelPropertyNames.FirstName:
                 {
-                    if (listener is PropertyChangeEventListener<TInstance, FirstNameChangeEventArgs> firstNameListener)
+                    if (listener is PropertyChangeEventListener<TInstance> firstNameValueListener)
                     {
-                        _firstNameChanging += firstNameListener.OnEvent;
-                        firstNameListener.OnDetachAction = (listener) => _firstNameChanging -= listener.OnEvent;
-                        return;
-                    }
-
-                    if (listener is PropertyChangeEventListener<TInstance, PropertyChangeEventArgs<string>> firstNameValueListener)
-                    {
-                        _firstNameValueChanging += firstNameValueListener.OnEvent;
-                        firstNameValueListener.OnDetachAction = (listener) => _firstNameValueChanging -= listener.OnEvent;
+                        _firstNameChanging += firstNameValueListener.OnEvent;
+                        firstNameValueListener.OnDetachAction = (listener) => _firstNameChanging -= listener.OnEvent;
                         return;
                     }
 
                     break;
                 }
 
-                case PropertyNames.LastName:
+                case MyViewModelPropertyNames.LastName:
                 {
-                    if (listener is PropertyChangeEventListener<TInstance, LastNameChangeEventArgs> lastNameListener)
+                    if (listener is PropertyChangeEventListener<TInstance> lastNameValueListener)
                     {
-                        _lastNameChanging += lastNameListener.OnEvent;
-                        lastNameListener.OnDetachAction = (listener) => _lastNameChanging -= listener.OnEvent;
-                        return;
-                    }
-
-                    if (listener is PropertyChangeEventListener<TInstance, PropertyChangeEventArgs<string>> lastNameValueListener)
-                    {
-                        _lastNameValueChanging += lastNameValueListener.OnEvent;
-                        lastNameValueListener.OnDetachAction = (listener) => _lastNameValueChanging -= listener.OnEvent;
+                        _lastNameChanging += lastNameValueListener.OnEvent;
+                        lastNameValueListener.OnDetachAction = (listener) => _lastNameChanging -= listener.OnEvent;
                         return;
                     }
 
@@ -293,9 +306,9 @@ namespace MvvmTests
             }
         }
 
-        public void PropertyChanged<TInstance, TEventArgs>(string propertyName, PropertyChangeEventListener<TInstance, TEventArgs> listener)
+        /// <inheritdoc cref="global::ZBase.Foundation.Mvvm.INotifyPropertyChanged.PropertyChanged{TInstance}(string, PropertyChangeEventListener{TInstance})" />
+        public void PropertyChanged<TInstance>(string propertyName, PropertyChangeEventListener<TInstance> listener)
            where TInstance : class
-           where TEventArgs : IPropertyChangeEventArgs
         {
             if (propertyName == null)
                 throw new global::System.ArgumentNullException(nameof(propertyName));
@@ -305,200 +318,34 @@ namespace MvvmTests
 
             switch (propertyName)
             {
-                case PropertyNames.Age:
+                case MyViewModelPropertyNames.Age:
                 {
-                    if (listener is PropertyChangeEventListener<TInstance, AgeChangeEventArgs> ageListener)
-                    {
-                        _ageChanged += ageListener.OnEvent;
-                        ageListener.OnDetachAction = (listener) => _ageChanged -= listener.OnEvent;
-                        return;
-                    }
-
-                    if (listener is PropertyChangeEventListener<TInstance, PropertyChangeEventArgs<int>> ageValueListener)
-                    {
-                        _ageValueChanged += ageValueListener.OnEvent;
-                        ageValueListener.OnDetachAction = (listener) => _ageValueChanged -= listener.OnEvent;
-                        return;
-                    }
-
+                    _ageChanged += listener.OnEvent;
+                    listener.OnDetachAction = (listener) => _ageChanged -= listener.OnEvent;
                     break;
                 }
 
-                case PropertyNames.FirstName:
+                case MyViewModelPropertyNames.FirstName:
                 {
-                    if (listener is PropertyChangeEventListener<TInstance, FirstNameChangeEventArgs> firstNameListener)
-                    {
-                        _firstNameChanged += firstNameListener.OnEvent;
-                        firstNameListener.OnDetachAction = (listener) => _firstNameChanged -= listener.OnEvent;
-                        return;
-                    }
-
-                    if (listener is PropertyChangeEventListener<TInstance, PropertyChangeEventArgs<string>> firstNameValueListener)
-                    {
-                        _firstNameValueChanged += firstNameValueListener.OnEvent;
-                        firstNameValueListener.OnDetachAction = (listener) => _firstNameValueChanged -= listener.OnEvent;
-                        return;
-                    }
-
+                    _firstNameChanged += listener.OnEvent;
+                    listener.OnDetachAction = (listener) => _firstNameChanged -= listener.OnEvent;
                     break;
                 }
 
-                case PropertyNames.LastName:
+                case MyViewModelPropertyNames.LastName:
                 {
-                    if (listener is PropertyChangeEventListener<TInstance, LastNameChangeEventArgs> lastNameListener)
-                    {
-                        _lastNameChanged += lastNameListener.OnEvent;
-                        lastNameListener.OnDetachAction = (listener) => _lastNameChanged -= listener.OnEvent;
-                        return;
-                    }
-
-                    if (listener is PropertyChangeEventListener<TInstance, PropertyChangeEventArgs<string>> lastNameValueListener)
-                    {
-                        _lastNameValueChanged += lastNameValueListener.OnEvent;
-                        lastNameValueListener.OnDetachAction = (listener) => _lastNameValueChanged -= listener.OnEvent;
-                        return;
-                    }
-
+                    _lastNameChanged += listener.OnEvent;
+                    listener.OnDetachAction = (listener) => _lastNameChanged -= listener.OnEvent;
                     break;
                 }
 
-                case PropertyNames.FullName:
+                case MyViewModelPropertyNames.FullName:
                 {
-                    if (listener is PropertyChangeEventListener<TInstance, FullNameChangeEventArgs> fullNameListener)
-                    {
-                        _fullNameChanged += fullNameListener.OnEvent;
-                        fullNameListener.OnDetachAction = (listener) => _fullNameChanged -= listener.OnEvent;
-                        return;
-                    }
-
-                    if (listener is PropertyChangeEventListener<TInstance, PropertyChangeEventArgs<string>> fullNameValueListener)
-                    {
-                        _fullNameValueChanged += fullNameValueListener.OnEvent;
-                        fullNameValueListener.OnDetachAction = (listener) => _fullNameValueChanged -= listener.OnEvent;
-                        return;
-                    }
-
+                    _fullNameChanged += listener.OnEvent;
+                    listener.OnDetachAction = (listener) => _fullNameChanged -= listener.OnEvent;
                     break;
                 }
             }
-        }
-
-        protected virtual void OnPropertyChanging<TEventArgs>(global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler<TEventArgs> e, TEventArgs args)
-            where TEventArgs : struct, global::ZBase.Foundation.Mvvm.IPropertyChangeEventArgs
-        {
-            e?.Invoke(args);
-        }
-
-        protected virtual void OnPropertyChanged<TEventArgs>(global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler<TEventArgs> e, TEventArgs args)
-            where TEventArgs : struct, global::ZBase.Foundation.Mvvm.IPropertyChangeEventArgs
-        {
-            e?.Invoke(args);
-        }
-
-        private static class PropertyNames
-        {
-#pragma warning disable IDE1006 // Naming Styles
-            public const string Age = nameof(global::MvvmTests.MyViewModel.Age);
-            public const string FirstName = nameof(global::MvvmTests.MyViewModel.FirstName);
-            public const string LastName = nameof(global::MvvmTests.MyViewModel.LastName);
-            public const string FullName = nameof(global::MvvmTests.MyViewModel.FullName);
-#pragma warning restore IDE1006 // Naming Styles
-        }
-
-        public readonly struct AgeChangeEventArgs : global::ZBase.Foundation.Mvvm.IPropertyChangeEventArgs
-        {
-            public readonly MyViewModel Sender;
-            public readonly int Value;
-
-            public string PropertyName
-            {
-                [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-                get => PropertyNames.Age;
-            }
-
-            public AgeChangeEventArgs(MyViewModel sender, int value)
-            {
-                Sender = sender;
-                Value = value;
-            }
-
-            public static implicit operator PropertyChangeEventArgs<int>(AgeChangeEventArgs args)
-                => new PropertyChangeEventArgs<int>(args.Sender, args.PropertyName, args.Value);
-
-            public static implicit operator PropertyChangeEventArgs<object>(AgeChangeEventArgs args)
-                => new PropertyChangeEventArgs<object>(args.Sender, args.PropertyName, args.Value);
-        }
-
-        public readonly struct FirstNameChangeEventArgs : IPropertyChangeEventArgs
-        {
-            public readonly MyViewModel Sender;
-            public readonly string Value;
-
-            public string PropertyName
-            {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get => PropertyNames.FirstName;
-            }
-
-            public FirstNameChangeEventArgs(MyViewModel sender, string value)
-            {
-                Sender = sender;
-                Value = value;
-            }
-
-            public static implicit operator PropertyChangeEventArgs<string>(FirstNameChangeEventArgs args)
-                => new PropertyChangeEventArgs<string>(args.Sender, args.PropertyName, args.Value);
-
-            public static implicit operator PropertyChangeEventArgs<object>(FirstNameChangeEventArgs args)
-                => new PropertyChangeEventArgs<object>(args.Sender, args.PropertyName, args.Value);
-        }
-
-        public readonly struct LastNameChangeEventArgs : IPropertyChangeEventArgs
-        {
-            public readonly MyViewModel Sender;
-            public readonly string Value;
-
-            public string PropertyName
-            {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get => PropertyNames.LastName;
-            }
-
-            public LastNameChangeEventArgs(MyViewModel sender, string value)
-            {
-                Sender = sender;
-                Value = value;
-            }
-
-            public static implicit operator PropertyChangeEventArgs<string>(LastNameChangeEventArgs args)
-                => new PropertyChangeEventArgs<string>(args.Sender, args.PropertyName, args.Value);
-
-            public static implicit operator PropertyChangeEventArgs<object>(LastNameChangeEventArgs args)
-                => new PropertyChangeEventArgs<object>(args.Sender, args.PropertyName, args.Value);
-        }
-
-        public readonly struct FullNameChangeEventArgs : IPropertyChangeEventArgs
-        {
-            public readonly MyViewModel Sender;
-            public readonly string Value;
-
-            public string PropertyName
-            {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get => PropertyNames.FullName;
-            }
-
-            public FullNameChangeEventArgs(MyViewModel sender, string value)
-            {
-                Sender = sender;
-                Value = value;
-            }
-
-            public static implicit operator PropertyChangeEventArgs<string>(FullNameChangeEventArgs args)
-                => new PropertyChangeEventArgs<string>(args.Sender, args.PropertyName, args.Value);
-
-            public static implicit operator PropertyChangeEventArgs<object>(FullNameChangeEventArgs args)
-                => new PropertyChangeEventArgs<object>(args.Sender, args.PropertyName, args.Value);
         }
     }
 }
@@ -528,9 +375,18 @@ namespace MvvmTests
         [global::UnityEngine.SerializeField]
         private BindingField _fieldOnUpdateBlockRaycasts = new BindingField() { Label = "blocksRaycasts" };
 
-        private PropertyChangeEventListener<CanvasGroupBinder, PropertyChangeEventArgs<float>> _listenerOnUpdateAlpha;
-        private PropertyChangeEventListener<CanvasGroupBinder, PropertyChangeEventArgs<bool>> _listenerOnUpdateInteractable;
-        private PropertyChangeEventListener<CanvasGroupBinder, PropertyChangeEventArgs<bool>> _listenerOnUpdateBlockRaycasts;
+        [global::UnityEngine.SerializeReference]
+        private Converter _converterOnUpdateAlpha = new Converter() { Label = nameof(OnUpdateAlpha) };
+
+        [global::UnityEngine.SerializeReference]
+        private Converter _converterOnUpdateInteractable = new Converter() { Label = "interactable" };
+
+        [global::UnityEngine.SerializeReference]
+        private Converter _converterOnUpdateBlockRaycasts = new Converter() { Label = "blocksRaycasts" };
+
+        private PropertyChangeEventListener<CanvasGroupBinder> _listenerOnUpdateAlpha;
+        private PropertyChangeEventListener<CanvasGroupBinder> _listenerOnUpdateInteractable;
+        private PropertyChangeEventListener<CanvasGroupBinder> _listenerOnUpdateBlockRaycasts;
 
         //protected override void Initialize()
         protected virtual void Initialize()
@@ -540,16 +396,16 @@ namespace MvvmTests
                 return;
             }
 
-            _listenerOnUpdateAlpha = new PropertyChangeEventListener<CanvasGroupBinder, PropertyChangeEventArgs<float>>(this) {
-                OnEventAction = (instance, args) => instance.OnUpdateAlpha(args.Value)
+            _listenerOnUpdateAlpha = new PropertyChangeEventListener<CanvasGroupBinder>(this) {
+                OnEventAction = (instance, args) => instance.OnUpdateAlpha(_converterOnUpdateAlpha.Convert(args.Value))
             };
 
-            _listenerOnUpdateInteractable = new PropertyChangeEventListener<CanvasGroupBinder, PropertyChangeEventArgs<bool>>(this) {
-                OnEventAction = (instance, args) => instance.OnUpdateInteractable(args.Value)
+            _listenerOnUpdateInteractable = new PropertyChangeEventListener<CanvasGroupBinder>(this) {
+                OnEventAction = (instance, args) => instance.OnUpdateInteractable(_converterOnUpdateInteractable.Convert(args.Value))
             };
 
-            _listenerOnUpdateBlockRaycasts = new PropertyChangeEventListener<CanvasGroupBinder, PropertyChangeEventArgs<bool>>(this) {
-                OnEventAction = (instance, args) => instance.OnUpdateBlockRaycasts(args.Value)
+            _listenerOnUpdateBlockRaycasts = new PropertyChangeEventListener<CanvasGroupBinder>(this) {
+                OnEventAction = (instance, args) => instance.OnUpdateBlockRaycasts(_converterOnUpdateBlockRaycasts.Convert(args.Value))
             };
 
             inpc.PropertyChanged(_fieldOnUpdateAlpha.Member, _listenerOnUpdateAlpha);

@@ -3,10 +3,10 @@
 namespace ZBase.Foundation.Mvvm
 {
     [Serializable]
-    public class BindingField
+    public sealed class BindingField
     {
         /// <summary>
-        /// Label for the value is controlled by this binder
+        /// Label for the binding field
         /// </summary>
 #if UNITY_5_3_OR_NEWER
         [field: UnityEngine.SerializeField]
@@ -26,15 +26,5 @@ namespace ZBase.Foundation.Mvvm
     public sealed class BindingFieldAttribute : Attribute
     {
         public string Label { get; set; }
-    }
-
-    public sealed class BindingFieldFallbackAttribute : Attribute
-    {
-        public string Name { get; }
-
-        public BindingFieldFallbackAttribute(string name)
-        {
-            Name = name;
-        }
     }
 }

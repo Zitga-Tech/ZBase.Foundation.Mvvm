@@ -5,9 +5,8 @@
     /// </summary>
     public interface INotifyPropertyChanged
     {
-        public void PropertyChanged<TInstance, TEventArgs>(string propertyName, PropertyChangeEventListener<TInstance, TEventArgs> listener)
+        public void PropertyChanged<TInstance>(string propertyName, PropertyChangeEventListener<TInstance> listener)
            where TInstance : class
-           where TEventArgs : IPropertyChangeEventArgs
         { }
     }
 }

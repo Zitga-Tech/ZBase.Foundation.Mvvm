@@ -6,8 +6,11 @@ using System.Collections.Generic;
 
 namespace UnityEngine
 {
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Field)]
     public sealed class SerializeField : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public sealed class SerializeReference : Attribute { }
 
     public enum FindObjectsInactive
     {

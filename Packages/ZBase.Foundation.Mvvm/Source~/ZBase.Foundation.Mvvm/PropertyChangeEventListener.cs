@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Runtime.CompilerServices;
 
 namespace ZBase.Foundation.Mvvm
 {
@@ -13,17 +14,16 @@ namespace ZBase.Foundation.Mvvm
     /// <typeparam name="TInstance">Type of instance listening for the event.</typeparam>
     /// <typeparam name="TEventArgs">Type of event arguments for the event.</typeparam>
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-    public sealed class PropertyChangeEventListener<TInstance, TEventArgs> : IEventListener
+    public sealed class PropertyChangeEventListener<TInstance> : IEventListener
         where TInstance : class
-        where TEventArgs : IPropertyChangeEventArgs
     {
         /// <summary>
         /// WeakReference to the instance listening for the event.
         /// </summary>
-        private readonly WeakReference _weakInstance;
+        private readonly WeakReference<TInstance> _weakInstance;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyChangeEventListener{TInstance, TEventArgs}"/> class.
+        /// Initializes a new instance of the <see cref="PropertyChangeEventListener{TInstance}"/> class.
         /// </summary>
         /// <param name="instance">Instance subscribing to the event.</param>
         public PropertyChangeEventListener(TInstance instance)
@@ -33,27 +33,30 @@ namespace ZBase.Foundation.Mvvm
                 throw new ArgumentNullException(nameof(instance));
             }
 
-            _weakInstance = new WeakReference(instance);
+            _weakInstance = new WeakReference<TInstance>(instance);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryGetTarget(out TInstance target)
+            => _weakInstance.TryGetTarget(out target);
 
         /// <summary>
         /// Gets or sets the method to call when the event fires.
         /// </summary>
-        public Action<TInstance, TEventArgs> OnEventAction { get; set; }
+        public Action<TInstance, PropertyChangeEventArgs> OnEventAction { get; set; }
 
         /// <summary>
         /// Gets or sets the method to call when detaching from the event.
         /// </summary>
-        public Action<PropertyChangeEventListener<TInstance, TEventArgs>> OnDetachAction { get; set; }
+        public Action<PropertyChangeEventListener<TInstance>> OnDetachAction { get; set; }
 
         /// <summary>
         /// Handler for the subscribed event calls OnEventAction to handle it.
         /// </summary>
         /// <param name="eventArgs">Event arguments.</param>
-        public void OnEvent(TEventArgs eventArgs)
+        public void OnEvent(in PropertyChangeEventArgs eventArgs)
         {
-            var target = (TInstance)_weakInstance.Target;
-            if (target != null)
+            if (_weakInstance.TryGetTarget(out var target))
             {
                 // Call registered action
                 OnEventAction?.Invoke(target, eventArgs);

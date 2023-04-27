@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MvvmTest", "MvvmTest\MvvmTe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZBase.Foundation.SourceGen.Common", "Common\ZBase.Foundation.SourceGen.Common.csproj", "{BE33BAC2-0C21-4A82-99B1-11634A9BBB3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZBase.Foundation.Mvvm", "ZBase.Foundation.Mvvm\ZBase.Foundation.Mvvm.csproj", "{7A0B5F15-4F6B-4043-8F4A-2B4568ADCDEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZBase.Foundation.Mvvm", "ZBase.Foundation.Mvvm\ZBase.Foundation.Mvvm.csproj", "{7A0B5F15-4F6B-4043-8F4A-2B4568ADCDEB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
