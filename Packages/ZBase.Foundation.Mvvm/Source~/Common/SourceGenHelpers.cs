@@ -41,14 +41,12 @@ namespace ZBase.Foundation.SourceGen
         public struct SourceGenConfig
         {
             public string projectPath;
-            public bool performSafetyChecks;
             public bool outputSourceGenFiles;
         }
 
         public struct ParseOptionConfig
         {
             public bool pathIsInFirstAdditionalTextItem;
-            public bool performSafetyChecks;
             public bool outputSourceGenFiles;
         }
 
@@ -62,17 +60,14 @@ namespace ZBase.Foundation.SourceGen
 
                 // Is Unity 2021.1+ and not dots runtime
                 var inUnity2021OrNewer = false;
-                var isDotsRuntime = false;
 
                 foreach (var symbolName in options.PreprocessorSymbolNames)
                 {
-                    isDotsRuntime |= symbolName == "UNITY_DOTSRUNTIME";
                     inUnity2021OrNewer |= symbolName == "UNITY_2021_1_OR_NEWER";
-                    parseOptionsConfig.performSafetyChecks |= symbolName == "ENABLE_UNITY_COLLECTIONS_CHECKS";
-                    parseOptionsConfig.outputSourceGenFiles |= symbolName == "DOTS_OUTPUT_SOURCEGEN_FILES";
+                    parseOptionsConfig.outputSourceGenFiles |= symbolName == "MVVM_OUTPUT_SOURCEGEN_FILES";
                 }
 
-                parseOptionsConfig.pathIsInFirstAdditionalTextItem = inUnity2021OrNewer && !isDotsRuntime;
+                parseOptionsConfig.pathIsInFirstAdditionalTextItem = inUnity2021OrNewer;
 
                 return parseOptionsConfig;
             });
@@ -83,7 +78,6 @@ namespace ZBase.Foundation.SourceGen
                 .Select((lTextsRIsInsideText, token) =>
                 {
                     var config = new SourceGenConfig {
-                        performSafetyChecks = lTextsRIsInsideText.Right.performSafetyChecks,
                         outputSourceGenFiles = lTextsRIsInsideText.Right.outputSourceGenFiles
                     };
 
@@ -98,7 +92,6 @@ namespace ZBase.Foundation.SourceGen
 
                     var path = projectPathIsInFirstAdditionalTextItem ? texts[0].GetText(token)?.ToString() : texts[0].Path;
                     config.projectPath = path?.Replace('\\', '/');
-
                     return config;
                 });
 
@@ -112,14 +105,13 @@ namespace ZBase.Foundation.SourceGen
             {
                 return;
             }
-
-            bool isDotsRuntime = context.ParseOptions.PreprocessorSymbolNames.Contains("UNITY_DOTSRUNTIME");
+            
             var inUnity2021OrNewer = context.ParseOptions.PreprocessorSymbolNames.Contains("UNITY_2021_1_OR_NEWER");
 
             if (!context.AdditionalFiles.Any() || string.IsNullOrEmpty(context.AdditionalFiles[0].Path))
                 return;
 
-            ProjectPath = (inUnity2021OrNewer && !isDotsRuntime ? context.AdditionalFiles[0].GetText().ToString() : context.AdditionalFiles[0].Path).Replace('\\', '/');
+            ProjectPath = (inUnity2021OrNewer ? context.AdditionalFiles[0].GetText().ToString() : context.AdditionalFiles[0].Path).Replace('\\', '/');
         }
 
         private static string GetTempGeneratedPathToFile(string fileNameWithExtension)

@@ -48,7 +48,7 @@ namespace ZBase.Foundation.Mvvm
             {
                 return;
             }
-
+            
             context.CancellationToken.ThrowIfCancellationRequested();
 
             try

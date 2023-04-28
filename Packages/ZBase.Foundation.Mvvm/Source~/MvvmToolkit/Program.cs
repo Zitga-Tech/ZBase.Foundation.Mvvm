@@ -30,17 +30,16 @@ namespace MvvmToolkit
         public string? FullName => $"{FirstName} {LastName}";
 
         [RelayCommand]
-        private static void GreetUser(MyViewModel user)
+        private static void GreetUser(MyViewModel x)
         {
-            Console.WriteLine($"Hello {user.FullName}!");
+            Console.WriteLine($"Hello {x.FullName}");
         }
 
-        private static bool Validate(int x) => false;
+        private static bool Validate() => false;
 
         [RelayCommand(CanExecute = nameof(Validate))]
-        private void DoX(int x)
+        private void DoX()
         {
-
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace ZBase.Foundation.Mvvm
 {
-    public enum TypeKind : byte
+    public enum ValueTypeCode : byte
     {
         Undefined = 0,
         Bool      = 1,

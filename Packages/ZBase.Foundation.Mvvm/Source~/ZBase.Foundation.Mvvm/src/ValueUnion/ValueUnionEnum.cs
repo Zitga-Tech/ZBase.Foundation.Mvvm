@@ -13,7 +13,7 @@ namespace ZBase.Foundation.Mvvm
     public readonly struct ValueUnionEnum<T>
         where T : unmanaged, System.Enum
     {
-        public static readonly TypeKind UnderlyingType = default(T).ToEnumTypeKind();
+        public static readonly ValueTypeCode UnderlyingTypeCode = default(T).ToEnumTypeCode();
 
         [FieldOffset(ValueUnion.META_OFFSET)] public readonly ValueUnion Base;
         [FieldOffset(ValueUnion.FIELD_OFFSET)] public readonly T Enum;
@@ -25,13 +25,13 @@ namespace ZBase.Foundation.Mvvm
 
         public ValueUnionEnum(T value)
         {
-            Base = new ValueUnion(UnderlyingType);
+            Base = new ValueUnion(UnderlyingTypeCode);
             Enum = value;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator ValueUnion(in ValueUnionEnum<T> value)
-            => new ValueUnion(value.Base.Storage, UnderlyingType);
+            => new ValueUnion(value.Base.Storage, UnderlyingTypeCode);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator ValueUnionEnum<T>(T value)
@@ -39,10 +39,10 @@ namespace ZBase.Foundation.Mvvm
 
         public static explicit operator ValueUnionEnum<T>(in ValueUnion value)
         {
-            if (value.Type.IsEnumTypeKind())
+            if (value.TypeCode.IsEnumTypeCode())
                 return new ValueUnionEnum<T>(value);
 
-            throw new System.InvalidCastException($"Cannot cast value from {value.Type} into {nameof(UnderlyingType)}.");
+            throw new System.InvalidCastException($"Cannot cast value from {value.TypeCode} into {nameof(UnderlyingTypeCode)}.");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -51,7 +51,7 @@ namespace ZBase.Foundation.Mvvm
 
         public bool TryGetValue(out T dest)
         {
-            if (Base.Type.IsNumberImplicitlyConvertible(UnderlyingType))
+            if (Base.TypeCode.IsNumberImplicitlyConvertible(UnderlyingTypeCode))
             {
                 dest = Enum;
                 return true;
@@ -63,7 +63,7 @@ namespace ZBase.Foundation.Mvvm
 
         public bool TrySetValue(ref T dest)
         {
-            if (Base.Type.IsNumberImplicitlyConvertible(UnderlyingType))
+            if (Base.TypeCode.IsNumberImplicitlyConvertible(UnderlyingTypeCode))
             {
                 dest = Enum;
                 return true;

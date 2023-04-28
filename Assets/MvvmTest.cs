@@ -1,40 +1,42 @@
 using System;
 using UnityEngine;
+using ZBase.Foundation.Mvvm;
 
 namespace MvvmTests
 {
     public class MvvmTest : MonoBehaviour
     {
-        [SerializeReference, SerializeReferenceDropdown]
-        private IBoolAdapter _boolAdapter;
     }
 
-    public interface IAdapter
+    public partial class MyModel : IObservableObject
     {
-    }
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(FloatValue))]
+        private int _intValue;
 
-    public interface IAdapter<T> : IAdapter
-    {
-        T Convert(object value);
-    }
+        private int FloatValue => default;
 
-    public interface IBoolAdapter : IAdapter<bool> { }
-
-    [Serializable]
-    public class BoolAdapter : IBoolAdapter
-    {
-        public bool Convert(object value)
+        [RelayCommand]
+        private void Work(int value)
         {
-            return (bool)value;
+
+        }
+
+        private bool Validate(int x) => false;
+
+        [RelayCommand(CanExecute = nameof(Validate))]
+        private void Process(int x)
+        {
+
         }
     }
 
-    [Serializable]
-    public class BoolAdapter2 : IBoolAdapter
+    public partial class MyModelX : IObservableObject
     {
-        public bool Convert(object value)
-        {
-            return (bool)value;
-        }
+        [ObservableProperty]
+        private int _intValue;
+
+        [ObservableProperty]
+        private string _stringValue;
     }
 }

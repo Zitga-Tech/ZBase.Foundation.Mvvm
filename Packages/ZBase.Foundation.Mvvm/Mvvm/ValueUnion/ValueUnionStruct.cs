@@ -27,7 +27,7 @@ namespace ZBase.Foundation.Mvvm
 
         public ValueUnionStruct(T value)
         {
-            Base = new ValueUnion(TypeKind.Struct);
+            Base = new ValueUnion(ValueTypeCode.Struct);
             TypeId = StructTypeId;
             Struct = value;
         }
@@ -35,12 +35,12 @@ namespace ZBase.Foundation.Mvvm
         public bool IsTypeValid
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => Base.Type == TypeKind.Struct && TypeId == StructTypeId;
+            get => Base.TypeCode == ValueTypeCode.Struct && TypeId == StructTypeId;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator ValueUnion(in ValueUnionStruct<T> value)
-            => new ValueUnion(value.Base.Storage, TypeKind.Struct);
+            => new ValueUnion(value.Base.Storage, ValueTypeCode.Struct);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator ValueUnionStruct<T>(T value)

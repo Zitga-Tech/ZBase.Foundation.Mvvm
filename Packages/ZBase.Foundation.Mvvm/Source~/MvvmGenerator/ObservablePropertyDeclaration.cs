@@ -15,6 +15,7 @@ namespace ZBase.Foundation.Mvvm
         public const string OBSERVABLE_PROPERTY_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ObservablePropertyAttribute";
         public const string NOTIFY_PROPERTY_CHANGED_FOR_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.NotifyPropertyChangedForAttribute";
         public const string NOTIFY_CAN_EXECUTE_CHANGED_FOR_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.NotifyCanExecuteChangedForAttribute";
+        public const string RELAY_COMMAND_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.RelayCommandAttribute";
 
         public ClassDeclarationSyntax Syntax { get; }
 
@@ -26,9 +27,15 @@ namespace ZBase.Foundation.Mvvm
 
         public List<MemberRef> Members { get; }
 
+        /// <summary>
+        /// Key is <c>Field.Name</c>
+        /// </summary>
         public Dictionary<string, IPropertySymbol> NotifyPropertyChangedForMap { get; }
 
-        public Dictionary<string, IMethodSymbol> NotifyCanExecuteChangedForMap { get; }
+        /// <summary>
+        /// Key is the command name (<c>Method.Name + "Command"</c>)
+        /// </summary>
+        public HashSet<string> NotifyCanExecuteChangedForSet { get; }
 
         public ObservablePropertyDeclaration(ClassDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
         {
@@ -37,7 +44,7 @@ namespace ZBase.Foundation.Mvvm
             FullyQualifiedName = Symbol.ToFullName();
             Members = new List<MemberRef>();
             NotifyPropertyChangedForMap = new Dictionary<string, IPropertySymbol>();
-            NotifyCanExecuteChangedForMap = new Dictionary<string, IMethodSymbol>();
+            NotifyCanExecuteChangedForSet = new HashSet<string>();
 
             var implementInterface = false;
 
@@ -61,77 +68,91 @@ namespace ZBase.Foundation.Mvvm
             }
 
             var members = Symbol.GetMembers();
-            var notifyPropertyChangedForSet = new HashSet<string>();
-            var notifyCanExecuteChangedForSet = new HashSet<string>();
+            var fieldToPropertyChanged = new Dictionary<string, string>();
+            var commandSet = new HashSet<string>();
+            var propertyMap = new Dictionary<string, IPropertySymbol>();
+            var methods = new List<IMethodSymbol>();
 
             foreach (var member in members)
             {
-                if (member is not IFieldSymbol field
-                    || field.HasAttribute(OBSERVABLE_PROPERTY_ATTRIBUTE) == false
-                )
+                if (member is IFieldSymbol field)
                 {
+                    if (field.HasAttribute(OBSERVABLE_PROPERTY_ATTRIBUTE))
+                    {
+                        var memberRef = new MemberRef {
+                            Member = field,
+                            PropertyName = field.ToPropertyName(),
+                        };
+
+                        var notifyPropChangedFor = field.GetAttribute(NOTIFY_PROPERTY_CHANGED_FOR_ATTRIBUTE);
+
+                        if (notifyPropChangedFor != null
+                            && notifyPropChangedFor.ConstructorArguments.Length > 0
+                            && notifyPropChangedFor.ConstructorArguments[0].Value is string propName
+                        )
+                        {
+                            fieldToPropertyChanged[field.Name] = propName;
+                        }
+
+                        var notifyCanExecuteChangedFor = field.GetAttribute(NOTIFY_CAN_EXECUTE_CHANGED_FOR_ATTRIBUTE);
+
+                        if (notifyCanExecuteChangedFor != null
+                            && notifyCanExecuteChangedFor.ConstructorArguments.Length > 0
+                        )
+                        {
+                            var args = notifyCanExecuteChangedFor.ConstructorArguments;
+
+                            foreach (var arg in args)
+                            {
+                                if (arg.Value is string commandName)
+                                {
+                                    memberRef.CommandNames.Add(commandName);
+                                    commandSet.Add(commandName);
+                                }
+                            }
+                        }
+
+                        Members.Add(memberRef);
+                    }
+
                     continue;
                 }
 
-                var memberRef = new MemberRef {
-                    Member = field,
-                    PropertyName = field.ToPropertyName(),
-                };
-
-                var notifyPropChangedFor = field.GetAttribute(NOTIFY_PROPERTY_CHANGED_FOR_ATTRIBUTE);
-
-                if (notifyPropChangedFor != null
-                    && notifyPropChangedFor.ConstructorArguments.Length > 0
-                    && notifyPropChangedFor.ConstructorArguments[0].Value is string propName
-                )
-                {
-                    memberRef.NotifyPropertyChangedFor = propName;
-                    notifyPropertyChangedForSet.Add(propName);
-                }
-
-                var notifyCanExecuteChangedFor = field.GetAttribute(NOTIFY_CAN_EXECUTE_CHANGED_FOR_ATTRIBUTE);
-
-                if (notifyCanExecuteChangedFor != null
-                    && notifyCanExecuteChangedFor.ConstructorArguments.Length > 0
-                )
-                {
-                    var args = notifyCanExecuteChangedFor.ConstructorArguments;
-
-                    foreach (var arg in args)
-                    {
-                        if (arg.Value is string commandName)
-                        {
-                            memberRef.NotifyCanExecuteChangedFor.Add(commandName);
-                            notifyCanExecuteChangedForSet.Add(commandName);
-                        }
-                    }
-                }
-
-                Members.Add(memberRef);
-            }
-
-            foreach (var member in members)
-            {
                 if (member is IPropertySymbol property)
                 {
-                    if (notifyPropertyChangedForSet.Contains(property.Name))
+                    propertyMap[property.Name] = property;
+                    continue;
+                }
+
+                if (member is IMethodSymbol method)
+                {
+                    if (method.HasAttribute(RELAY_COMMAND_ATTRIBUTE))
                     {
-                        NotifyPropertyChangedForMap[property.Name] = property;
+                        methods.Add(method);
                     }
 
                     continue;
                 }
-                
-                if (member is IMethodSymbol method)
+            }
+
+            foreach (var kv in fieldToPropertyChanged)
+            {
+                var fieldName = kv.Key;
+                var propertyName = kv.Value;
+
+                if (propertyMap.TryGetValue(propertyName, out var property))
                 {
-                    var commandName = $"{method.Name}Command";
+                    NotifyPropertyChangedForMap[fieldName] = property;
+                }
+            }
 
-                    if (notifyCanExecuteChangedForSet.Contains(commandName))
-                    {
-                        NotifyCanExecuteChangedForMap[commandName] = method;
-                    }
+            foreach (var method in methods)
+            {
+                var commandName = $"{method.Name}Command";
 
-                    continue;
+                if (commandSet.Contains(commandName))
+                {
+                    NotifyCanExecuteChangedForSet.Add(commandName);
                 }
             }
 
@@ -144,9 +165,7 @@ namespace ZBase.Foundation.Mvvm
 
             public string PropertyName { get; set; }
 
-            public string NotifyPropertyChangedFor { get; set; }
-
-            public HashSet<string> NotifyCanExecuteChangedFor { get; } = new();
+            public HashSet<string> CommandNames { get; } = new();
         }
     }
 }
