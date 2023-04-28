@@ -1,4 +1,8 @@
-﻿#if MVVM_VALUE_UNION_SIZE_24_BYTES || MVVM_VALUE_UNION_SIZE_32_BYTES || MVVM_VALUE_UNION_SIZE_40_BYTES || MVVM_VALUE_UNION_SIZE_48_BYTES || MVVM_VALUE_UNION_SIZE_56_BYTES || MVVM_VALUE_UNION_SIZE_64_BYTES || MVVM_VALUE_UNION_SIZE_72_BYTES || MVVM_VALUE_UNION_SIZE_80_BYTES || MVVM_VALUE_UNION_SIZE_88_BYTES || MVVM_VALUE_UNION_SIZE_96_BYTES || MVVM_VALUE_UNION_SIZE_104_BYTES || MVVM_VALUE_UNION_SIZE_112_BYTES || MVVM_VALUE_UNION_SIZE_120_BYTES || MVVM_VALUE_UNION_SIZE_128_BYTES
+﻿#if MVVM_VALUE_UNION_SIZE_16_BYTES || MVVM_VALUE_UNION_SIZE_24_BYTES || MVVM_VALUE_UNION_SIZE_32_BYTES || MVVM_VALUE_UNION_SIZE_40_BYTES || MVVM_VALUE_UNION_SIZE_48_BYTES || MVVM_VALUE_UNION_SIZE_56_BYTES || MVVM_VALUE_UNION_SIZE_64_BYTES || MVVM_VALUE_UNION_SIZE_72_BYTES || MVVM_VALUE_UNION_SIZE_80_BYTES || MVVM_VALUE_UNION_SIZE_88_BYTES || MVVM_VALUE_UNION_SIZE_96_BYTES || MVVM_VALUE_UNION_SIZE_104_BYTES || MVVM_VALUE_UNION_SIZE_112_BYTES || MVVM_VALUE_UNION_SIZE_120_BYTES || MVVM_VALUE_UNION_SIZE_128_BYTES
+#define __MVVM_VALUE_UNION_STORAGE_ENABLE_L2__
+#endif
+
+#if MVVM_VALUE_UNION_SIZE_24_BYTES || MVVM_VALUE_UNION_SIZE_32_BYTES || MVVM_VALUE_UNION_SIZE_40_BYTES || MVVM_VALUE_UNION_SIZE_48_BYTES || MVVM_VALUE_UNION_SIZE_56_BYTES || MVVM_VALUE_UNION_SIZE_64_BYTES || MVVM_VALUE_UNION_SIZE_72_BYTES || MVVM_VALUE_UNION_SIZE_80_BYTES || MVVM_VALUE_UNION_SIZE_88_BYTES || MVVM_VALUE_UNION_SIZE_96_BYTES || MVVM_VALUE_UNION_SIZE_104_BYTES || MVVM_VALUE_UNION_SIZE_112_BYTES || MVVM_VALUE_UNION_SIZE_120_BYTES || MVVM_VALUE_UNION_SIZE_128_BYTES
 #define __MVVM_VALUE_UNION_STORAGE_ENABLE_L3__
 #endif
 
@@ -59,13 +63,32 @@ using System.Runtime.InteropServices;
 namespace ZBase.Foundation.Mvvm
 {
     /// <summary>
-    /// Serves as a storage for the <see cref="ValueUnion"/> type.
+    /// Represents a storage layout for the <see cref="ValueUnion"/> type.
+    /// <br/>
+    /// The first 8 bytes are used to store meta data.
+    /// While the rest are used to store the actual data.
+    /// </summary>
+    /// <seealso cref="ValueUnionData"/>
+    [StructLayout(LayoutKind.Explicit)]
+    public readonly struct ValueUnionStorage
+    {
+        public const int META_SIZE = sizeof(ulong);
+        public const int META_OFFSET = 0;
+        public const int DATA_OFFSET = META_OFFSET + META_SIZE;
+
+        [FieldOffset(META_OFFSET)] public readonly ulong Meta;
+        [FieldOffset(DATA_OFFSET)] public readonly ValueUnionData Data;
+    }
+
+    /// <summary>
+    /// Represents a unified layout to store the actual value for <see cref="ValueUnion"/>.
     /// </summary>
     /// <remarks>
-    /// By default, the storage size is 16 bytes.
+    /// By default, the size is 8 bytes.
     /// <br />
-    /// To change its size, define one of the following symbols:
+    /// To resize, define one of the following symbols:
     /// <list type="bullet">
+    /// <item><c>MVVM_VALUE_UNION_SIZE_16_BYTES</c></item>
     /// <item><c>MVVM_VALUE_UNION_SIZE_24_BYTES</c></item>
     /// <item><c>MVVM_VALUE_UNION_SIZE_32_BYTES</c></item>
     /// <item><c>MVVM_VALUE_UNION_SIZE_40_BYTES</c></item>
@@ -83,10 +106,13 @@ namespace ZBase.Foundation.Mvvm
     /// </list>
     /// </remarks>
     [StructLayout(LayoutKind.Sequential)]
-    public readonly struct ValueUnionStorage
+    public readonly struct ValueUnionData
     {
         private readonly ulong _l1;
+
+#if __MVVM_VALUE_UNION_STORAGE_ENABLE_L3__
         private readonly ulong _l2;
+#endif
 
 #if __MVVM_VALUE_UNION_STORAGE_ENABLE_L3__
         private readonly ulong _l3;
@@ -144,5 +170,4 @@ namespace ZBase.Foundation.Mvvm
         private readonly ulong _l16;
 #endif
     }
-
 }
