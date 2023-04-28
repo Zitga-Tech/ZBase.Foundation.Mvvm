@@ -15,7 +15,6 @@
         ULong     = 10,
         Short     = 11,
         UShort    = 12,
-        Enum      = 13,
         Struct    = 14,
         String    = 15,
         Object    = 16,

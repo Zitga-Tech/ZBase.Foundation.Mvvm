@@ -10,48 +10,59 @@ namespace ZBase.Foundation.Mvvm
     /// </summary>
     /// <seealso cref="ValueUnionStorage" />
     [StructLayout(LayoutKind.Explicit, Pack = 1)]
-    public readonly struct ValueUnionStruct<TStruct>
-        where TStruct : struct
+    public readonly struct ValueUnionStruct<T>
+        where T : struct
     {
+        public static readonly TypeId StructTypeId = TypeId.Of<T>();
+
         [FieldOffset(ValueUnion.META_OFFSET)] public readonly ValueUnion Base;
 
-        [FieldOffset(ValueUnion.ENUM_TYPE_OFFSET + 1)] public readonly TypeId TypeId;
-        [FieldOffset(ValueUnion.FIELD_OFFSET)] public readonly TStruct Struct;
+        [FieldOffset(ValueUnion.TYPE_OFFSET + 1)] public readonly TypeId TypeId;
+        [FieldOffset(ValueUnion.FIELD_OFFSET)] public readonly T Struct;
 
         private ValueUnionStruct(in ValueUnion value) : this()
         {
             Base = value;
         }
 
-        public ValueUnionStruct(TStruct value)
+        public ValueUnionStruct(T value)
         {
             Base = new ValueUnion(TypeKind.Struct);
-            TypeId = TypeId.Of<TStruct>();
+            TypeId = StructTypeId;
             Struct = value;
         }
 
-        public static implicit operator ValueUnion(in ValueUnionStruct<TStruct> value)
+        public bool IsTypeValid
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => Base.Type == TypeKind.Struct && TypeId == StructTypeId;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator ValueUnion(in ValueUnionStruct<T> value)
             => new ValueUnion(value.Base.Storage, TypeKind.Struct);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator ValueUnionStruct<TStruct>(TStruct value)
-            => new ValueUnionStruct<TStruct>(value);
+        public static implicit operator ValueUnionStruct<T>(T value)
+            => new ValueUnionStruct<T>(value);
+
+        public static explicit operator ValueUnionStruct<T>(in ValueUnion value)
+        {
+            var union = new ValueUnionStruct<T>(value);
+
+            if (union.TypeId == StructTypeId)
+                return union;
+
+            throw new System.InvalidCastException($"Cannot cast value from {union.TypeId.AsType()} to {StructTypeId.AsType()}.");
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator TStruct(in ValueUnionStruct<TStruct> value)
-            => value.Struct;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator ValueUnionStruct<TStruct>(in ValueUnion value)
-            => new ValueUnionStruct<TStruct>(value);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TypeEquals(in ValueUnionStruct<TStruct> other)
+        public bool TypeEquals(in ValueUnionStruct<T> other)
             => Base.TypeEquals(other.Base);
 
-        public bool TryGetValue(out TStruct dest)
+        public bool TryGetValue(out T dest)
         {
-            if (Base.Type == TypeKind.Struct)
+            if (IsTypeValid)
             {
                 dest = Struct;
                 return true;
@@ -61,9 +72,9 @@ namespace ZBase.Foundation.Mvvm
             return false;
         }
 
-        public bool TrySetValue(ref TStruct dest)
+        public bool TrySetValue(ref T dest)
         {
-            if (Base.Type == TypeKind.Struct)
+            if (IsTypeValid)
             {
                 dest = Struct;
                 return true;

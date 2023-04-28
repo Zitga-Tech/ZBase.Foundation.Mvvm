@@ -16,23 +16,18 @@ namespace ZBase.Foundation.Mvvm
         public const int META_OFFSET = 0;
 
         public const int TYPE_OFFSET = META_OFFSET + 0;
-        public const int ENUM_TYPE_OFFSET = META_OFFSET + 1;
-
         public const int FIELD_OFFSET = META_OFFSET + META_SIZE;
 
         public static readonly ValueUnion Undefined = default;
-        public static readonly ValueUnion UndefinedEnum = new ValueUnion(TypeKind.Enum, EnumUnderlyingTypeKind.Undefined);
 
         private static readonly string s_defaultStringForString = $"{nameof(ValueUnion)}.{TypeKind.String}";
         private static readonly string s_defaultStringForObject = $"{nameof(ValueUnion)}.{TypeKind.Object}";
-        private static readonly string s_defaultStringForEnum = $"{nameof(ValueUnion)}.{TypeKind.Enum}";
         private static readonly string s_defaultStringForStruct = $"{nameof(ValueUnion)}.{TypeKind.Struct}";
 
         [FieldOffset(META_OFFSET)] public readonly ValueUnionStorage Storage;
         [FieldOffset(META_OFFSET)] public readonly uint Meta;
 
         [FieldOffset(TYPE_OFFSET)] public readonly TypeKind Type;
-        [FieldOffset(ENUM_TYPE_OFFSET)] public readonly EnumUnderlyingTypeKind EnumType;
 
         [FieldOffset(FIELD_OFFSET)] public readonly bool Bool;
         [FieldOffset(FIELD_OFFSET)] public readonly byte Byte;
@@ -48,10 +43,6 @@ namespace ZBase.Foundation.Mvvm
         [FieldOffset(FIELD_OFFSET)] public readonly ushort UShort;
         [FieldOffset(FIELD_OFFSET)] public readonly GCHandle GCHandle;
 
-        public bool IsValid => IsEnum || Type != TypeKind.Undefined;
-
-        public bool IsEnum => Type == TypeKind.Enum && EnumType != EnumUnderlyingTypeKind.Undefined;
-
         public ValueUnion(ValueUnionStorage storage) : this()
         {
             Storage = storage;
@@ -63,39 +54,11 @@ namespace ZBase.Foundation.Mvvm
             Type = type;
         }
 
-        public ValueUnion(ValueUnionStorage storage, TypeKind type, EnumUnderlyingTypeKind enumType) : this()
-        {
-            Storage = storage;
-            Type = type;
-            EnumType = enumType;
-        }
-
         public ValueUnion(TypeKind type) : this()
         {
             Type = type;
         }
 
-        public ValueUnion(TypeKind type, EnumUnderlyingTypeKind enumType) : this()
-        {
-            Type = type;
-            EnumType = enumType;
-        }
-
-        public ValueUnion(TypeKind type, EnumUnderlyingTypeKind enumType, bool value)    : this() { Type = type; EnumType = enumType; Bool = value; }
-        public ValueUnion(TypeKind type, EnumUnderlyingTypeKind enumType, byte value)    : this() { Type = type; EnumType = enumType; Byte = value; }
-        public ValueUnion(TypeKind type, EnumUnderlyingTypeKind enumType, sbyte value)   : this() { Type = type; EnumType = enumType; SByte = value; }
-        public ValueUnion(TypeKind type, EnumUnderlyingTypeKind enumType, char value)    : this() { Type = type; EnumType = enumType; Char = value; }
-        public ValueUnion(TypeKind type, EnumUnderlyingTypeKind enumType, double value)  : this() { Type = type; EnumType = enumType; Double = value; }
-        public ValueUnion(TypeKind type, EnumUnderlyingTypeKind enumType, float value)   : this() { Type = type; EnumType = enumType; Float = value; }
-        public ValueUnion(TypeKind type, EnumUnderlyingTypeKind enumType, int value)     : this() { Type = type; EnumType = enumType; Int = value; }
-        public ValueUnion(TypeKind type, EnumUnderlyingTypeKind enumType, uint value)    : this() { Type = type; EnumType = enumType; UInt = value; }
-        public ValueUnion(TypeKind type, EnumUnderlyingTypeKind enumType, long value)    : this() { Type = type; EnumType = enumType; Long = value; }
-        public ValueUnion(TypeKind type, EnumUnderlyingTypeKind enumType, ulong value)   : this() { Type = type; EnumType = enumType; ULong = value; }
-        public ValueUnion(TypeKind type, EnumUnderlyingTypeKind enumType, short value)   : this() { Type = type; EnumType = enumType; Short = value; }
-        public ValueUnion(TypeKind type, EnumUnderlyingTypeKind enumType, ushort value)  : this() { Type = type; EnumType = enumType; UShort = value; }
-        public ValueUnion(TypeKind type, EnumUnderlyingTypeKind enumType, string value)  : this() { Type = type; EnumType = enumType; GCHandle = GCHandle.Alloc(value); }
-        public ValueUnion(TypeKind type, EnumUnderlyingTypeKind enumType, object value)  : this() { Type = type; EnumType = enumType; GCHandle = GCHandle.Alloc(value); }
-        
         public ValueUnion(bool value)    : this() { Type = TypeKind.Bool; Bool = value; }
         public ValueUnion(byte value)    : this() { Type = TypeKind.Byte; Byte = value; }
         public ValueUnion(sbyte value)   : this() { Type = TypeKind.SByte; SByte = value; }
@@ -126,37 +89,173 @@ namespace ZBase.Foundation.Mvvm
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator ValueUnion(ushort value)  => new ValueUnion(value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator ValueUnion(string value)  => new ValueUnion(value);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static explicit operator bool(in ValueUnion value)    => value.Bool;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static explicit operator byte(in ValueUnion value)    => value.Byte;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static explicit operator sbyte(in ValueUnion value)   => value.SByte;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static explicit operator char(in ValueUnion value)    => value.Char;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static explicit operator double(in ValueUnion value)  => value.Double;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static explicit operator float(in ValueUnion value)   => value.Float;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static explicit operator int(in ValueUnion value)     => value.Int;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static explicit operator uint(in ValueUnion value)    => value.UInt;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static explicit operator long(in ValueUnion value)    => value.Long;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static explicit operator ulong(in ValueUnion value)   => value.ULong;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static explicit operator short(in ValueUnion value)   => value.Short;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static explicit operator ushort(in ValueUnion value)  => value.UShort;
-
         public bool TypeEquals(in ValueUnion other)
-            => Type == TypeKind.Enum && other.Type == TypeKind.Enum
-            ? EnumType == other.EnumType
-            : Type == other.Type;
+            => Type == other.Type;
 
-        public bool TryGetValue(out bool dest)    { if (Type != TypeKind.Bool)    { dest = default; return false; } dest = Bool; return true; }
-        public bool TryGetValue(out byte dest)    { if (Type != TypeKind.Byte)    { dest = default; return false; } dest = Byte; return true; }
-        public bool TryGetValue(out sbyte dest)   { if (Type != TypeKind.SByte)   { dest = default; return false; } dest = SByte; return true; }
-        public bool TryGetValue(out char dest)    { if (Type != TypeKind.Char)    { dest = default; return false; } dest = Char; return true; }
-        public bool TryGetValue(out double dest)  { if (Type != TypeKind.Double)  { dest = default; return false; } dest = Double; return true; }
-        public bool TryGetValue(out float dest)   { if (Type != TypeKind.Float)   { dest = default; return false; } dest = Float; return true; }
-        public bool TryGetValue(out int dest)     { if (Type != TypeKind.Int)     { dest = default; return false; } dest = Int; return true; }
-        public bool TryGetValue(out uint dest)    { if (Type != TypeKind.UInt)    { dest = default; return false; } dest = UInt; return true; }
-        public bool TryGetValue(out long dest)    { if (Type != TypeKind.Long)    { dest = default; return false; } dest = Long; return true; }
-        public bool TryGetValue(out ulong dest)   { if (Type != TypeKind.ULong)   { dest = default; return false; } dest = ULong; return true; }
-        public bool TryGetValue(out short dest)   { if (Type != TypeKind.Short)   { dest = default; return false; } dest = Short; return true; }
-        public bool TryGetValue(out ushort dest)  { if (Type != TypeKind.UShort)  { dest = default; return false; } dest = UShort; return true; }
-        
+        public bool TryGetValue(out bool dest)
+        {
+            if (Type == TypeKind.Bool)
+            {
+                dest = Bool; return true;
+            }
+
+            dest = default; return false;
+        }
+
+        public bool TryGetValue(out byte dest)
+        {
+            if (Type == TypeKind.Byte)
+            {
+                dest = Byte; return true;
+            }
+
+            dest = default; return false;
+        }
+
+        public bool TryGetValue(out sbyte dest)
+        {
+            if (Type == TypeKind.SByte)
+            {
+                dest = SByte; return true;
+            }
+
+            dest = default; return false;
+        }
+
+        public bool TryGetValue(out char dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.SByte: dest = (char)SByte; return true;
+                case TypeKind.Char: dest = Char; return true;
+                case TypeKind.UShort: dest = (char)UShort; return true;
+            }
+
+            dest = default; return false;
+        }
+
+        public bool TryGetValue(out double dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.Byte  : dest = Byte ; return true;
+                case TypeKind.SByte : dest = SByte; return true;
+                case TypeKind.Char  : dest = Char; return true;
+                case TypeKind.Double: dest = Double; return true;
+                case TypeKind.Float : dest = Float; return true;
+                case TypeKind.Int   : dest = Int; return true;
+                case TypeKind.UInt  : dest = UInt; return true;
+                case TypeKind.Long  : dest = Long; return true;
+                case TypeKind.ULong : dest = ULong; return true;
+                case TypeKind.Short : dest = Short; return true;
+                case TypeKind.UShort: dest = UShort; return true;
+            }
+
+            dest = default; return false;
+        }
+
+        public bool TryGetValue(out float dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.Byte: dest = Byte; return true;
+                case TypeKind.SByte: dest = SByte; return true;
+                case TypeKind.Char: dest = Char; return true;
+                case TypeKind.Float: dest = Float; return true;
+                case TypeKind.Int: dest = Int; return true;
+                case TypeKind.UInt: dest = UInt; return true;
+                case TypeKind.Long: dest = Long; return true;
+                case TypeKind.ULong: dest = ULong; return true;
+                case TypeKind.Short: dest = Short; return true;
+                case TypeKind.UShort: dest = UShort; return true;
+            }
+
+            dest = default; return false;
+        }
+
+        public bool TryGetValue(out int dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.Byte: dest = Byte; return true;
+                case TypeKind.SByte: dest = SByte; return true;
+                case TypeKind.Char: dest = Char; return true;
+                case TypeKind.Int: dest = Int; return true;
+                case TypeKind.Short: dest = Short; return true;
+                case TypeKind.UShort: dest = UShort; return true;
+            }
+
+            dest = default; return false;
+        }
+
+        public bool TryGetValue(out uint dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.Byte: dest = Byte; return true;
+                case TypeKind.Char: dest = Char; return true;
+                case TypeKind.UInt: dest = UInt; return true;
+                case TypeKind.UShort: dest = UShort; return true;
+            }
+
+            dest = default; return false;
+        }
+
+        public bool TryGetValue(out long dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.Byte: dest = Byte; return true;
+                case TypeKind.SByte: dest = SByte; return true;
+                case TypeKind.Char: dest = Char; return true;
+                case TypeKind.Int: dest = Int; return true;
+                case TypeKind.UInt: dest = UInt; return true;
+                case TypeKind.Long: dest = Long; return true;
+                case TypeKind.Short: dest = Short; return true;
+                case TypeKind.UShort: dest = UShort; return true;
+            }
+
+            dest = default; return false;
+        }
+
+        public bool TryGetValue(out ulong dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.Byte: dest = Byte; return true;
+                case TypeKind.Char: dest = Char; return true;
+                case TypeKind.UInt: dest = UInt; return true;
+                case TypeKind.ULong: dest = ULong; return true;
+                case TypeKind.UShort: dest = UShort; return true;
+            }
+
+            dest = default; return false;
+        }
+
+        public bool TryGetValue(out short dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.Byte: dest = Byte; return true;
+                case TypeKind.SByte: dest = SByte; return true;
+                case TypeKind.Short: dest = Short; return true;
+            }
+
+            dest = default; return false;
+        }
+
+        public bool TryGetValue(out ushort dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.Byte: dest = Byte; return true;
+                case TypeKind.Char: dest = Char; return true;
+                case TypeKind.UShort: dest = UShort; return true;
+            }
+
+            dest = default; return false;
+        }
+
         public bool TryGetValue(out string dest)
         {
             if (Type == TypeKind.String && GCHandle.Target is string value)
@@ -193,18 +292,169 @@ namespace ZBase.Foundation.Mvvm
             return false;
         }
 
-        public bool TrySetValue(ref bool dest)    { if (Type != TypeKind.Bool)    { return false; } dest = Bool; return true; }
-        public bool TrySetValue(ref byte dest)    { if (Type != TypeKind.Byte)    { return false; } dest = Byte; return true; }
-        public bool TrySetValue(ref sbyte dest)   { if (Type != TypeKind.SByte)   { return false; } dest = SByte; return true; }
-        public bool TrySetValue(ref char dest)    { if (Type != TypeKind.Char)    { return false; } dest = Char; return true; }
-        public bool TrySetValue(ref double dest)  { if (Type != TypeKind.Double)  { return false; } dest = Double; return true; }
-        public bool TrySetValue(ref float dest)   { if (Type != TypeKind.Float)   { return false; } dest = Float; return true; }
-        public bool TrySetValue(ref int dest)     { if (Type != TypeKind.Int)     { return false; } dest = Int; return true; }
-        public bool TrySetValue(ref uint dest)    { if (Type != TypeKind.UInt)    { return false; } dest = UInt; return true; }
-        public bool TrySetValue(ref long dest)    { if (Type != TypeKind.Long)    { return false; } dest = Long; return true; }
-        public bool TrySetValue(ref ulong dest)   { if (Type != TypeKind.ULong)   { return false; } dest = ULong; return true; }
-        public bool TrySetValue(ref short dest)   { if (Type != TypeKind.Short)   { return false; } dest = Short; return true; }
-        public bool TrySetValue(ref ushort dest)  { if (Type != TypeKind.UShort)  { return false; } dest = UShort; return true; }
+        public bool TrySetValue(ref bool dest)
+        {
+            if (Type == TypeKind.Bool)
+            {
+                dest = Bool; return true;
+            }
+
+            return false;
+        }
+
+        public bool TrySetValue(ref byte dest)
+        {
+            if (Type == TypeKind.Byte)
+            {
+                dest = Byte; return true;
+            }
+
+            return false;
+        }
+
+        public bool TrySetValue(ref sbyte dest)
+        {
+            if (Type == TypeKind.SByte)
+            {
+                dest = SByte; return true;
+            }
+
+            return false;
+        }
+
+        public bool TrySetValue(ref char dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.SByte: dest = (char)SByte; return true;
+                case TypeKind.Char: dest = Char; return true;
+                case TypeKind.UShort: dest = (char)UShort; return true;
+            }
+
+            return false;
+        }
+
+        public bool TrySetValue(ref double dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.Byte: dest = Byte; return true;
+                case TypeKind.SByte: dest = SByte; return true;
+                case TypeKind.Char: dest = Char; return true;
+                case TypeKind.Double: dest = Double; return true;
+                case TypeKind.Float: dest = Float; return true;
+                case TypeKind.Int: dest = Int; return true;
+                case TypeKind.UInt: dest = UInt; return true;
+                case TypeKind.Long: dest = Long; return true;
+                case TypeKind.ULong: dest = ULong; return true;
+                case TypeKind.Short: dest = Short; return true;
+                case TypeKind.UShort: dest = UShort; return true;
+            }
+
+            return false;
+        }
+
+        public bool TrySetValue(ref float dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.Byte: dest = Byte; return true;
+                case TypeKind.SByte: dest = SByte; return true;
+                case TypeKind.Char: dest = Char; return true;
+                case TypeKind.Float: dest = Float; return true;
+                case TypeKind.Int: dest = Int; return true;
+                case TypeKind.UInt: dest = UInt; return true;
+                case TypeKind.Long: dest = Long; return true;
+                case TypeKind.ULong: dest = ULong; return true;
+                case TypeKind.Short: dest = Short; return true;
+                case TypeKind.UShort: dest = UShort; return true;
+            }
+
+            return false;
+        }
+
+        public bool TrySetValue(ref int dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.Byte: dest = Byte; return true;
+                case TypeKind.SByte: dest = SByte; return true;
+                case TypeKind.Char: dest = Char; return true;
+                case TypeKind.Int: dest = Int; return true;
+                case TypeKind.Short: dest = Short; return true;
+                case TypeKind.UShort: dest = UShort; return true;
+            }
+
+            return false;
+        }
+
+        public bool TrySetValue(ref uint dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.Byte: dest = Byte; return true;
+                case TypeKind.Char: dest = Char; return true;
+                case TypeKind.UInt: dest = UInt; return true;
+                case TypeKind.UShort: dest = UShort; return true;
+            }
+
+            return false;
+        }
+
+        public bool TrySetValue(ref long dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.Byte: dest = Byte; return true;
+                case TypeKind.SByte: dest = SByte; return true;
+                case TypeKind.Char: dest = Char; return true;
+                case TypeKind.Int: dest = Int; return true;
+                case TypeKind.UInt: dest = UInt; return true;
+                case TypeKind.Long: dest = Long; return true;
+                case TypeKind.Short: dest = Short; return true;
+                case TypeKind.UShort: dest = UShort; return true;
+            }
+
+            return false;
+        }
+
+        public bool TrySetValue(ref ulong dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.Byte: dest = Byte; return true;
+                case TypeKind.Char: dest = Char; return true;
+                case TypeKind.UInt: dest = UInt; return true;
+                case TypeKind.ULong: dest = ULong; return true;
+                case TypeKind.UShort: dest = UShort; return true;
+            }
+
+            return false;
+        }
+
+        public bool TrySetValue(ref short dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.Byte: dest = Byte; return true;
+                case TypeKind.SByte: dest = SByte; return true;
+                case TypeKind.Short: dest = Short; return true;
+            }
+
+            return false;
+        }
+
+        public bool TrySetValue(ref ushort dest)
+        {
+            switch (Type)
+            {
+                case TypeKind.Byte: dest = Byte; return true;
+                case TypeKind.Char: dest = Char; return true;
+                case TypeKind.UShort: dest = UShort; return true;
+            }
+
+            return false;
+        }
 
         public bool TrySetValue(ref string dest)
         {
@@ -245,6 +495,8 @@ namespace ZBase.Foundation.Mvvm
                 case TypeKind.Short: return Short.ToString();
                 case TypeKind.UShort: return UShort.ToString();
 
+                case TypeKind.Struct: return s_defaultStringForStruct;
+
                 case TypeKind.String:
                 {
                     if (GCHandle.Target is string value)
@@ -260,23 +512,6 @@ namespace ZBase.Foundation.Mvvm
 
                     return s_defaultStringForObject;
                 }
-
-                case TypeKind.Enum:
-                {
-                    return EnumType switch {
-                        EnumUnderlyingTypeKind.Byte => Byte.ToString(),
-                        EnumUnderlyingTypeKind.SByte => SByte.ToString(),
-                        EnumUnderlyingTypeKind.Int => Int.ToString(),
-                        EnumUnderlyingTypeKind.UInt => UInt.ToString(),
-                        EnumUnderlyingTypeKind.Long => Long.ToString(),
-                        EnumUnderlyingTypeKind.ULong => ULong.ToString(),
-                        EnumUnderlyingTypeKind.Short => Short.ToString(),
-                        EnumUnderlyingTypeKind.UShort => UShort.ToString(),
-                        _ => s_defaultStringForEnum,
-                    };
-                }
-
-                case TypeKind.Struct: return s_defaultStringForStruct;
             }
 
             return string.Empty;
