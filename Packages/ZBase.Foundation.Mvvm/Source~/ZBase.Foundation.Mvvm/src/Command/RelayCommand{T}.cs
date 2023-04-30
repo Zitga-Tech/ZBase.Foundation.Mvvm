@@ -77,7 +77,7 @@ namespace ZBase.Foundation.Mvvm
                 return false;
             }
 
-            if (!TryGetCommandArgument(parameter, out T result))
+            if (TryGetCommandArgument(parameter, out T result) == false)
             {
                 ThrowArgumentExceptionForInvalidCommandArgument(parameter);
             }
