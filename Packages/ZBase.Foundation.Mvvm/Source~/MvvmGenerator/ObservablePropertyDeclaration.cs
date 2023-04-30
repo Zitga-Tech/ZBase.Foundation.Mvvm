@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using ZBase.Foundation.SourceGen;
@@ -124,7 +123,7 @@ namespace ZBase.Foundation.Mvvm
                     continue;
                 }
 
-                if (member is IMethodSymbol method)
+                if (member is IMethodSymbol method && method.Parameters.Length <= 1)
                 {
                     if (method.HasAttribute(RELAY_COMMAND_ATTRIBUTE))
                     {
