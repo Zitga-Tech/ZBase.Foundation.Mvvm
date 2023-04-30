@@ -13,7 +13,7 @@ namespace ZBase.Foundation.Mvvm
     /// </summary>
     /// <typeparam name="TInstance">Type of instance listening for the event.</typeparam>
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-    public sealed class PropertyChangeEventListener<TInstance> : IEventListener
+    public sealed class EventListener<TInstance> : IEventListener
         where TInstance : class
     {
         /// <summary>
@@ -22,10 +22,10 @@ namespace ZBase.Foundation.Mvvm
         private readonly WeakReference<TInstance> _weakInstance;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyChangeEventListener{TInstance}"/> class.
+        /// Initializes a new instance of the <see cref="EventListener{TInstance}"/> class.
         /// </summary>
         /// <param name="instance">Instance subscribing to the event.</param>
-        public PropertyChangeEventListener(TInstance instance)
+        public EventListener(TInstance instance)
         {
             if (instance == null)
             {
@@ -42,18 +42,18 @@ namespace ZBase.Foundation.Mvvm
         /// <summary>
         /// Gets or sets the method to call when the event fires.
         /// </summary>
-        public Action<TInstance, PropertyChangeEventArgs> OnEventAction { get; set; }
+        public Action<TInstance, EventArgs> OnEventAction { get; set; }
 
         /// <summary>
         /// Gets or sets the method to call when detaching from the event.
         /// </summary>
-        public Action<PropertyChangeEventListener<TInstance>> OnDetachAction { get; set; }
+        public Action<EventListener<TInstance>> OnDetachAction { get; set; }
 
         /// <summary>
         /// Handler for the subscribed event calls OnEventAction to handle it.
         /// </summary>
         /// <param name="eventArgs">Event arguments.</param>
-        public void OnEvent(in PropertyChangeEventArgs eventArgs)
+        public void OnEvent(in EventArgs eventArgs)
         {
             if (_weakInstance.TryGetTarget(out var target))
             {

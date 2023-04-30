@@ -21,8 +21,7 @@ namespace ZBase.Foundation.Mvvm
         /// </summary>
         private readonly Func<bool> _canExecute;
 
-        /// <inheritdoc/>
-        public event EventHandler CanExecuteChanged;
+        private event EventHandler _canExecuteChanged;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RelayCommand"/> class that can always execute.
@@ -47,9 +46,20 @@ namespace ZBase.Foundation.Mvvm
         }
 
         /// <inheritdoc/>
+        public void CanExecuteChanged<TInstance>(EventListener<TInstance> listener)
+            where TInstance : class
+        {
+            if (listener == null) throw new ArgumentNullException(nameof(listener));
+
+            _canExecuteChanged += listener.OnEvent;
+            listener.OnDetachAction = (listener) => _canExecuteChanged -= listener.OnEvent;
+        }
+
+        /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void NotifyCanExecuteChanged()
         {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+            _canExecuteChanged?.Invoke(new EventArgs(this, ValueUnion.Undefined));
         }
 
         /// <inheritdoc/>

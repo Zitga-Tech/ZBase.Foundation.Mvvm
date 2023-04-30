@@ -1,13 +1,11 @@
-﻿using System;
-
-namespace ZBase.Foundation.Mvvm
+﻿namespace ZBase.Foundation.Mvvm
 {
     public interface ICommand
     {
         /// <summary>
         /// Occurs when changes occur that affect whether or not the command should execute.
         /// </summary>
-        event EventHandler CanExecuteChanged;
+        void CanExecuteChanged<TInstance>(EventListener<TInstance> listener) where TInstance : class;
 
         /// <summary>
         /// Defines the method that determines whether the command can execute in its current state.
