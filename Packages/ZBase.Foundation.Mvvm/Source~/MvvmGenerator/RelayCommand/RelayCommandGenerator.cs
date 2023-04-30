@@ -8,18 +8,18 @@ using ZBase.Foundation.SourceGen;
 namespace ZBase.Foundation.Mvvm
 {
     [Generator]
-    public class ObservablePropertyGenerator : IIncrementalGenerator
+    public class RelayCommandGenerator : IIncrementalGenerator
     {
-        public const string OBSERVABLE_PROPERTY = "ObservableProperty";
-        public const string GENERATOR_NAME = nameof(ObservablePropertyGenerator);
+        public const string RELAY_COMMAND = "RelayCommand";
+        public const string GENERATOR_NAME = nameof(RelayCommandGenerator);
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             var projectPathProvider = SourceGenHelpers.GetSourceGenConfigProvider(context);
 
             var candidateProvider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: (node, token) => GeneratorHelpers.IsSyntaxMatch(node, token, SyntaxKind.FieldDeclaration, OBSERVABLE_PROPERTY),
-                transform: GeneratorHelpers.GetSemanticMatch
+                predicate: (node, token) => ObservableObjectHelpers.IsSyntaxMatchByAttribute(node, token, SyntaxKind.MethodDeclaration, RELAY_COMMAND),
+                transform: ObservableObjectHelpers.GetSemanticMatch
             ).Where(t => t is { });
 
             var compilationProvider = context.CompilationProvider;
@@ -48,7 +48,7 @@ namespace ZBase.Foundation.Mvvm
             {
                 return;
             }
-            
+
             context.CancellationToken.ThrowIfCancellationRequested();
 
             try
@@ -57,7 +57,7 @@ namespace ZBase.Foundation.Mvvm
 
                 var syntaxTree = candidate.SyntaxTree;
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var declaration = new ObservablePropertyDeclaration(candidate, semanticModel, context.CancellationToken);
+                var declaration = new RelayCommandDeclaration(candidate, semanticModel, context.CancellationToken);
 
                 if (declaration.IsValid == false)
                 {
@@ -104,10 +104,10 @@ namespace ZBase.Foundation.Mvvm
         }
 
         private static readonly DiagnosticDescriptor s_errorDescriptor
-            = new("SG_OBSERVABLE_PROPERTY_01"
-                , "Observable Property Generator Error"
-                , "This error indicates a bug in the Observable Property source generators. Error message: '{0}'."
-                , "ZBase.Foundation.Mvvm.ObservablePropertyAttribute"
+            = new("SG_RELAY_COMMAND_01"
+                , "Relay Command Generator Error"
+                , "This error indicates a bug in the RelayCommand source generators. Error message: '{0}'."
+                , "ZBase.Foundation.Mvvm.IObservableObject"
                 , DiagnosticSeverity.Error
                 , isEnabledByDefault: true
                 , description: ""

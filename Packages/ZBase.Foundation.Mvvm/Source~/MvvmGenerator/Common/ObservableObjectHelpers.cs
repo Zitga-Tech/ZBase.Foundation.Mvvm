@@ -7,7 +7,7 @@ using ZBase.Foundation.SourceGen;
 
 namespace ZBase.Foundation.Mvvm
 {
-    public static class GeneratorHelpers
+    public static class ObservableObjectHelpers
     {
         public const string NAMESPACE = "ZBase.Foundation.Mvvm";
         public const string IOBSERVABLE_OBJECT_NAME = "IObservableObject";
@@ -15,7 +15,7 @@ namespace ZBase.Foundation.Mvvm
         public const string FIELD_PREFIX_UNDERSCORE = "_";
         public const string FIELD_PREFIX_M_UNDERSCORE = "m_";
 
-        public static bool IsSyntaxMatch(
+        public static bool IsSyntaxMatchByAttribute(
               SyntaxNode syntaxNode
             , CancellationToken token
             , SyntaxKind syntaxKind
