@@ -3,9 +3,9 @@
     public readonly struct EventArgs
     {
         public readonly object Sender;
-        public readonly ValueUnion Value;
+        public readonly Union Value;
 
-        public EventArgs(object sender, in ValueUnion value)
+        public EventArgs(object sender, in Union value)
         {
             Sender = sender;
             Value = value;
@@ -16,9 +16,9 @@
     {
         public readonly IObservableObject Sender;
         public readonly string PropertyName;
-        public readonly ValueUnion Value;
+        public readonly Union Value;
 
-        public PropertyChangeEventArgs(IObservableObject sender, string propertyName, in ValueUnion value)
+        public PropertyChangeEventArgs(IObservableObject sender, string propertyName, in Union value)
         {
             Sender = sender;
             PropertyName = propertyName;

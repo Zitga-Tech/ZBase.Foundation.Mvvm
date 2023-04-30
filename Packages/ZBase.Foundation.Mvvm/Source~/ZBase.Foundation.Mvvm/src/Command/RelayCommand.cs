@@ -59,7 +59,7 @@ namespace ZBase.Foundation.Mvvm
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void NotifyCanExecuteChanged()
         {
-            _canExecuteChanged?.Invoke(new EventArgs(this, ValueUnion.Undefined));
+            _canExecuteChanged?.Invoke(new EventArgs(this, Union.Undefined));
         }
 
         /// <inheritdoc/>

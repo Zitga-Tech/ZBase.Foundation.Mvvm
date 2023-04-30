@@ -7,7 +7,6 @@
 
 using System;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using ZBase.Foundation.Mvvm;
 
 namespace MvvmTests
@@ -43,7 +42,7 @@ namespace MvvmTests
             }
         }
 
-        private void Print(in ValueUnion value)
+        private void Print(in Union value)
         {
             Console.WriteLine(value);
         }
@@ -107,7 +106,7 @@ namespace MvvmTests
         private UnityEngine.CanvasGroup _canvasGroup;
 
         [BindingField]
-        private void OnUpdateAlpha(in ValueUnion value)
+        private void OnUpdateAlpha(in Union value)
         {
             if (value.TryGetValue(out float alpha))
             {
@@ -116,7 +115,7 @@ namespace MvvmTests
         }
 
         [BindingField(Label = "interactable")]
-        private void OnUpdateInteractable(in ValueUnion value)
+        private void OnUpdateInteractable(in Union value)
         {
             if (value.TryGetValue(out bool interactable))
             {
@@ -125,7 +124,7 @@ namespace MvvmTests
         }
 
         [BindingField(Label = nameof(UnityEngine.CanvasGroup.blocksRaycasts))]
-        private void OnUpdateBlockRaycasts(in ValueUnion value)
+        private void OnUpdateBlockRaycasts(in Union value)
         {
             if (value.TryGetValue(out bool blocksRaycasts))
             {

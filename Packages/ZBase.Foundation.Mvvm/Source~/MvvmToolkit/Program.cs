@@ -7,7 +7,32 @@ namespace MvvmToolkit
     {
         public static void Main()
         {
+            var model = new MyViewModel();
+            model.PropertyChanged += Model_PropertyChanged;
 
+            var random = new Random();
+
+            while (true)
+            {
+                var key = Console.ReadKey();
+
+                switch (key.Key)
+                {
+                    case ConsoleKey.Spacebar:
+                        model.LastName = random.NextInt64().ToString();
+                        break;
+
+                    default: return;
+                }
+            }
+        }
+
+        private static void Model_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (sender is MyViewModel model)
+            {
+                Console.WriteLine($"Changed: {e.PropertyName}: {model.FullName}");
+            }
         }
     }
 
@@ -35,10 +60,10 @@ namespace MvvmToolkit
             Console.WriteLine($"Hello {x.FullName}");
         }
 
-        private static bool Validate() => false;
+        private static bool Validate(MyViewModel x) => false;
 
         [RelayCommand(CanExecute = nameof(Validate))]
-        private void DoX()
+        private void DoX(MyViewModel x)
         {
         }
     }

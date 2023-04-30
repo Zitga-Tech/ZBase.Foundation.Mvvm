@@ -6,80 +6,80 @@ namespace ZBase.Foundation.Mvvm
     /// <summary>
     /// A union of all supported values.
     /// </summary>
-    /// <seealso cref="ValueUnionStorage" />
+    /// <seealso cref="UnionBase" />
     [StructLayout(LayoutKind.Explicit)]
-    public readonly partial struct ValueUnion
+    public readonly partial struct Union
     {
-        public static readonly ValueUnion Undefined = default;
+        public static readonly Union Undefined = default;
 
-        private static readonly string s_defaultStringForString = $"{nameof(ValueUnion)}.{TypeKind.String}";
-        private static readonly string s_defaultStringForObject = $"{nameof(ValueUnion)}.{TypeKind.Object}";
-        private static readonly string s_defaultStringForStruct = $"{nameof(ValueUnion)}.{TypeKind.Struct}";
+        private static readonly string s_defaultStringForString = $"{nameof(Union)}.{TypeKind.String}";
+        private static readonly string s_defaultStringForObject = $"{nameof(Union)}.{TypeKind.Object}";
+        private static readonly string s_defaultStringForStruct = $"{nameof(Union)}.{TypeKind.Struct}";
 
-        [FieldOffset(ValueUnionStorage.META_OFFSET)] public readonly ValueUnionStorage Storage;
-        [FieldOffset(ValueUnionStorage.META_OFFSET)] public readonly TypeKind Type;
+        [FieldOffset(UnionBase.META_OFFSET)] public readonly UnionBase Base;
+        [FieldOffset(UnionBase.META_OFFSET)] public readonly TypeKind Type;
 
-        [FieldOffset(ValueUnionStorage.DATA_OFFSET)] public readonly bool Bool;
-        [FieldOffset(ValueUnionStorage.DATA_OFFSET)] public readonly byte Byte;
-        [FieldOffset(ValueUnionStorage.DATA_OFFSET)] public readonly sbyte SByte;
-        [FieldOffset(ValueUnionStorage.DATA_OFFSET)] public readonly char Char;
-        [FieldOffset(ValueUnionStorage.DATA_OFFSET)] public readonly double Double;
-        [FieldOffset(ValueUnionStorage.DATA_OFFSET)] public readonly float Float;
-        [FieldOffset(ValueUnionStorage.DATA_OFFSET)] public readonly int Int;
-        [FieldOffset(ValueUnionStorage.DATA_OFFSET)] public readonly uint UInt;
-        [FieldOffset(ValueUnionStorage.DATA_OFFSET)] public readonly long Long;
-        [FieldOffset(ValueUnionStorage.DATA_OFFSET)] public readonly ulong ULong;
-        [FieldOffset(ValueUnionStorage.DATA_OFFSET)] public readonly short Short;
-        [FieldOffset(ValueUnionStorage.DATA_OFFSET)] public readonly ushort UShort;
-        [FieldOffset(ValueUnionStorage.DATA_OFFSET)] public readonly GCHandle GCHandle;
+        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly bool Bool;
+        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly byte Byte;
+        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly sbyte SByte;
+        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly char Char;
+        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly double Double;
+        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly float Float;
+        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly int Int;
+        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly uint UInt;
+        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly long Long;
+        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly ulong ULong;
+        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly short Short;
+        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly ushort UShort;
+        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly GCHandle GCHandle;
 
-        public ValueUnion(ValueUnionStorage storage) : this()
+        public Union(UnionBase @base) : this()
         {
-            Storage = storage;
+            Base = @base;
         }
 
-        public ValueUnion(ValueUnionStorage storage, TypeKind type) : this()
+        public Union(UnionBase @base, TypeKind type) : this()
         {
-            Storage = storage;
+            Base = @base;
             Type = type;
         }
 
-        public ValueUnion(TypeKind type) : this()
+        public Union(TypeKind type) : this()
         {
             Type = type;
         }
 
-        public ValueUnion(bool value) : this() { Type = TypeKind.Bool; Bool = value; }
-        public ValueUnion(byte value) : this() { Type = TypeKind.Byte; Byte = value; }
-        public ValueUnion(sbyte value) : this() { Type = TypeKind.SByte; SByte = value; }
-        public ValueUnion(char value) : this() { Type = TypeKind.Char; Char = value; }
-        public ValueUnion(double value) : this() { Type = TypeKind.Double; Double = value; }
-        public ValueUnion(float value) : this() { Type = TypeKind.Float; Float = value; }
-        public ValueUnion(int value) : this() { Type = TypeKind.Int; Int = value; }
-        public ValueUnion(uint value) : this() { Type = TypeKind.UInt; UInt = value; }
-        public ValueUnion(long value) : this() { Type = TypeKind.Long; Long = value; }
-        public ValueUnion(ulong value) : this() { Type = TypeKind.ULong; ULong = value; }
-        public ValueUnion(short value) : this() { Type = TypeKind.Short; Short = value; }
-        public ValueUnion(ushort value) : this() { Type = TypeKind.UShort; UShort = value; }
-        public ValueUnion(string value) : this() { Type = TypeKind.String; GCHandle = GCHandle.Alloc(value); }
-        public ValueUnion(object value) : this() { Type = TypeKind.Object; GCHandle = GCHandle.Alloc(value); }
+        public Union(bool value) : this() { Type = TypeKind.Bool; Bool = value; }
+        public Union(byte value) : this() { Type = TypeKind.Byte; Byte = value; }
+        public Union(sbyte value) : this() { Type = TypeKind.SByte; SByte = value; }
+        public Union(char value) : this() { Type = TypeKind.Char; Char = value; }
+        public Union(double value) : this() { Type = TypeKind.Double; Double = value; }
+        public Union(float value) : this() { Type = TypeKind.Float; Float = value; }
+        public Union(int value) : this() { Type = TypeKind.Int; Int = value; }
+        public Union(uint value) : this() { Type = TypeKind.UInt; UInt = value; }
+        public Union(long value) : this() { Type = TypeKind.Long; Long = value; }
+        public Union(ulong value) : this() { Type = TypeKind.ULong; ULong = value; }
+        public Union(short value) : this() { Type = TypeKind.Short; Short = value; }
+        public Union(ushort value) : this() { Type = TypeKind.UShort; UShort = value; }
+        public Union(string value) : this() { Type = TypeKind.String; GCHandle = GCHandle.Alloc(value); }
+        public Union(object value) : this() { Type = TypeKind.Object; GCHandle = GCHandle.Alloc(value); }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator ValueUnion(bool value) => new ValueUnion(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator ValueUnion(byte value) => new ValueUnion(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator ValueUnion(sbyte value) => new ValueUnion(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator ValueUnion(char value) => new ValueUnion(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator ValueUnion(decimal value) => new ValueUnion(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator ValueUnion(double value) => new ValueUnion(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator ValueUnion(float value) => new ValueUnion(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator ValueUnion(int value) => new ValueUnion(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator ValueUnion(uint value) => new ValueUnion(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator ValueUnion(long value) => new ValueUnion(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator ValueUnion(ulong value) => new ValueUnion(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator ValueUnion(short value) => new ValueUnion(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator ValueUnion(ushort value) => new ValueUnion(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator ValueUnion(string value) => new ValueUnion(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(bool value) => new Union(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(byte value) => new Union(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(sbyte value) => new Union(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(char value) => new Union(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(decimal value) => new Union(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(double value) => new Union(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(float value) => new Union(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(int value) => new Union(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(uint value) => new Union(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(long value) => new Union(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(ulong value) => new Union(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(short value) => new Union(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(ushort value) => new Union(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(string value) => new Union(value);
 
-        public bool TypeEquals(in ValueUnion other)
+        public bool TypeEquals(in Union other)
             => Type == other.Type;
 
         public bool TryGetValue(out bool dest)

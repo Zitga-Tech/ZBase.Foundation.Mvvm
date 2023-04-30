@@ -2,6 +2,6 @@
 {
     public interface IAdapter
     {
-        ValueUnion Convert(in ValueUnion value);
+        Union Convert(in Union value);
     }
 }

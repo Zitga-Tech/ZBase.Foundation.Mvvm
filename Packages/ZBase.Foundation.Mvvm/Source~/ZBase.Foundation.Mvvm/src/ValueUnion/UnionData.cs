@@ -63,25 +63,7 @@ using System.Runtime.InteropServices;
 namespace ZBase.Foundation.Mvvm
 {
     /// <summary>
-    /// Represents a storage layout for the <see cref="ValueUnion"/> type.
-    /// <br/>
-    /// The first 8 bytes are used to store meta data.
-    /// While the rest are used to store the actual data.
-    /// </summary>
-    /// <seealso cref="ValueUnionData"/>
-    [StructLayout(LayoutKind.Explicit)]
-    public readonly struct ValueUnionStorage
-    {
-        public const int META_SIZE = sizeof(ulong);
-        public const int META_OFFSET = 0;
-        public const int DATA_OFFSET = META_OFFSET + META_SIZE;
-
-        [FieldOffset(META_OFFSET)] public readonly ulong Meta;
-        [FieldOffset(DATA_OFFSET)] public readonly ValueUnionData Data;
-    }
-
-    /// <summary>
-    /// Represents a unified layout to store the actual value for <see cref="ValueUnion"/>.
+    /// Represents a unified layout to store the actual value for <see cref="Union"/>.
     /// </summary>
     /// <remarks>
     /// By default, the size is 8 bytes.
@@ -106,7 +88,7 @@ namespace ZBase.Foundation.Mvvm
     /// </list>
     /// </remarks>
     [StructLayout(LayoutKind.Sequential)]
-    public readonly struct ValueUnionData
+    public readonly struct UnionData
     {
         private readonly ulong _l1;
 
