@@ -1,4 +1,6 @@
-﻿namespace ZBase.Foundation.Mvvm
+﻿using ZBase.Foundation.Unions;
+
+namespace ZBase.Foundation.Mvvm
 {
     public interface IAdapter
     {

@@ -4,12 +4,14 @@
         <TargetFramework>netstandard2.1</TargetFramework>
         <LangVersion>9.0</LangVersion>
         <OutputType>Library</OutputType>
-        <AssemblyName>Mvvm</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
         <PackageReference Include="Unity3D" Version="2.1.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ZBase.Foundation.Unions\ZBase.Foundation.Unions.csproj" />
     </ItemGroup>
 
     <Target Name="CopySourceFiles" AfterTargets="Build">

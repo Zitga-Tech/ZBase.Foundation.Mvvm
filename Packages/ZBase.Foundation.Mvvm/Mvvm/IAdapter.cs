@@ -1,7 +1,9 @@
-﻿namespace ZBase.Foundation.Mvvm
+﻿using ZBase.Foundation.Unions;
+
+namespace ZBase.Foundation.Mvvm
 {
     public interface IAdapter
     {
-        ValueUnion Convert(in ValueUnion value);
+        Union Convert(in Union value);
     }
 }

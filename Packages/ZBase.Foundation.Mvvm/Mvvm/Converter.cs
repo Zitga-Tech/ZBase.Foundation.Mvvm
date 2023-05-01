@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using ZBase.Foundation.Unions;
 
 namespace ZBase.Foundation.Mvvm
 {
@@ -28,7 +29,7 @@ namespace ZBase.Foundation.Mvvm
             set => _adapter = value ?? throw new ArgumentNullException(nameof(value));
         }
 
-        public virtual ValueUnion Convert(in ValueUnion value)
+        public virtual Union Convert(in Union value)
             => Adapter?.Convert(value) ?? value;
     }
 }

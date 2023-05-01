@@ -8,6 +8,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using ZBase.Foundation.Mvvm;
+using ZBase.Foundation.Unions;
 
 namespace MvvmTests
 {
