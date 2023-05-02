@@ -6,6 +6,6 @@
   "documentationUrl": "https://github.com/Zitga-Tech/ZBase.Foundation.Mvvm/blob/main/README.md",
   "type": "library",
   "dependencies": {
-    "com.zbase.foundation.unions": "1.0.0"
+    "org.nuget.system.runtime.compilerservices.unsafe": "6.0.0"
   }
 }

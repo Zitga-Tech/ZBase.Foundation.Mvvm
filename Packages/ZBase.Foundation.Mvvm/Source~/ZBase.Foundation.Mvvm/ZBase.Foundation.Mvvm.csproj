@@ -16,7 +16,7 @@
 
     <Target Name="CopySourceFiles" AfterTargets="Build">
         <ItemGroup>
-            <DataFiles Include="$(ProjectDir)/src/**/*.*" />
+            <DataFiles Include="$(ProjectDir)/Mvvm/**/*.*" />
         </ItemGroup>
         <Copy SourceFiles="@(DataFiles)" DestinationFolder="$(ProjectDir)../../Mvvm/%(RecursiveDir)" SkipUnchangedFiles="true" Retries="3" RetryDelayMilliseconds="300" />
     </Target>
