@@ -16,7 +16,7 @@ namespace ZBase.Foundation.Unions
     /// 
     /// </remarks>
     /// <seealso cref="UnionBase" />
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Explicit, Size = UnionData.SIZE)]
     public readonly partial struct Union
     {
         public const int UNION_TYPE_KIND_SIZE = sizeof(UnionTypeKind);

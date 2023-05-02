@@ -90,6 +90,41 @@ namespace ZBase.Foundation.Unions
     [StructLayout(LayoutKind.Sequential)]
     public readonly struct UnionData
     {
+
+#if UNION_SIZE_128_BYTES
+        public const int SIZE = 128;
+#elif UNION_SIZE_120_BYTES
+        public const int SIZE = 120;
+#elif UNION_SIZE_112_BYTES
+        public const int SIZE = 112;
+#elif UNION_SIZE_104_BYTES
+        public const int SIZE = 104;
+#elif UNION_SIZE_96_BYTES
+        public const int SIZE = 96;
+#elif UNION_SIZE_88_BYTES
+        public const int SIZE = 88;
+#elif UNION_SIZE_80_BYTES
+        public const int SIZE = 80;
+#elif UNION_SIZE_72_BYTES
+        public const int SIZE = 72;
+#elif UNION_SIZE_64_BYTES
+        public const int SIZE = 64;
+#elif UNION_SIZE_56_BYTES
+        public const int SIZE = 56;
+#elif UNION_SIZE_48_BYTES
+        public const int SIZE = 48;
+#elif UNION_SIZE_40_BYTES
+        public const int SIZE = 40;
+#elif UNION_SIZE_32_BYTES
+        public const int SIZE = 32;
+#elif UNION_SIZE_24_BYTES
+        public const int SIZE = 24;
+#elif UNION_SIZE_16_BYTES
+        public const int SIZE = 16;
+#else
+        public const int SIZE = 8;
+#endif
+
         private readonly ulong _l1;
 
 #if __UNION_STORAGE_ENABLE_L2__

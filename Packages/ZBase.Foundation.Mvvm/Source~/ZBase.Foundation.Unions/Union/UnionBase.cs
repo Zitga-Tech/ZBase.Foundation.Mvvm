@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Unions
     /// While the rest are used to store the actual data.
     /// </summary>
     /// <seealso cref="UnionData"/>
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Explicit, Size = UnionData.SIZE)]
     public readonly struct UnionBase
     {
         public const int META_SIZE = sizeof(ulong);
