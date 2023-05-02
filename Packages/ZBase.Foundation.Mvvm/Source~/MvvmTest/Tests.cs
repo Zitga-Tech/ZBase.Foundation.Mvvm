@@ -250,9 +250,7 @@ namespace MvvmTests
 
             static Converter()
             {
-#if !UNITY_5_3_OR_NEWER || !UNITY_EDITOR
                 Init();
-#endif
             }
 
 #if UNITY_5_3_OR_NEWER && UNITY_EDITOR
