@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using ZBase.Foundation.Mvvm;
 using ZBase.Foundation.Unions;
 
@@ -55,6 +56,9 @@ namespace MvvmTests
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(Total))]
         private int _intValue;
+
+        [ObservableProperty]
+        private TypeCode _typeCode;
 
         private int Total { get; }
     }
@@ -366,6 +370,94 @@ namespace MvvmTests
             inpc.PropertyChanged(_fieldOnUpdateAlpha.Member, _listenerOnUpdateAlpha);
             inpc.PropertyChanged(_fieldOnUpdateInteractable.Member, _listenerOnUpdateInteractable);
             inpc.PropertyChanged(_fieldOnUpdateBlockRaycasts.Member, _listenerOnUpdateBlockRaycasts);
+        }
+    }
+}
+
+namespace MvvmTests
+{
+    public enum MyEnum { A, B, C }
+
+    [StructLayout(LayoutKind.Explicit)]
+    public readonly partial struct UnionMyEnum : IUnion<MyEnum>
+    {
+        public static readonly UnionTypeId MyEnumTypeId = UnionTypeId.Of<MyEnum>();
+
+        [FieldOffset(UnionBase.META_OFFSET)] public readonly Union Union;
+        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly MyEnum Value;
+
+        public UnionMyEnum(MyEnum value)
+        {
+            Union = new Union(UnionTypeKind.ValueType, MyEnumTypeId);
+            Value = value;
+        }
+
+        public UnionMyEnum(in Union union) : this()
+        {
+            Union = union;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator UnionMyEnum(MyEnum value)
+            => new UnionMyEnum(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Union(in UnionMyEnum value)
+            => value.Union;
+
+        public sealed class Converter : IUnionConverter<MyEnum>
+        {
+            public static readonly Converter Default = new Converter();
+
+            static Converter()
+            {
+#if !UNITY_5_3_OR_NEWER || !UNITY_EDITOR
+                Init();
+#endif
+            }
+
+#if UNITY_5_3_OR_NEWER && UNITY_EDITOR
+            [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+#endif
+            private static void Init()
+            {
+                ZBase.Foundation.Unions.UnionConverter.TryRegister(Default);
+            }
+
+            private Converter() { }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public Union ToUnion(MyEnum value)
+                => new UnionMyEnum(value);
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public Union<MyEnum> ToUnionT(MyEnum value)
+                => new UnionMyEnum(value).Union;
+
+            public bool TryGetValue(in Union union, out MyEnum result)
+            {
+                if (union.TypeId == MyEnumTypeId)
+                {
+                    var unionMyEnum = new UnionMyEnum(union);
+                    result = unionMyEnum.Value;
+                    return true;
+                }
+
+                result = default;
+                return false;
+            }
+
+            public bool TrySetValue(in Union union, ref MyEnum result)
+            {
+                if (union.TypeId == MyEnumTypeId)
+                {
+                    var unionMyEnum = new UnionMyEnum(union);
+                    result = unionMyEnum.Value;
+                    return true;
+                }
+
+                return false;
+            }
         }
     }
 }

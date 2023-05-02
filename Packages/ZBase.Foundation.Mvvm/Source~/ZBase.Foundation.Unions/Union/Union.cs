@@ -59,20 +59,27 @@ namespace ZBase.Foundation.Unions
             Base = @base;
         }
 
-        public Union(bool value) : this() { TypeKind = UnionTypeKind.Bool; Bool = value; }
-        public Union(byte value) : this() { TypeKind = UnionTypeKind.Byte; Byte = value; }
-        public Union(sbyte value) : this() { TypeKind = UnionTypeKind.SByte; SByte = value; }
-        public Union(char value) : this() { TypeKind = UnionTypeKind.Char; Char = value; }
-        public Union(double value) : this() { TypeKind = UnionTypeKind.Double; Double = value; }
-        public Union(float value) : this() { TypeKind = UnionTypeKind.Float; Float = value; }
-        public Union(int value) : this() { TypeKind = UnionTypeKind.Int; Int = value; }
-        public Union(uint value) : this() { TypeKind = UnionTypeKind.UInt; UInt = value; }
-        public Union(long value) : this() { TypeKind = UnionTypeKind.Long; Long = value; }
-        public Union(ulong value) : this() { TypeKind = UnionTypeKind.ULong; ULong = value; }
-        public Union(short value) : this() { TypeKind = UnionTypeKind.Short; Short = value; }
-        public Union(ushort value) : this() { TypeKind = UnionTypeKind.UShort; UShort = value; }
-        public Union(string value) : this() { TypeKind = UnionTypeKind.String; GCHandle = GCHandle.Alloc(value); }
-        public Union(object value) : this() { TypeKind = UnionTypeKind.Object; GCHandle = GCHandle.Alloc(value); }
+        public Union(bool value)   : this() { TypeKind = UnionTypeKind.Bool  ; TypeId = UnionTypeId.Of<bool>(); Bool = value; }
+        public Union(byte value)   : this() { TypeKind = UnionTypeKind.Byte  ; TypeId = UnionTypeId.Of<byte>(); Byte = value; }
+        public Union(sbyte value)  : this() { TypeKind = UnionTypeKind.SByte ; TypeId = UnionTypeId.Of<sbyte>(); SByte = value; }
+        public Union(char value)   : this() { TypeKind = UnionTypeKind.Char  ; TypeId = UnionTypeId.Of<char>(); Char = value; }
+        public Union(double value) : this() { TypeKind = UnionTypeKind.Double; TypeId = UnionTypeId.Of<double>(); Double = value; }
+        public Union(float value)  : this() { TypeKind = UnionTypeKind.Float ; TypeId = UnionTypeId.Of<float>(); Float = value; }
+        public Union(int value)    : this() { TypeKind = UnionTypeKind.Int   ; TypeId = UnionTypeId.Of<int>(); Int = value; }
+        public Union(uint value)   : this() { TypeKind = UnionTypeKind.UInt  ; TypeId = UnionTypeId.Of<uint>(); UInt = value; }
+        public Union(long value)   : this() { TypeKind = UnionTypeKind.Long  ; TypeId = UnionTypeId.Of<long>(); Long = value; }
+        public Union(ulong value)  : this() { TypeKind = UnionTypeKind.ULong ; TypeId = UnionTypeId.Of<ulong>(); ULong = value; }
+        public Union(short value)  : this() { TypeKind = UnionTypeKind.Short ; TypeId = UnionTypeId.Of<short>(); Short = value; }
+        public Union(ushort value) : this() { TypeKind = UnionTypeKind.UShort; TypeId = UnionTypeId.Of<ushort>(); UShort = value; }
+        public Union(string value) : this() { TypeKind = UnionTypeKind.String; TypeId = UnionTypeId.Of<string>(); GCHandle = GCHandle.Alloc(value); }
+        public Union(object value) : this() { TypeKind = UnionTypeKind.Object; TypeId = UnionTypeId.Of<object>(); GCHandle = GCHandle.Alloc(value); }
+        
+        public Union(object value, UnionTypeId typeId) : this()
+        {
+            TypeKind = UnionTypeKind.Object;
+            TypeId = typeId;
+            GCHandle = GCHandle.Alloc(value);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(bool value) => new Union(value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(byte value) => new Union(value);
@@ -92,191 +99,191 @@ namespace ZBase.Foundation.Unions
         public bool TypeEquals(in Union other)
             => TypeKind == other.TypeKind;
 
-        public bool TryGetValue(out bool dest)
+        public bool TryGetValue(out bool result)
         {
             if (TypeKind == UnionTypeKind.Bool)
             {
-                dest = Bool; return true;
+                result = Bool; return true;
             }
 
-            dest = default; return false;
+            result = default; return false;
         }
 
-        public bool TryGetValue(out byte dest)
+        public bool TryGetValue(out byte result)
         {
             if (TypeKind == UnionTypeKind.Byte)
             {
-                dest = Byte; return true;
+                result = Byte; return true;
             }
 
-            dest = default; return false;
+            result = default; return false;
         }
 
-        public bool TryGetValue(out sbyte dest)
+        public bool TryGetValue(out sbyte result)
         {
             if (TypeKind == UnionTypeKind.SByte)
             {
-                dest = SByte; return true;
+                result = SByte; return true;
             }
 
-            dest = default; return false;
+            result = default; return false;
         }
 
-        public bool TryGetValue(out char dest)
+        public bool TryGetValue(out char result)
         {
             switch (TypeKind)
             {
-                case UnionTypeKind.SByte: dest = (char)SByte; return true;
-                case UnionTypeKind.Char: dest = Char; return true;
-                case UnionTypeKind.UShort: dest = (char)UShort; return true;
+                case UnionTypeKind.SByte: result = (char)SByte; return true;
+                case UnionTypeKind.Char: result = Char; return true;
+                case UnionTypeKind.UShort: result = (char)UShort; return true;
             }
 
-            dest = default; return false;
+            result = default; return false;
         }
 
-        public bool TryGetValue(out double dest)
+        public bool TryGetValue(out double result)
         {
             switch (TypeKind)
             {
-                case UnionTypeKind.Byte: dest = Byte; return true;
-                case UnionTypeKind.SByte: dest = SByte; return true;
-                case UnionTypeKind.Char: dest = Char; return true;
-                case UnionTypeKind.Double: dest = Double; return true;
-                case UnionTypeKind.Float: dest = Float; return true;
-                case UnionTypeKind.Int: dest = Int; return true;
-                case UnionTypeKind.UInt: dest = UInt; return true;
-                case UnionTypeKind.Long: dest = Long; return true;
-                case UnionTypeKind.ULong: dest = ULong; return true;
-                case UnionTypeKind.Short: dest = Short; return true;
-                case UnionTypeKind.UShort: dest = UShort; return true;
+                case UnionTypeKind.Byte: result = Byte; return true;
+                case UnionTypeKind.SByte: result = SByte; return true;
+                case UnionTypeKind.Char: result = Char; return true;
+                case UnionTypeKind.Double: result = Double; return true;
+                case UnionTypeKind.Float: result = Float; return true;
+                case UnionTypeKind.Int: result = Int; return true;
+                case UnionTypeKind.UInt: result = UInt; return true;
+                case UnionTypeKind.Long: result = Long; return true;
+                case UnionTypeKind.ULong: result = ULong; return true;
+                case UnionTypeKind.Short: result = Short; return true;
+                case UnionTypeKind.UShort: result = UShort; return true;
             }
 
-            dest = default; return false;
+            result = default; return false;
         }
 
-        public bool TryGetValue(out float dest)
+        public bool TryGetValue(out float result)
         {
             switch (TypeKind)
             {
-                case UnionTypeKind.Byte: dest = Byte; return true;
-                case UnionTypeKind.SByte: dest = SByte; return true;
-                case UnionTypeKind.Char: dest = Char; return true;
-                case UnionTypeKind.Float: dest = Float; return true;
-                case UnionTypeKind.Int: dest = Int; return true;
-                case UnionTypeKind.UInt: dest = UInt; return true;
-                case UnionTypeKind.Long: dest = Long; return true;
-                case UnionTypeKind.ULong: dest = ULong; return true;
-                case UnionTypeKind.Short: dest = Short; return true;
-                case UnionTypeKind.UShort: dest = UShort; return true;
+                case UnionTypeKind.Byte: result = Byte; return true;
+                case UnionTypeKind.SByte: result = SByte; return true;
+                case UnionTypeKind.Char: result = Char; return true;
+                case UnionTypeKind.Float: result = Float; return true;
+                case UnionTypeKind.Int: result = Int; return true;
+                case UnionTypeKind.UInt: result = UInt; return true;
+                case UnionTypeKind.Long: result = Long; return true;
+                case UnionTypeKind.ULong: result = ULong; return true;
+                case UnionTypeKind.Short: result = Short; return true;
+                case UnionTypeKind.UShort: result = UShort; return true;
             }
 
-            dest = default; return false;
+            result = default; return false;
         }
 
-        public bool TryGetValue(out int dest)
+        public bool TryGetValue(out int result)
         {
             switch (TypeKind)
             {
-                case UnionTypeKind.Byte: dest = Byte; return true;
-                case UnionTypeKind.SByte: dest = SByte; return true;
-                case UnionTypeKind.Char: dest = Char; return true;
-                case UnionTypeKind.Int: dest = Int; return true;
-                case UnionTypeKind.Short: dest = Short; return true;
-                case UnionTypeKind.UShort: dest = UShort; return true;
+                case UnionTypeKind.Byte: result = Byte; return true;
+                case UnionTypeKind.SByte: result = SByte; return true;
+                case UnionTypeKind.Char: result = Char; return true;
+                case UnionTypeKind.Int: result = Int; return true;
+                case UnionTypeKind.Short: result = Short; return true;
+                case UnionTypeKind.UShort: result = UShort; return true;
             }
 
-            dest = default; return false;
+            result = default; return false;
         }
 
-        public bool TryGetValue(out uint dest)
+        public bool TryGetValue(out uint result)
         {
             switch (TypeKind)
             {
-                case UnionTypeKind.Byte: dest = Byte; return true;
-                case UnionTypeKind.Char: dest = Char; return true;
-                case UnionTypeKind.UInt: dest = UInt; return true;
-                case UnionTypeKind.UShort: dest = UShort; return true;
+                case UnionTypeKind.Byte: result = Byte; return true;
+                case UnionTypeKind.Char: result = Char; return true;
+                case UnionTypeKind.UInt: result = UInt; return true;
+                case UnionTypeKind.UShort: result = UShort; return true;
             }
 
-            dest = default; return false;
+            result = default; return false;
         }
 
-        public bool TryGetValue(out long dest)
+        public bool TryGetValue(out long result)
         {
             switch (TypeKind)
             {
-                case UnionTypeKind.Byte: dest = Byte; return true;
-                case UnionTypeKind.SByte: dest = SByte; return true;
-                case UnionTypeKind.Char: dest = Char; return true;
-                case UnionTypeKind.Int: dest = Int; return true;
-                case UnionTypeKind.UInt: dest = UInt; return true;
-                case UnionTypeKind.Long: dest = Long; return true;
-                case UnionTypeKind.Short: dest = Short; return true;
-                case UnionTypeKind.UShort: dest = UShort; return true;
+                case UnionTypeKind.Byte: result = Byte; return true;
+                case UnionTypeKind.SByte: result = SByte; return true;
+                case UnionTypeKind.Char: result = Char; return true;
+                case UnionTypeKind.Int: result = Int; return true;
+                case UnionTypeKind.UInt: result = UInt; return true;
+                case UnionTypeKind.Long: result = Long; return true;
+                case UnionTypeKind.Short: result = Short; return true;
+                case UnionTypeKind.UShort: result = UShort; return true;
             }
 
-            dest = default; return false;
+            result = default; return false;
         }
 
-        public bool TryGetValue(out ulong dest)
+        public bool TryGetValue(out ulong result)
         {
             switch (TypeKind)
             {
-                case UnionTypeKind.Byte: dest = Byte; return true;
-                case UnionTypeKind.Char: dest = Char; return true;
-                case UnionTypeKind.UInt: dest = UInt; return true;
-                case UnionTypeKind.ULong: dest = ULong; return true;
-                case UnionTypeKind.UShort: dest = UShort; return true;
+                case UnionTypeKind.Byte: result = Byte; return true;
+                case UnionTypeKind.Char: result = Char; return true;
+                case UnionTypeKind.UInt: result = UInt; return true;
+                case UnionTypeKind.ULong: result = ULong; return true;
+                case UnionTypeKind.UShort: result = UShort; return true;
             }
 
-            dest = default; return false;
+            result = default; return false;
         }
 
-        public bool TryGetValue(out short dest)
+        public bool TryGetValue(out short result)
         {
             switch (TypeKind)
             {
-                case UnionTypeKind.Byte: dest = Byte; return true;
-                case UnionTypeKind.SByte: dest = SByte; return true;
-                case UnionTypeKind.Short: dest = Short; return true;
+                case UnionTypeKind.Byte: result = Byte; return true;
+                case UnionTypeKind.SByte: result = SByte; return true;
+                case UnionTypeKind.Short: result = Short; return true;
             }
 
-            dest = default; return false;
+            result = default; return false;
         }
 
-        public bool TryGetValue(out ushort dest)
+        public bool TryGetValue(out ushort result)
         {
             switch (TypeKind)
             {
-                case UnionTypeKind.Byte: dest = Byte; return true;
-                case UnionTypeKind.Char: dest = Char; return true;
-                case UnionTypeKind.UShort: dest = UShort; return true;
+                case UnionTypeKind.Byte: result = Byte; return true;
+                case UnionTypeKind.Char: result = Char; return true;
+                case UnionTypeKind.UShort: result = UShort; return true;
             }
 
-            dest = default; return false;
+            result = default; return false;
         }
 
-        public bool TryGetValue(out string dest)
+        public bool TryGetValue(out string result)
         {
             if (TypeKind == UnionTypeKind.String && GCHandle.Target is string value)
             {
-                dest = value;
+                result = value;
                 return true;
             }
 
-            dest = default;
+            result = default;
             return false;
         }
 
-        public bool TryGetValue(out object dest)
+        public bool TryGetValue(out object result)
         {
-            if (TypeKind == UnionTypeKind.Object && GCHandle.Target is object value)
+            if (TypeKind == UnionTypeKind.Object)
             {
-                dest = value;
+                result = GCHandle.Target;
                 return true;
             }
 
-            dest = default;
+            result = default;
             return false;
         }
 
@@ -499,7 +506,7 @@ namespace ZBase.Foundation.Unions
                     return TypeId.AsType().ToString();
                 }
 
-                case UnionTypeKind.UserDefined: return TypeId.AsType().ToString();
+                case UnionTypeKind.ValueType: return TypeId.AsType().ToString();
             }
 
             return string.Empty;

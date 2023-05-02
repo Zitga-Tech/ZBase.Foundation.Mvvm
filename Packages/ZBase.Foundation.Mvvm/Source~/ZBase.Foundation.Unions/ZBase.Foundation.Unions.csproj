@@ -11,4 +11,23 @@
         <PackageReference Include="Unity3D" Version="2.1.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Union\UnionConverters.t4.tt">
+        <Generator>TextTemplatingFileGenerator</Generator>
+        <LastGenOutput>UnionConverters.t4.cs</LastGenOutput>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Union\UnionConverters.t4.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>UnionConverters.t4.tt</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>

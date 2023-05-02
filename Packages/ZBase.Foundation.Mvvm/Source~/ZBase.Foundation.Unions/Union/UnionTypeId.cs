@@ -48,13 +48,16 @@ namespace ZBase.Foundation.Unions
         public static bool operator !=(in UnionTypeId lhs, in UnionTypeId rhs)
             => lhs._id != rhs._id;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static UnionTypeId Of<T>()
         {
             var id = new UnionTypeId(Id<T>.Value);
-            TypeVault.Register<T>(id);
+            TypeVault.Register(id, Id<T>.Type);
             return id;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Type TypeOf<T>()
+            => Id<T>.Type;
 
         private readonly struct UndefinedType { }
 
@@ -79,26 +82,26 @@ namespace ZBase.Foundation.Unions
                 s_vault = new ConcurrentDictionary<UnionTypeId, Type>();
                 s_vault.TryAdd(Undefined, UndefinedType);
 
-                Register<bool>(UnionTypeId.Of<bool>());
-                Register<byte>(UnionTypeId.Of<byte>());
-                Register<sbyte>(UnionTypeId.Of<sbyte>());
-                Register<char>(UnionTypeId.Of<char>());
-                Register<decimal>(UnionTypeId.Of<decimal>());
-                Register<double>(UnionTypeId.Of<double>());
-                Register<float>(UnionTypeId.Of<float>());
-                Register<int>(UnionTypeId.Of<int>());
-                Register<uint>(UnionTypeId.Of<uint>());
-                Register<long>(UnionTypeId.Of<long>());
-                Register<ulong>(UnionTypeId.Of<ulong>());
-                Register<short>(UnionTypeId.Of<short>());
-                Register<ushort>(UnionTypeId.Of<ushort>());
-                Register<string>(UnionTypeId.Of<string>());
-                Register<object>(UnionTypeId.Of<object>());
+                UnionTypeId.Of<bool>();
+                UnionTypeId.Of<byte>();
+                UnionTypeId.Of<sbyte>();
+                UnionTypeId.Of<char>();
+                UnionTypeId.Of<decimal>();
+                UnionTypeId.Of<double>();
+                UnionTypeId.Of<float>();
+                UnionTypeId.Of<int>();
+                UnionTypeId.Of<uint>();
+                UnionTypeId.Of<long>();
+                UnionTypeId.Of<ulong>();
+                UnionTypeId.Of<short>();
+                UnionTypeId.Of<ushort>();
+                UnionTypeId.Of<string>();
+                UnionTypeId.Of<object>();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static void Register<T>(UnionTypeId id)
-                => s_vault.TryAdd(id, typeof(T));
+            public static void Register(UnionTypeId id, Type type)
+                => s_vault.TryAdd(id, type);
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static bool TryGetType(UnionTypeId id, out Type type)
@@ -132,6 +135,8 @@ namespace ZBase.Foundation.Unions
             private static readonly uint s_value;
 
             public static uint Value => s_value;
+
+            public static readonly Type Type = typeof(T);
 
             static Id()
             {

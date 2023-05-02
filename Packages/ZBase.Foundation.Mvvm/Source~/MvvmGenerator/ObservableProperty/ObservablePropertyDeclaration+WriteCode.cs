@@ -58,10 +58,6 @@ namespace ZBase.Foundation.Mvvm
             foreach (var member in NotifyPropertyChangedForMap.Values)
             {
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler {OnChangingEventName(member)};");
-                p.PrintEndLine();
-
-                p.PrintLine(GENERATED_CODE);
                 p.PrintLine($"private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler {OnChangedEventName(member)};");
                 p.PrintEndLine();
             }
@@ -90,7 +86,7 @@ namespace ZBase.Foundation.Mvvm
                         p.OpenScope();
                         {
                             p.PrintLine($"{OnChangingMethodName(member)}(value);");
-                            p.PrintLine($"var {argsName} = new global::ZBase.Foundation.Mvvm.PropertyChangeEventArgs(this, nameof(this.{propertyName}), value);");
+                            p.PrintLine($"var {argsName} = new global::ZBase.Foundation.Mvvm.PropertyChangeEventArgs(this, nameof(this.{propertyName}), global::ZBase.Foundation.Unions.UnionConverter.ToUnion(value));");
                             p.PrintLine($"this.{OnChangingEventName(member)}?.Invoke({argsName});");
                             p.PrintLine($"this.{fieldName} = value;");
                             p.PrintLine($"{OnChangedMethodName(member)}(value);");
@@ -101,7 +97,7 @@ namespace ZBase.Foundation.Mvvm
                                 var otherArgsName = OnChangedArgsName(property);
                                 p.PrintEndLine();
                                 p.PrintLine($"{OnChangedMethodName(property)}(this.{propertyName});");
-                                p.PrintLine($"var {otherArgsName} = new global::ZBase.Foundation.Mvvm.PropertyChangeEventArgs(this, nameof(this.{propertyName}), this.{propertyName});");
+                                p.PrintLine($"var {otherArgsName} = new global::ZBase.Foundation.Mvvm.PropertyChangeEventArgs(this, nameof(this.{propertyName}), global::ZBase.Foundation.Unions.UnionConverter.ToUnion(this.{propertyName}));");
                                 p.PrintLine($"this.{OnChangedEventName(property)}?.Invoke({otherArgsName});");
                             }
 

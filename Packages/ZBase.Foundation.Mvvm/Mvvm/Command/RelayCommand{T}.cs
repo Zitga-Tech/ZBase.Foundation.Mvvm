@@ -81,7 +81,7 @@ namespace ZBase.Foundation.Mvvm
         /// <inheritdoc/>
         public bool CanExecute(Union parameter)
         {
-            if (UnionAPI.TryGetValue(parameter, out T result) == false)
+            if (UnionConverter.TryGetValue(parameter, out T result) == false)
             {
                 ThrowArgumentException();
             }
@@ -99,7 +99,7 @@ namespace ZBase.Foundation.Mvvm
         /// <inheritdoc/>
         public void Execute(Union parameter)
         {
-            if (UnionAPI.TryGetValue(parameter, out T result) == false)
+            if (UnionConverter.TryGetValue(parameter, out T result) == false)
             {
                 ThrowArgumentException();
             }
