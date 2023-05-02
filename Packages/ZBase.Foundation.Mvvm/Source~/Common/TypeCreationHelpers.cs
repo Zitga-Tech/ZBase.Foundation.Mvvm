@@ -184,7 +184,7 @@ namespace ZBase.Foundation.SourceGen
             };
         }
 
-        static (string start, StringBuilder end) GetBaseDeclaration(BaseTypeDeclarationSyntax typeSyntax)
+        static (string start, StringBuilder end) GetBaseDeclaration(SyntaxNode typeSyntax)
         {
             var builderStart = "";
             var builderEnd = new StringBuilder();
@@ -224,7 +224,7 @@ namespace ZBase.Foundation.SourceGen
 
         public static SourceText GenerateSourceTextForRootNodes(
               string generatedSourceFilePath
-            , BaseTypeDeclarationSyntax originalSyntax
+            , SyntaxNode originalSyntax
             , string generatedSyntax
             , CancellationToken cancellationToken
         )

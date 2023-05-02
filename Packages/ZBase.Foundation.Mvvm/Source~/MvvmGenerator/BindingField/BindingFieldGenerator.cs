@@ -17,14 +17,14 @@ namespace ZBase.Foundation.Mvvm
             var projectPathProvider = SourceGenHelpers.GetSourceGenConfigProvider(context);
 
             var candidateProvider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: (node, token) => GeneratorHelpers.IsSyntaxMatch(node, token),
-                transform: (syntaxContext, token) => GeneratorHelpers.GetSemanticMatch(syntaxContext, token, INTERFACE)
-            ).Where(t => t is { });
+                predicate: static (node, token) => GeneratorHelpers.IsSyntaxMatch(node, token),
+                transform: static (syntaxContext, token) => GeneratorHelpers.GetSemanticMatch(syntaxContext, token, INTERFACE)
+            ).Where(static t => t is { });
 
             var compilationProvider = context.CompilationProvider;
             var combined = candidateProvider.Combine(compilationProvider).Combine(projectPathProvider);
 
-            context.RegisterSourceOutput(combined, (sourceProductionContext, source) => {
+            context.RegisterSourceOutput(combined, static (sourceProductionContext, source) => {
                 GenerateOutput(
                     sourceProductionContext
                     , source.Left.Right

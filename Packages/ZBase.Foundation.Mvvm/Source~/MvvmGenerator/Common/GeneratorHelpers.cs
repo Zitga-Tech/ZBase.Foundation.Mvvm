@@ -131,5 +131,16 @@ namespace ZBase.Foundation.Mvvm
         {
             return $"{char.ToUpper(value[0])}{value.Slice(1).ToString()}";
         }
+
+        public static string GetKeyword(this Accessibility accessibility)
+            => accessibility switch {
+                Accessibility.Public => "public",
+                Accessibility.Private => "private",
+                Accessibility.Protected => "protected",
+                Accessibility.Internal => "internal",
+                Accessibility.ProtectedOrInternal => "protected internal",
+                Accessibility.ProtectedAndInternal => "private protected",
+                _ => ""
+            };
     }
 }

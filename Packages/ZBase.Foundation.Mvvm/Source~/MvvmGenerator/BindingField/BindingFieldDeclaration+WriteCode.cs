@@ -11,10 +11,11 @@ namespace ZBase.Foundation.Mvvm
         {
             var scopePrinter = new SyntaxNodeScopePrinter(Printer.DefaultLarge, Syntax.Parent);
             var p = scopePrinter.printer;
-            p = p.IncreasedIndent();
 
             p.PrintLine("#pragma warning disable");
             p.PrintEndLine();
+
+            p = p.IncreasedIndent();
 
             p.PrintBeginLine();
             p.Print("partial class ").Print(Syntax.Identifier.Text);
@@ -90,10 +91,11 @@ namespace ZBase.Foundation.Mvvm
         {
             var scopePrinter = new SyntaxNodeScopePrinter(Printer.DefaultLarge, Syntax.Parent);
             var p = scopePrinter.printer;
-            p = p.IncreasedIndent();
 
             p.PrintLine("#pragma warning disable");
             p.PrintEndLine();
+
+            p = p.IncreasedIndent();
 
             WriteBindingInfoAttributes(ref p);
 

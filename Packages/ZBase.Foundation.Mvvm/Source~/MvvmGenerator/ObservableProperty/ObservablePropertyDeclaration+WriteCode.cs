@@ -16,10 +16,11 @@ namespace ZBase.Foundation.Mvvm
         {
             var scopePrinter = new SyntaxNodeScopePrinter(Printer.DefaultLarge, Syntax.Parent);
             var p = scopePrinter.printer;
-            p = p.IncreasedIndent();
 
             p.PrintLine("#pragma warning disable");
             p.PrintEndLine();
+
+            p = p.IncreasedIndent();
 
             p.PrintBeginLine();
             p.Print("partial class ").Print(Syntax.Identifier.Text);
@@ -47,8 +48,7 @@ namespace ZBase.Foundation.Mvvm
                     var keyword = Symbol.IsSealed ? "" : "virtual ";
 
                     p.PrintLine($"/// <inheritdoc cref=\"global::ZBase.Foundation.Mvvm.INotifyPropertyChanging.PropertyChanging{{TInstance}}(string, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener{{TInstance}})\" />");
-                    p.PrintLine(GENERATED_CODE);
-                    p.PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine($"public {keyword}bool PropertyChanging<TInstance>(string propertyName, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener<TInstance> listener) where TInstance : class");
                     p.OpenScope();
                     {
@@ -66,8 +66,7 @@ namespace ZBase.Foundation.Mvvm
                     p.PrintEndLine();
 
                     p.PrintLine($"/// <inheritdoc cref=\"global::ZBase.Foundation.Mvvm.INotifyPropertyChanged.PropertyChanged{{TInstance}}(string, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener{{TInstance}})\" />");
-                    p.PrintLine(GENERATED_CODE);
-                    p.PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine($"public {keyword}bool PropertyChanged<TInstance>(string propertyName, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener<TInstance> listener) where TInstance : class");
                     p.OpenScope();
                     {
@@ -180,9 +179,7 @@ namespace ZBase.Foundation.Mvvm
                 var argsName = OnChangedArgsName(member);
                 var converterForField = GeneratorHelpers.ToTitleCase(member.Member.Type.ToValidIdentifier().AsSpan());
 
-                p.PrintLine(GENERATED_CODE);
-                p.PrintLine(EXCLUDE_COVERAGE);
-                p.PrintLine(OBSERVABLE_PROPERTY);
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(OBSERVABLE_PROPERTY);
                 p.PrintLine($"public {typeName} {propertyName}");
                 p.OpenScope();
                 {
@@ -271,8 +268,7 @@ namespace ZBase.Foundation.Mvvm
             var keyword = IsBaseObservableObject ? "override " : Symbol.IsSealed ? "" : "virtual ";
 
             p.PrintLine($"/// <inheritdoc cref=\"global::ZBase.Foundation.Mvvm.INotifyPropertyChanging.PropertyChanging{{TInstance}}(string, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener{{TInstance}})\" />");
-            p.PrintLine(GENERATED_CODE);
-            p.PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
             p.PrintLine($"public {keyword}bool PropertyChanging<TInstance>(string propertyName, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener<TInstance> listener) where TInstance : class");
             p.OpenScope();
             {
@@ -321,8 +317,7 @@ namespace ZBase.Foundation.Mvvm
             var keyword = IsBaseObservableObject ? "override " : Symbol.IsSealed ? "" : "virtual ";
 
             p.PrintLine($"/// <inheritdoc cref=\"global::ZBase.Foundation.Mvvm.INotifyPropertyChanged.PropertyChanged{{TInstance}}(string, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener{{TInstance}})\" />");
-            p.PrintLine(GENERATED_CODE);
-            p.PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
             p.PrintLine($"public {keyword}bool PropertyChanged<TInstance>(string propertyName, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener<TInstance> listener) where TInstance : class");
             p.OpenScope();
             {
@@ -462,8 +457,7 @@ namespace ZBase.Foundation.Mvvm
                 }
             }
 
-            p.PrintLine(GENERATED_CODE);
-            p.PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
             p.PrintLine("private class UnionConverters");
             p.OpenScope();
             {
@@ -483,8 +477,7 @@ namespace ZBase.Foundation.Mvvm
                     var fieldName = type.ToValidIdentifier();
                     var propertyName = GeneratorHelpers.ToTitleCase(fieldName.AsSpan());
 
-                    p.PrintLine(GENERATED_CODE);
-                    p.PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine($"public global::ZBase.Foundation.Unions.IUnionConverter<{typeName}> {propertyName}");
                     p.OpenScope();
                     {

@@ -9,7 +9,13 @@ using ZBase.Foundation.Unions;
 
 namespace X.TY.Z
 {
-    public struct MyStr<T> { }
+    public partial class Ab
+    {
+        public partial class Name
+        {
+            public struct MyStr<T> { }
+        }
+    }
 }
 
 namespace MvvmTests
@@ -61,12 +67,12 @@ namespace MvvmTests
         private TypeCode _typeCode;
 
         [ObservableProperty]
-        private X.TY.Z.MyStr<MyEnum[]> _customValue;
+        private X.TY.Z.Ab.Name.MyStr<MyEnum> _customValue;
 
         private int Total { get; }
 
         [RelayCommand]
-        private void Process(ModelA a) { }
+        private void Process(X.TY.Z.Ab.Name.MyStr<MyEnum> a) { }
         
         private bool Validate(int x) => false;
 

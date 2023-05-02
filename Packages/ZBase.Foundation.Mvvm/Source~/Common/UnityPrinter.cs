@@ -708,5 +708,101 @@ namespace ZBase.Foundation.SourceGen
             return this;
         }
     }
+
+    /// <summary>
+    /// Printer that replicate the full scope path declaration (namespace, class and struct declarations) to a given ISymbol
+    /// </summary>
+    public struct SymbolScopePrinter
+    {
+        private ISymbol _symbol;
+        public Printer     printer;
+
+        public SymbolScopePrinter(Printer printer, ISymbol symbol)
+        {
+            this.printer = printer;
+            _symbol = symbol;
+        }
+
+        public SymbolScopePrinter PrintScope(ISymbol symbol)
+        {
+            PrintScopeContainingNamespace(symbol.ContainingNamespace);
+            PrintScopeContainingType(symbol.ContainingType);
+            return this;
+        }
+
+        private SymbolScopePrinter PrintScopeContainingNamespace(INamespaceSymbol symbol)
+        {
+            if (symbol != null && string.IsNullOrWhiteSpace(symbol.Name) == false)
+            {
+                printer.PrintBeginLine().Print("namespace ");
+                PrintNamespacePart(ref printer, symbol, symbol);
+                printer = printer.PrintEndLine().PrintLine("{").WithIncreasedIndent();
+            }
+
+            return this;
+
+            static void PrintNamespacePart(ref Printer p, INamespaceSymbol ns, INamespaceSymbol root)
+            {
+                if (ns != null && string.IsNullOrWhiteSpace(ns.Name) == false)
+                {
+                    if (ns.ContainingNamespace != null)
+                    {
+                        PrintNamespacePart(ref p, ns.ContainingNamespace, root);
+                    }
+
+                    p.Print(ns.Name);
+
+                    if (ns.Name != root.Name)
+                    {
+                        p.Print(".");
+                    }
+                }
+            }
+        }
+
+        private SymbolScopePrinter PrintScopeContainingType(INamedTypeSymbol symbol)
+        {
+            if (symbol != null && string.IsNullOrWhiteSpace(symbol.Name) == false)
+            {
+                if (symbol.ContainingType != null)
+                {
+                    PrintScopeContainingType(symbol.ContainingType);
+                }
+
+                printer.PrintBeginLine().Print("partial ");
+
+                if (symbol.TypeKind == TypeKind.Struct)
+                    printer.Print("struct ");
+                else
+                    printer.Print("class ");
+
+                printer = printer.PrintEndLine(symbol.Name).PrintLine("{").WithIncreasedIndent();
+            }
+
+            return this;
+        }
+
+        public SymbolScopePrinter PrintOpen() => PrintScope(_symbol);
+
+        public SymbolScopePrinter PrintClose()
+        {
+            ISymbol parent = _symbol.ContainingType;
+
+            while (parent != null && string.IsNullOrEmpty(parent.Name) == false)
+            {
+                printer = printer.WithDecreasedIndent().PrintLine("}");
+                parent = parent.ContainingType;
+            }
+
+            parent = _symbol.ContainingNamespace;
+
+            if (parent != null && string.IsNullOrEmpty(parent.Name) == false)
+            {
+                printer = printer.WithDecreasedIndent().PrintLine("}");
+            }
+
+            return this;
+        }
+    }
 }
 

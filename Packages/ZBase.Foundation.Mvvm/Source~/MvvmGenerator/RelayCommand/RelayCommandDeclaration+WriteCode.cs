@@ -13,10 +13,11 @@ namespace ZBase.Foundation.Mvvm
         {
             var scopePrinter = new SyntaxNodeScopePrinter(Printer.DefaultLarge, Syntax.Parent);
             var p = scopePrinter.printer;
-            p = p.IncreasedIndent();
 
             p.PrintLine("#pragma warning disable");
             p.PrintEndLine();
+
+            p = p.IncreasedIndent();
 
             WriteRelayCommandInfoAttributes(ref p);
 
@@ -87,9 +88,7 @@ namespace ZBase.Foundation.Mvvm
                 var canExecuteArg = CanExecuteMethodArg(member.CanExecuteMethod);
 
                 p.PrintLine($"/// <summary>Gets an <see cref=\"{interfaceNameComment}\"/> instance wrapping <see cref=\"{method.Name}\"/>.</summary>");
-                p.PrintLine(GENERATED_CODE);
-                p.PrintLine(EXCLUDE_COVERAGE);
-                p.PrintLine(RELAY_COMMAND);
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(RELAY_COMMAND);
                 p.PrintLine($"public {interfaceName} {propertyName}");
                 p.OpenScope();
                 {
