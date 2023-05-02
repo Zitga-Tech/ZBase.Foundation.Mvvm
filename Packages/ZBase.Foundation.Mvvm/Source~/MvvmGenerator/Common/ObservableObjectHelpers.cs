@@ -91,17 +91,6 @@ namespace ZBase.Foundation.Mvvm
             return null;
         }
 
-        public static string ToKeyword(this Accessibility accessibility)
-            => accessibility switch {
-                Accessibility.Public => "public",
-                Accessibility.Private => "private",
-                Accessibility.Protected => "protected",
-                Accessibility.Internal => "internal",
-                Accessibility.ProtectedOrInternal => "protected internal",
-                Accessibility.ProtectedAndInternal => "private protected",
-                _ => string.Empty,
-            };
-
         public static string ToPropertyName(this IFieldSymbol field)
         {
             var nameSpan = field.Name.AsSpan();

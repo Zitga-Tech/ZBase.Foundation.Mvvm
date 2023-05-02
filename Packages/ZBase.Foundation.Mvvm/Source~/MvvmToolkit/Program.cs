@@ -7,37 +7,11 @@ namespace MvvmToolkit
     {
         public static void Main()
         {
-            var model = new MyViewModel();
-            model.PropertyChanged += Model_PropertyChanged;
-
-            var random = new Random();
-
-            while (true)
-            {
-                var key = Console.ReadKey();
-
-                switch (key.Key)
-                {
-                    case ConsoleKey.Spacebar:
-                        model.LastName = random.NextInt64().ToString();
-                        break;
-
-                    default: return;
-                }
-            }
-        }
-
-        private static void Model_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (sender is MyViewModel model)
-            {
-                Console.WriteLine($"Changed: {e.PropertyName}: {model.FullName}");
-            }
         }
     }
 
     [ObservableObject]
-    public partial class MyViewModel
+    public partial class ModelA
     {
         [ObservableProperty]
         private int _age;
@@ -52,19 +26,29 @@ namespace MvvmToolkit
         [NotifyCanExecuteChangedFor(nameof(GreetUserCommand))]
         private string? _lastName;
 
-        public string? FullName => $"{FirstName} {LastName}";
+        private string? FullName => $"{FirstName} {LastName}";
 
         [RelayCommand]
-        private static void GreetUser(MyViewModel x)
+        private static void GreetUser(ModelA x)
         {
             Console.WriteLine($"Hello {x.FullName}");
         }
 
-        private static bool Validate(MyViewModel x) => false;
+        private static bool Validate(ModelA x) => false;
 
         [RelayCommand(CanExecute = nameof(Validate))]
-        private void DoX(MyViewModel x)
+        private void DoX(ModelA x)
         {
         }
+    }
+
+    [ObservableObject]
+    public partial class ModelB
+    {
+        [ObservableProperty]
+        private string _name;
+
+        [ObservableProperty]
+        private TypeCode _type;
     }
 }

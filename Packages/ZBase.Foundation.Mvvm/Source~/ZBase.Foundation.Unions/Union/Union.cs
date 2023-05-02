@@ -24,10 +24,6 @@ namespace ZBase.Foundation.Unions
 
         public static readonly Union Undefined = default;
 
-        private static readonly string s_defaultStringForString = $"{nameof(Union)}.{UnionTypeKind.String}";
-        private static readonly string s_defaultStringForObject = $"{nameof(Union)}.{UnionTypeKind.Object}";
-        private static readonly string s_defaultStringForStruct = $"{nameof(Union)}.{UnionTypeKind.Struct}";
-
         [FieldOffset(UnionBase.META_OFFSET)] public readonly UnionBase Base;
         [FieldOffset(UnionBase.META_OFFSET)] public readonly UnionTypeKind TypeKind;
         [FieldOffset(UNION_TYPE_ID_OFFSET)]  public readonly UnionTypeId TypeId;
@@ -45,20 +41,22 @@ namespace ZBase.Foundation.Unions
         [FieldOffset(UnionBase.DATA_OFFSET)] public readonly ushort UShort;
         [FieldOffset(UnionBase.DATA_OFFSET)] public readonly GCHandle GCHandle;
 
+        public Union(UnionBase @base, UnionTypeKind type, UnionTypeId typeId) : this()
+        {
+            Base = @base;
+            TypeKind = type;
+            TypeId = typeId;
+        }
+
+        public Union(UnionTypeKind type, UnionTypeId typeId) : this()
+        {
+            TypeKind = type;
+            TypeId = typeId;
+        }
+
         public Union(UnionBase @base) : this()
         {
             Base = @base;
-        }
-
-        public Union(UnionBase @base, UnionTypeKind type) : this()
-        {
-            Base = @base;
-            TypeKind = type;
-        }
-
-        public Union(UnionTypeKind type) : this()
-        {
-            TypeKind = type;
         }
 
         public Union(bool value) : this() { TypeKind = UnionTypeKind.Bool; Bool = value; }
@@ -282,18 +280,6 @@ namespace ZBase.Foundation.Unions
             return false;
         }
 
-        public bool TryGetValue<T>(out T dest)
-        {
-            if (TypeKind == UnionTypeKind.String && GCHandle.Target is T value)
-            {
-                dest = value;
-                return true;
-            }
-
-            dest = default;
-            return false;
-        }
-
         public bool TrySetValue(ref bool dest)
         {
             if (TypeKind == UnionTypeKind.Bool)
@@ -497,14 +483,12 @@ namespace ZBase.Foundation.Unions
                 case UnionTypeKind.Short: return Short.ToString();
                 case UnionTypeKind.UShort: return UShort.ToString();
 
-                case UnionTypeKind.Struct: return s_defaultStringForStruct;
-
                 case UnionTypeKind.String:
                 {
                     if (GCHandle.Target is string value)
                         return value;
 
-                    return s_defaultStringForString;
+                    return string.Empty;
                 }
 
                 case UnionTypeKind.Object:
@@ -512,8 +496,10 @@ namespace ZBase.Foundation.Unions
                     if (GCHandle.Target is object value)
                         return value.ToString();
 
-                    return s_defaultStringForObject;
+                    return TypeId.AsType().ToString();
                 }
+
+                case UnionTypeKind.UserDefined: return TypeId.AsType().ToString();
             }
 
             return string.Empty;

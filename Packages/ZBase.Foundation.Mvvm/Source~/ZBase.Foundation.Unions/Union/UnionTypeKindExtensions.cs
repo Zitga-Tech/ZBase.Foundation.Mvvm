@@ -2,52 +2,60 @@
 {
     public static class UnionTypeKindExtensions
     {
-        public static UnionTypeKind ToUnionTypeKind(this System.TypeCode value)
+        public static UnionTypeKind ToUnionType(this string value)
             => value switch {
-                System.TypeCode.Boolean => UnionTypeKind.Bool,
-                System.TypeCode.Byte => UnionTypeKind.Byte,
-                System.TypeCode.SByte => UnionTypeKind.SByte,
-                System.TypeCode.Char => UnionTypeKind.Char,
-                System.TypeCode.Double => UnionTypeKind.Double,
-                System.TypeCode.Single => UnionTypeKind.Float,
-                System.TypeCode.Int32 => UnionTypeKind.Int,
-                System.TypeCode.UInt32 => UnionTypeKind.UInt,
-                System.TypeCode.Int64 => UnionTypeKind.Long,
-                System.TypeCode.UInt64 => UnionTypeKind.ULong,
-                System.TypeCode.Int16 => UnionTypeKind.Short,
-                System.TypeCode.UInt16 => UnionTypeKind.UShort,
-                System.TypeCode.String => UnionTypeKind.String,
-                System.TypeCode.Object => UnionTypeKind.Object,
-                _ => throw new System.InvalidCastException("Not a valid supported type."),
+                "bool" => UnionTypeKind.Bool,
+                "byte" => UnionTypeKind.Byte,
+                "sbyte" => UnionTypeKind.SByte,
+                "char" => UnionTypeKind.Char,
+                "double" => UnionTypeKind.Double,
+                "float" => UnionTypeKind.Float,
+                "int" => UnionTypeKind.Int,
+                "uint" => UnionTypeKind.UInt,
+                "long" => UnionTypeKind.Long,
+                "ulong" => UnionTypeKind.ULong,
+                "short" => UnionTypeKind.Short,
+                "ushort" => UnionTypeKind.UShort,
+                "string" => UnionTypeKind.String,
+                "object" => UnionTypeKind.Object,
+                nameof(System.Boolean) => UnionTypeKind.Bool,
+                nameof(System.Byte) => UnionTypeKind.Byte,
+                nameof(System.SByte) => UnionTypeKind.SByte,
+                nameof(System.Char) => UnionTypeKind.Char,
+                nameof(System.Double) => UnionTypeKind.Double,
+                nameof(System.Single) => UnionTypeKind.Float,
+                nameof(System.Int32) => UnionTypeKind.Int,
+                nameof(System.UInt32) => UnionTypeKind.UInt,
+                nameof(System.Int64) => UnionTypeKind.Long,
+                nameof(System.UInt64) => UnionTypeKind.ULong,
+                nameof(System.Int16) => UnionTypeKind.Short,
+                nameof(System.UInt16) => UnionTypeKind.UShort,
+                nameof(System.String) => UnionTypeKind.String,
+                nameof(System.Object) => UnionTypeKind.Object,
+                not null and string { Length: >= 0 } => UnionTypeKind.UserDefined,
+                _ => UnionTypeKind.Undefined,
             };
 
-        public static UnionTypeKind ToEnumTypeKind(this UnionTypeKind value)
-            => value switch {
-                UnionTypeKind.Byte => UnionTypeKind.Byte,
-                UnionTypeKind.SByte => UnionTypeKind.SByte,
-                UnionTypeKind.Int => UnionTypeKind.Int,
-                UnionTypeKind.UInt => UnionTypeKind.UInt,
-                UnionTypeKind.Long => UnionTypeKind.Long,
-                UnionTypeKind.ULong => UnionTypeKind.ULong,
-                UnionTypeKind.Short => UnionTypeKind.Short,
-                UnionTypeKind.UShort => UnionTypeKind.UShort,
-                _ => throw new System.InvalidCastException("Not a valid supported type for enum."),
+        public static bool IsNativeUnionType(this string value)
+            => value.ToUnionType() switch {
+                UnionTypeKind.Bool => true,
+                UnionTypeKind.Byte => true,
+                UnionTypeKind.SByte => true,
+                UnionTypeKind.Char => true,
+                UnionTypeKind.Double => true,
+                UnionTypeKind.Float => true,
+                UnionTypeKind.Int => true,
+                UnionTypeKind.UInt => true,
+                UnionTypeKind.Long => true,
+                UnionTypeKind.ULong => true,
+                UnionTypeKind.Short => true,
+                UnionTypeKind.UShort => true,
+                UnionTypeKind.String => true,
+                UnionTypeKind.Object => true,
+                _ => false,
             };
 
-        public static UnionTypeKind ToEnumTypeKind(this System.TypeCode value)
-            => value switch {
-                System.TypeCode.Byte => UnionTypeKind.Byte,
-                System.TypeCode.SByte => UnionTypeKind.SByte,
-                System.TypeCode.Int32 => UnionTypeKind.Int,
-                System.TypeCode.UInt32 => UnionTypeKind.UInt,
-                System.TypeCode.Int64 => UnionTypeKind.Long,
-                System.TypeCode.UInt64 => UnionTypeKind.ULong,
-                System.TypeCode.Int16 => UnionTypeKind.Short,
-                System.TypeCode.UInt16 => UnionTypeKind.UShort,
-                _ => throw new System.InvalidCastException("Not a valid supported type for enum."),
-            };
-
-        public static bool IsEnumUnionTypeKind(this UnionTypeKind value)
+        public static bool IsEnumUnderlyingType(this UnionTypeKind value)
             => value switch {
                 UnionTypeKind.Byte => true,
                 UnionTypeKind.SByte => true,
@@ -60,9 +68,19 @@
                 _ => false,
             };
 
-        public static UnionTypeKind ToEnumTypeKind<TEnum>(this TEnum value)
+        public static UnionTypeKind ToEnumUnderlyingTypeKind<TEnum>(this TEnum value)
             where TEnum : unmanaged, System.Enum
-            => value.GetTypeCode().ToEnumTypeKind();
+            => value.GetTypeCode() switch {
+                System.TypeCode.Byte => UnionTypeKind.Byte,
+                System.TypeCode.SByte => UnionTypeKind.SByte,
+                System.TypeCode.Int32 => UnionTypeKind.Int,
+                System.TypeCode.UInt32 => UnionTypeKind.UInt,
+                System.TypeCode.Int64 => UnionTypeKind.Long,
+                System.TypeCode.UInt64 => UnionTypeKind.ULong,
+                System.TypeCode.Int16 => UnionTypeKind.Short,
+                System.TypeCode.UInt16 => UnionTypeKind.UShort,
+                _ => UnionTypeKind.Undefined,
+            };
 
         public static bool IsNumberImplicitlyConvertible(this UnionTypeKind src, UnionTypeKind dest)
         {

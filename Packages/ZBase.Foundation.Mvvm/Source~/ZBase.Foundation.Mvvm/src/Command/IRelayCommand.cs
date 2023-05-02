@@ -19,7 +19,7 @@
     public interface IRelayCommand<in T> : IRelayCommand
     {
         /// <summary>
-        /// Provides a strongly-typed variant of <see cref="ICommand.CanExecute(object)"/>.
+        /// Provides a strongly-typed variant of <see cref="ICommand.CanExecute(ZBase.Foundation.Unions.Union)"/>.
         /// </summary>
         /// <param name="parameter">The input parameter.</param>
         /// <returns>Whether or not the current command can be executed.</returns>
@@ -27,7 +27,7 @@
         bool CanExecute(T parameter);
 
         /// <summary>
-        /// Provides a strongly-typed variant of <see cref="ICommand.Execute(object)"/>.
+        /// Provides a strongly-typed variant of <see cref="ICommand.Execute(ZBase.Foundation.Unions.Union)"/>.
         /// </summary>
         /// <param name="parameter">The input parameter.</param>
         /// <remarks>Use this overload to avoid boxing, if <typeparamref name="T"/> is a value type.</remarks>

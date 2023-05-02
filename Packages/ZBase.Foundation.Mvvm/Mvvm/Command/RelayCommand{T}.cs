@@ -79,18 +79,11 @@ namespace ZBase.Foundation.Mvvm
         }
 
         /// <inheritdoc/>
-        public bool CanExecute(object parameter)
+        public bool CanExecute(Union parameter)
         {
-            // Special case a null value for a value type argument type.
-            // This ensures that no exceptions are thrown during initialization.
-            if (parameter is null && default(T) is not null)
+            if (UnionAPI.TryGetValue(parameter, out T result) == false)
             {
-                return false;
-            }
-
-            if (TryGetCommandArgument(parameter, out T result) == false)
-            {
-                ThrowArgumentExceptionForInvalidCommandArgument(parameter);
+                ThrowArgumentException();
             }
 
             return CanExecute(result);
@@ -104,68 +97,21 @@ namespace ZBase.Foundation.Mvvm
         }
 
         /// <inheritdoc/>
-        public void Execute(object parameter)
+        public void Execute(Union parameter)
         {
-            if (TryGetCommandArgument(parameter, out T result) == false)
+            if (UnionAPI.TryGetValue(parameter, out T result) == false)
             {
-                ThrowArgumentExceptionForInvalidCommandArgument(parameter);
+                ThrowArgumentException();
             }
 
             Execute(result);
         }
 
-        /// <summary>
-        /// Tries to get a command argument of compatible type <typeparamref name="T"/> from an input <see cref="object"/>.
-        /// </summary>
-        /// <param name="parameter">The input parameter.</param>
-        /// <param name="result">The resulting <typeparamref name="T"/> value, if any.</param>
-        /// <returns>Whether or not a compatible command argument could be retrieved.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool TryGetCommandArgument(object parameter, out T result)
-        {
-            // If the argument is null and the default value of T is also null, then the
-            // argument is valid. T might be a reference type or a nullable value type.
-            if (parameter is null && default(T) is null)
-            {
-                result = default;
-
-                return true;
-            }
-
-            // Check if the argument is a T value, so either an instance of a type or a derived
-            // type of T is a reference type, an interface implementation if T is an interface,
-            // or a boxed value type in case T was a value type.
-            if (parameter is T argument)
-            {
-                result = argument;
-
-                return true;
-            }
-
-            result = default;
-            return false;
-        }
-
-        /// <summary>
-        /// Throws an <see cref="ArgumentException"/> if an invalid command argument is used.
-        /// </summary>
-        /// <param name="parameter">The input parameter.</param>
-        /// <exception cref="ArgumentException">Thrown with an error message to give info on the invalid parameter.</exception>
         [DoesNotReturn]
-        internal static void ThrowArgumentExceptionForInvalidCommandArgument(object parameter)
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal static void ThrowArgumentException()
         {
-            [MethodImpl(MethodImplOptions.NoInlining)]
-            static Exception GetException(object parameter)
-            {
-                if (parameter is null)
-                {
-                    return new ArgumentException($"Parameter \"{nameof(parameter)}\" (object) must not be null, as the command type requires an argument of type {typeof(T)}.", nameof(parameter));
-                }
-
-                return new ArgumentException($"Parameter \"{nameof(parameter)}\" (object) cannot be of type {parameter.GetType()}, as the command type requires an argument of type {typeof(T)}.", nameof(parameter));
-            }
-
-            throw GetException(parameter);
+            throw new ArgumentException($"The command type requires an argument of type {typeof(T)}.");
         }
     }
 }

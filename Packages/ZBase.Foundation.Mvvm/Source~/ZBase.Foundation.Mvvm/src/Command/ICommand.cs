@@ -1,4 +1,6 @@
-﻿namespace ZBase.Foundation.Mvvm
+﻿using ZBase.Foundation.Unions;
+
+namespace ZBase.Foundation.Mvvm
 {
     public interface ICommand
     {
@@ -12,12 +14,12 @@
         /// </summary>
         /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
         /// <returns>true if this command can be executed; otherwise, false.</returns>
-        bool CanExecute(object parameter);
+        bool CanExecute(Union parameter);
 
         /// <summary>
         /// Defines the method to be called when the command is invoked.
         /// </summary>
         /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
-        void Execute(object parameter);
+        void Execute(Union parameter);
     }
 }

@@ -65,13 +65,13 @@ namespace ZBase.Foundation.Mvvm
 
         /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool CanExecute(object parameter)
+        public bool CanExecute(Union parameter)
         {
             return _canExecute?.Invoke() != false;
         }
 
         /// <inheritdoc/>
-        public void Execute(object parameter)
+        public void Execute(Union parameter)
         {
             _execute();
         }

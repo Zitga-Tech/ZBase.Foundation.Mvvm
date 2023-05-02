@@ -11,7 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ZBase.Foundation.Unions\ZBase.Foundation.Unions.csproj" />
+        <ProjectReference Include="..\ZBase.Foundation.Unions\ZBase.Foundation.Unions.csproj" />
     </ItemGroup>
 
     <Target Name="CopySourceFiles" AfterTargets="Build">

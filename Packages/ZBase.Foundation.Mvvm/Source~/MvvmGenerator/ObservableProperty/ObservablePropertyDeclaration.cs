@@ -44,7 +44,7 @@ namespace ZBase.Foundation.Mvvm
             Members = new List<MemberRef>();
             NotifyPropertyChangedForMap = new Dictionary<string, IPropertySymbol>();
             NotifyCanExecuteChangedForSet = new HashSet<string>();
-
+            
             var implementInterface = false;
 
             if (candidate.BaseList != null)

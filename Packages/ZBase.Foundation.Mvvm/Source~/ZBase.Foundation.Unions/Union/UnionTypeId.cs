@@ -66,10 +66,12 @@ namespace ZBase.Foundation.Unions
 
             static TypeVault()
             {
+#if !UNITY_5_3_OR_NEWER
                 Init();
+#endif
             }
 
-#if UNITY_5_3_OR_NEWER && UNITY_EDITOR
+#if UNITY_5_3_OR_NEWER
             [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
 #endif
             private static void Init()

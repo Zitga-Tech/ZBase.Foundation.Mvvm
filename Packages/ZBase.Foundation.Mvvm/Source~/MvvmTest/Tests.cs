@@ -6,6 +6,7 @@
 #pragma warning disable IDE1006 // Naming Styles
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using ZBase.Foundation.Mvvm;
 using ZBase.Foundation.Unions;
@@ -25,7 +26,7 @@ namespace MvvmTests
                 OnEventAction = (instance, args) => instance.Print(args.Value)
             };
 
-            model.PropertyChanged(MyViewModelPropertyNames.Age, program._listener);
+            model.PropertyChanged(nameof(MyViewModel.Age), program._listener);
 
             while (true)
             {
@@ -137,22 +138,6 @@ namespace MvvmTests
 
 namespace MvvmTests
 {
-    public static partial class MyViewModelPropertyNames
-    {
-        /// <inheritdoc cref="global::MvvmTests.MyViewModel.Age" />
-        [global::System.CodeDom.Compiler.GeneratedCode("ZBase.Foundation.Mvvm.ObservablePropertyGenerator", "1.0.0")]
-        public const string Age = nameof(Age);
-
-        /// <inheritdoc cref="global::MvvmTests.MyViewModel.FirstName" />
-        public const string FirstName = nameof(FirstName);
-
-        /// <inheritdoc cref="global::MvvmTests.MyViewModel.LastName" />
-        public const string LastName = nameof(LastName);
-
-        /// <inheritdoc cref="global::MvvmTests.MyViewModel.FullName" />
-        public const string FullName = nameof(FullName);
-    }
-
     partial class MyViewModel : INotifyPropertyChanging, INotifyPropertyChanged
     {
         private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler _onChangingAge;
@@ -176,7 +161,7 @@ namespace MvvmTests
                 if (global::System.Collections.Generic.EqualityComparer<int>.Default.Equals(_age, value) == false)
                 {
                     OnAgeChanging(value);
-                    var args = new PropertyChangeEventArgs(this, MyViewModelPropertyNames.Age, value);
+                    var args = new PropertyChangeEventArgs(this, nameof(this.Age), value);
                     this._onChangingAge?.Invoke(args);
                     this._age = value;
                     OnAgeChanged(value);
@@ -196,12 +181,12 @@ namespace MvvmTests
                 if (global::System.Collections.Generic.EqualityComparer<string>.Default.Equals(_firstName, value) == false)
                 {
                     OnFirstNameChanging(value);
-                    var args = new PropertyChangeEventArgs(this, MyViewModelPropertyNames.Age, value);
+                    var args = new PropertyChangeEventArgs(this, nameof(this.Age), value);
                     this._onChangingFirstName?.Invoke(args);
                     this._firstName = value;
                     OnFirstNameChanged(value);
                     this._onChangedFirstName?.Invoke(args);
-                    this._onChangedFullName?.Invoke(new PropertyChangeEventArgs(this, MyViewModelPropertyNames.FullName, this.FullName));
+                    this._onChangedFullName?.Invoke(new PropertyChangeEventArgs(this, nameof(this.FullName), this.FullName));
                 }
             }
         }
@@ -217,12 +202,12 @@ namespace MvvmTests
                 if (global::System.Collections.Generic.EqualityComparer<string>.Default.Equals(_lastName, value) == false)
                 {
                     OnLastNameChanging(value);
-                    var args = new PropertyChangeEventArgs(this, MyViewModelPropertyNames.LastName, value);
+                    var args = new PropertyChangeEventArgs(this, nameof(this.LastName), value);
                     this._onChangingLastName?.Invoke(args);
                     this._lastName = value;
                     OnLastNameChanged(value);
                     this._onChangedLastName?.Invoke(args);
-                    this._onChangedFullName?.Invoke(new PropertyChangeEventArgs(this, MyViewModelPropertyNames.FullName, this.FullName));
+                    this._onChangedFullName?.Invoke(new PropertyChangeEventArgs(this, nameof(this.FullName), this.FullName));
                 }
             }
         }
@@ -240,7 +225,7 @@ namespace MvvmTests
         partial void OnLastNameChanged(string value);
 
         /// <inheritdoc cref="global::ZBase.Foundation.Mvvm.INotifyPropertyChanging.PropertyChanging{TInstance}(string, PropertyChangeEventListener{TInstance})" />
-        public void PropertyChanging<TInstance>(string propertyName, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener<TInstance> listener)
+        public virtual void PropertyChanging<TInstance>(string propertyName, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener<TInstance> listener)
             where TInstance : class
         {
             if (propertyName == null)
@@ -251,21 +236,21 @@ namespace MvvmTests
 
             switch (propertyName)
             {
-                case MyViewModelPropertyNames.Age:
+                case nameof(this.Age):
                 {
                     _onChangingAge += listener.OnEvent;
                     listener.OnDetachAction = (listener) => _onChangingAge -= listener.OnEvent;
                     break;
                 }
 
-                case MyViewModelPropertyNames.FirstName:
+                case nameof(this.FirstName):
                 {
                     _onChangingFirstName += listener.OnEvent;
                     listener.OnDetachAction = (listener) => _onChangingFirstName -= listener.OnEvent;
                     break;
                 }
 
-                case MyViewModelPropertyNames.LastName:
+                case nameof(this.LastName):
                 {
                     _onChangingLastName += listener.OnEvent;
                     listener.OnDetachAction = (listener) => _onChangingLastName -= listener.OnEvent;
@@ -275,7 +260,7 @@ namespace MvvmTests
         }
 
         /// <inheritdoc cref="global::ZBase.Foundation.Mvvm.INotifyPropertyChanged.PropertyChanged{TInstance}(string, PropertyChangeEventListener{TInstance})" />
-        public void PropertyChanged<TInstance>(string propertyName, PropertyChangeEventListener<TInstance> listener)
+        public virtual void PropertyChanged<TInstance>(string propertyName, PropertyChangeEventListener<TInstance> listener)
            where TInstance : class
         {
             if (propertyName == null)
@@ -283,37 +268,37 @@ namespace MvvmTests
 
             if (listener == null)
                 throw new global::System.ArgumentNullException(nameof(listener));
-
+            
             switch (propertyName)
             {
-                case MyViewModelPropertyNames.Age:
+                case nameof(this.Age):
                 {
                     _onChangedAge += listener.OnEvent;
                     listener.OnDetachAction = (listener) => _onChangedAge -= listener.OnEvent;
                     break;
                 }
 
-                case MyViewModelPropertyNames.FirstName:
+                case nameof(this.FirstName):
                 {
                     _onChangedFirstName += listener.OnEvent;
                     listener.OnDetachAction = (listener) => _onChangedFirstName -= listener.OnEvent;
                     break;
                 }
 
-                case MyViewModelPropertyNames.LastName:
+                case nameof(this.LastName):
                 {
                     _onChangedLastName += listener.OnEvent;
                     listener.OnDetachAction = (listener) => _onChangedLastName -= listener.OnEvent;
                     break;
                 }
 
-                case MyViewModelPropertyNames.FullName:
+                case nameof(this.FullName):
                 {
                     _onChangedFullName += listener.OnEvent;
                     listener.OnDetachAction = (listener) => _onChangedFullName -= listener.OnEvent;
                     break;
                 }
-
+                
                 default: throw new InvalidOperationException("Property name is invalid");
             }
         }

@@ -15,9 +15,8 @@
         ULong       = 10,
         Short       = 11,
         UShort      = 12,
-        Struct      = 14,
-        String      = 15,
-        Object      = 16,
-        UderDefined = 17,
+        String      = 13,
+        Object      = 14,
+        UserDefined = 15,
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
 using ZBase.Foundation.SourceGen;
 
 namespace ZBase.Foundation.Mvvm
@@ -15,14 +16,16 @@ namespace ZBase.Foundation.Mvvm
             var p = scopePrinter.printer;
             p = p.IncreasedIndent();
 
-            WritePropertyNamesClass(ref p);
+            WriteNotifyPropertyChangingAttributes(ref p);
+            WriteNotifyPropertyChangedAttributes(ref p);
 
             p.PrintBeginLine();
             p.Print("partial class ").Print(Syntax.Identifier.Text);
             p.PrintEndLine();
 
             p = p.IncreasedIndent();
-            p.PrintLine(": INotifyPropertyChanging, INotifyPropertyChanged");
+            p.PrintLine(": global::ZBase.Foundation.Mvvm.INotifyPropertyChanging");
+            p.PrintLine(", global::ZBase.Foundation.Mvvm.INotifyPropertyChanged");
             p = p.DecreasedIndent();
 
             p.OpenScope();
@@ -37,48 +40,6 @@ namespace ZBase.Foundation.Mvvm
 
             p = p.DecreasedIndent();
             return p.Result;
-        }
-
-        private void WritePropertyNamesClass(ref Printer p)
-        {
-            var accessKeyword = Symbol.DeclaredAccessibility.ToKeyword();
-
-            p.PrintLine(GENERATED_CODE);
-            p.PrintLine(EXCLUDE_COVERAGE);
-            p.PrintBeginLine();
-
-            if (string.IsNullOrEmpty(accessKeyword) == false)
-            {
-                p.Print(accessKeyword).Print(" ");
-            }
-
-            p.Print("static partial class ").Print(GetStaticClassName());
-            p.PrintEndLine();
-
-            p.OpenScope();
-            {
-                foreach (var member in Members)
-                {
-                    var propertyName = member.PropertyName;
-
-                    p.PrintLine($"/// <inheritdoc cref=\"{FullyQualifiedName}.{propertyName}\" />");
-                    p.PrintLine(GENERATED_CODE);
-                    p.PrintLine($"public const string {propertyName} = nameof({propertyName});");
-                    p.PrintEndLine();
-                }
-
-                foreach (var member in NotifyPropertyChangedForMap.Values)
-                {
-                    var propertyName = member.Name;
-
-                    p.PrintLine($"/// <inheritdoc cref=\"{FullyQualifiedName}.{propertyName}\" />");
-                    p.PrintLine(GENERATED_CODE);
-                    p.PrintLine($"public const string {propertyName} = nameof({propertyName});");
-                    p.PrintEndLine();
-                }
-            }
-            p.CloseScope();
-            p.PrintEndLine();
         }
 
         private void WriteEvents(ref Printer p)
@@ -108,8 +69,6 @@ namespace ZBase.Foundation.Mvvm
 
         private void WriteProperties(ref Printer p)
         {
-            var staticClassName = GetStaticClassName();
-
             foreach (var member in Members)
             {
                 var fieldName = member.Member.Name;
@@ -131,7 +90,7 @@ namespace ZBase.Foundation.Mvvm
                         p.OpenScope();
                         {
                             p.PrintLine($"{OnChangingMethodName(member)}(value);");
-                            p.PrintLine($"var {argsName} = new PropertyChangeEventArgs(this, {staticClassName}.{propertyName}, value);");
+                            p.PrintLine($"var {argsName} = new global::ZBase.Foundation.Mvvm.PropertyChangeEventArgs(this, nameof(this.{propertyName}), value);");
                             p.PrintLine($"this.{OnChangingEventName(member)}?.Invoke({argsName});");
                             p.PrintLine($"this.{fieldName} = value;");
                             p.PrintLine($"{OnChangedMethodName(member)}(value);");
@@ -142,7 +101,7 @@ namespace ZBase.Foundation.Mvvm
                                 var otherArgsName = OnChangedArgsName(property);
                                 p.PrintEndLine();
                                 p.PrintLine($"{OnChangedMethodName(property)}(this.{propertyName});");
-                                p.PrintLine($"var {otherArgsName} = new PropertyChangeEventArgs(this, {staticClassName}.{propertyName}, this.{propertyName});");
+                                p.PrintLine($"var {otherArgsName} = new global::ZBase.Foundation.Mvvm.PropertyChangeEventArgs(this, nameof(this.{propertyName}), this.{propertyName});");
                                 p.PrintLine($"this.{OnChangedEventName(property)}?.Invoke({otherArgsName});");
                             }
 
@@ -192,8 +151,6 @@ namespace ZBase.Foundation.Mvvm
 
         private void WritePropertyChangingMethod(ref Printer p)
         {
-            var staticClassName = GetStaticClassName();
-
             p.PrintLine($"/// <inheritdoc cref=\"global::ZBase.Foundation.Mvvm.INotifyPropertyChanging.PropertyChanging{{TInstance}}(string, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener{{TInstance}})\" />");
             p.PrintLine(GENERATED_CODE);
             p.PrintLine(EXCLUDE_COVERAGE);
@@ -212,7 +169,7 @@ namespace ZBase.Foundation.Mvvm
                         var propertyName = member.PropertyName;
                         var eventName = OnChangingEventName(member);
 
-                        p.PrintLine($"case {staticClassName}.{propertyName}:");
+                        p.PrintLine($"case nameof(this.{propertyName}):");
                         p.OpenScope();
                         {
                             p.PrintLine($"this.{eventName} += listener.OnEvent;");
@@ -231,8 +188,6 @@ namespace ZBase.Foundation.Mvvm
 
         private void WritePropertyChangedMethod(ref Printer p)
         {
-            var staticClassName = GetStaticClassName();
-
             p.PrintLine($"/// <inheritdoc cref=\"global::ZBase.Foundation.Mvvm.INotifyPropertyChanged.PropertyChanged{{TInstance}}(string, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener{{TInstance}})\" />");
             p.PrintLine(GENERATED_CODE);
             p.PrintLine(EXCLUDE_COVERAGE);
@@ -251,7 +206,7 @@ namespace ZBase.Foundation.Mvvm
                         var propertyName = member.PropertyName;
                         var eventName = OnChangedEventName(member);
 
-                        p.PrintLine($"case {staticClassName}.{propertyName}:");
+                        p.PrintLine($"case nameof(this.{propertyName}):");
                         p.OpenScope();
                         {
                             p.PrintLine($"this.{eventName} += listener.OnEvent;");
@@ -267,7 +222,7 @@ namespace ZBase.Foundation.Mvvm
                         var propertyName = member.Name;
                         var eventName = OnChangedEventName(member);
 
-                        p.PrintLine($"case {staticClassName}.{propertyName}:");
+                        p.PrintLine($"case nameof(this.{propertyName}):");
                         p.OpenScope();
                         {
                             p.PrintLine($"this.{eventName} += listener.OnEvent;");
@@ -284,8 +239,50 @@ namespace ZBase.Foundation.Mvvm
             p.PrintEndLine();
         }
 
-        private string GetStaticClassName()
-            => $"{Syntax.Identifier.Text}PropertyNames";
+        private void WriteNotifyPropertyChangingAttributes(ref Printer p)
+        {
+            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.NotifyPropertyChangingAttribute(nameof({0}.{1}), typeof({2}))]";
+
+            var className = Syntax.Identifier.Text;
+
+            foreach (var member in Members)
+            {
+                var propertyName = member.PropertyName;
+                var typeName = member.Member.Type.ToFullName();
+
+                p.PrintLine(string.Format(ATTRIBUTE, className, propertyName, typeName));
+            }
+        }
+
+        private void WriteNotifyPropertyChangedAttributes(ref Printer p)
+        {
+            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.NotifyPropertyChangedAttribute(nameof({0}.{1}), typeof({2}))]";
+
+            var className = Syntax.Identifier.Text;
+            var additionalProperties = new Dictionary<string, IPropertySymbol>();
+
+            foreach (var member in Members)
+            {
+                var fieldName = member.Member.Name;
+                var propertyName = member.PropertyName;
+                var typeName = member.Member.Type.ToFullName();
+
+                p.PrintLine(string.Format(ATTRIBUTE, className, propertyName, typeName));
+
+                if (NotifyPropertyChangedForMap.TryGetValue(fieldName, out var property))
+                {
+                    if (additionalProperties.ContainsKey(property.Name) == false)
+                    {
+                        additionalProperties[property.Name] = property;
+                    }
+                }
+            }
+
+            foreach (var property in additionalProperties.Values)
+            {
+                p.PrintLine(string.Format(ATTRIBUTE, className, property.Name, property.Type.ToFullName()));
+            }
+        }
 
         private string OnChangingEventName(MemberRef member)
             => $"_onChanging{member.PropertyName}";

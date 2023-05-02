@@ -16,7 +16,7 @@ namespace ZBase.Foundation.Mvvm
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             var projectPathProvider = SourceGenHelpers.GetSourceGenConfigProvider(context);
-
+            
             var candidateProvider = context.SyntaxProvider.CreateSyntaxProvider(
                 predicate: (node, token) => ObservableObjectHelpers.IsSyntaxMatchByAttribute(node, token, SyntaxKind.FieldDeclaration, OBSERVABLE_PROPERTY),
                 transform: ObservableObjectHelpers.GetSemanticMatch
