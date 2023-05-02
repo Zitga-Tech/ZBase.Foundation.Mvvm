@@ -10,10 +10,29 @@ namespace ZBase.Foundation.Mvvm
     public static class GeneratorHelpers
     {
         public const string NAMESPACE = "ZBase.Foundation.Mvvm";
-        public const string IOBSERVABLE_OBJECT_NAME = "IObservableObject";
-        public const string IOBSERVABLE_OBJECT_INTERFACE = "global::ZBase.Foundation.Mvvm.IObservableObject";
         public const string FIELD_PREFIX_UNDERSCORE = "_";
         public const string FIELD_PREFIX_M_UNDERSCORE = "m_";
+
+        public static bool IsSyntaxMatch(SyntaxNode syntaxNode , CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            if (syntaxNode is not ClassDeclarationSyntax classSyntax
+                || classSyntax.BaseList == null
+            )
+            {
+                return false;
+            }
+
+            var hasBaseTypes = classSyntax.BaseList.Types.Count > 0;
+
+            if (hasBaseTypes == false)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         public static bool IsSyntaxMatchByAttribute(
               SyntaxNode syntaxNode
@@ -31,18 +50,9 @@ namespace ZBase.Foundation.Mvvm
                 return false;
             }
             
-            var implementInterface = false;
+            var hasBaseTypes = classSyntax.BaseList.Types.Count > 0;
 
-            foreach (var baseType in classSyntax.BaseList.Types)
-            {
-                if (baseType.Type is IdentifierNameSyntax { Identifier: { ValueText: IOBSERVABLE_OBJECT_NAME } })
-                {
-                    implementInterface = true;
-                    break;
-                }
-            }
-
-            if (implementInterface == false)
+            if (hasBaseTypes == false)
             {
                 return false;
             }
@@ -65,6 +75,7 @@ namespace ZBase.Foundation.Mvvm
         public static ClassDeclarationSyntax GetSemanticMatch(
               GeneratorSyntaxContext syntaxContext
             , CancellationToken token
+            , string interfaceName
         )
         {
             token.ThrowIfCancellationRequested();
@@ -82,7 +93,12 @@ namespace ZBase.Foundation.Mvvm
             {
                 var typeInfo = semanticModel.GetTypeInfo(baseType.Type, token);
 
-                if (typeInfo.Type.ToFullName().StartsWith(IOBSERVABLE_OBJECT_INTERFACE))
+                if (typeInfo.Type.ToFullName().StartsWith(interfaceName))
+                {
+                    return classSyntax;
+                }
+
+                if (typeInfo.Type.ImplementsInterface(interfaceName))
                 {
                     return classSyntax;
                 }

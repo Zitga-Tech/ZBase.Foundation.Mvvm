@@ -9,7 +9,6 @@ namespace ZBase.Foundation.Mvvm
 {
     public partial class ObservablePropertyDeclaration
     {
-        public const string IOBSERVABLE_OBJECT_NAME = "IObservableObject";
         public const string IOBSERVABLE_OBJECT_INTERFACE = "global::ZBase.Foundation.Mvvm.IObservableObject";
         public const string OBSERVABLE_PROPERTY_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ObservablePropertyAttribute";
         public const string NOTIFY_PROPERTY_CHANGED_FOR_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.NotifyPropertyChangedForAttribute";
@@ -22,7 +21,7 @@ namespace ZBase.Foundation.Mvvm
 
         public string FullyQualifiedName { get; private set; }
 
-        public bool IsValid { get; }
+        public bool IsBaseObservableObject { get; }
 
         public List<MemberRef> Members { get; }
 
@@ -45,25 +44,12 @@ namespace ZBase.Foundation.Mvvm
             NotifyPropertyChangedForMap = new Dictionary<string, IPropertySymbol>();
             NotifyCanExecuteChangedForSet = new HashSet<string>();
             
-            var implementInterface = false;
-
-            if (candidate.BaseList != null)
+            if (Symbol.BaseType != null && Symbol.BaseType.TypeKind == TypeKind.Class)
             {
-                foreach (var baseType in candidate.BaseList.Types)
+                if (Symbol.BaseType.ImplementsInterface(IOBSERVABLE_OBJECT_INTERFACE))
                 {
-                    var typeInfo = semanticModel.GetTypeInfo(baseType.Type, token);
-
-                    if (typeInfo.Type.ToFullName().StartsWith(IOBSERVABLE_OBJECT_INTERFACE))
-                    {
-                        implementInterface = true;
-                        break;
-                    }
+                    IsBaseObservableObject = true;
                 }
-            }
-
-            if (implementInterface == false)
-            {
-                return;
             }
 
             var members = Symbol.GetMembers();
@@ -154,8 +140,6 @@ namespace ZBase.Foundation.Mvvm
                     NotifyCanExecuteChangedForSet.Add(commandName);
                 }
             }
-
-            IsValid = Members.Count > 0;
         }
 
         public class MemberRef

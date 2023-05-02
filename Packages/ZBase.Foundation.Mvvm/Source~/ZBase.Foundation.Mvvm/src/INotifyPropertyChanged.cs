@@ -5,8 +5,7 @@
     /// </summary>
     public interface INotifyPropertyChanged
     {
-        public void PropertyChanged<TInstance>(string propertyName, PropertyChangeEventListener<TInstance> listener)
-            where TInstance : class
-        { }
+        bool PropertyChanged<TInstance>(string propertyName, PropertyChangeEventListener<TInstance> listener)
+            where TInstance : class;
     }
 }

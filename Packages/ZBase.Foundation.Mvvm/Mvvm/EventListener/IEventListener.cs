@@ -4,5 +4,8 @@
 
 namespace ZBase.Foundation.Mvvm
 {
-    public interface IEventListener { }
+    public interface IEventListener
+    {
+        void Detach();
+    }
 }

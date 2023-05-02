@@ -9,8 +9,6 @@ namespace ZBase.Foundation.Mvvm
 {
     public partial class RelayCommandDeclaration
     {
-        public const string IOBSERVABLE_OBJECT_NAME = "IObservableObject";
-        public const string IOBSERVABLE_OBJECT_INTERFACE = "global::ZBase.Foundation.Mvvm.IObservableObject";
         public const string RELAY_COMMAND_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.RelayCommandAttribute";
 
         public ClassDeclarationSyntax Syntax { get; }
@@ -28,27 +26,6 @@ namespace ZBase.Foundation.Mvvm
             Syntax = candidate;
             FullyQualifiedName = typeSymbol.ToFullName();
             Members = new List<MemberRef>();
-
-            var implementInterface = false;
-
-            if (candidate.BaseList != null)
-            {
-                foreach (var baseType in candidate.BaseList.Types)
-                {
-                    var typeInfo = semanticModel.GetTypeInfo(baseType.Type, token);
-
-                    if (typeInfo.Type.ToFullName().StartsWith(IOBSERVABLE_OBJECT_INTERFACE))
-                    {
-                        implementInterface = true;
-                        break;
-                    }
-                }
-            }
-
-            if (implementInterface == false)
-            {
-                return;
-            }
 
             var members = typeSymbol.GetMembers();
             var methodMap = new Dictionary<string, IMethodSymbol>();

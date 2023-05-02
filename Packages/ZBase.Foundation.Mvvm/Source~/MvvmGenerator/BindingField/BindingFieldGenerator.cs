@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Linq;
@@ -8,18 +7,17 @@ using ZBase.Foundation.SourceGen;
 namespace ZBase.Foundation.Mvvm
 {
     [Generator]
-    public class RelayCommandGenerator : IIncrementalGenerator
+    public class BindingFieldGenerator : IIncrementalGenerator
     {
-        public const string ATTRIBUTE = "RelayCommand";
-        public const string INTERFACE = "global::ZBase.Foundation.Mvvm.IObservableObject";
-        public const string GENERATOR_NAME = nameof(RelayCommandGenerator);
+        public const string INTERFACE = "global::ZBase.Foundation.Mvvm.IBinder";
+        public const string GENERATOR_NAME = nameof(BindingFieldGenerator);
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             var projectPathProvider = SourceGenHelpers.GetSourceGenConfigProvider(context);
 
             var candidateProvider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: (node, token) => GeneratorHelpers.IsSyntaxMatchByAttribute(node, token, SyntaxKind.MethodDeclaration, ATTRIBUTE),
+                predicate: (node, token) => GeneratorHelpers.IsSyntaxMatch(node, token),
                 transform: (syntaxContext, token) => GeneratorHelpers.GetSemanticMatch(syntaxContext, token, INTERFACE)
             ).Where(t => t is { });
 
@@ -58,14 +56,19 @@ namespace ZBase.Foundation.Mvvm
 
                 var syntaxTree = candidate.SyntaxTree;
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var declaration = new RelayCommandDeclaration(candidate, semanticModel, context.CancellationToken);
+                var declaration = new BindingFieldDeclaration(candidate, semanticModel, context.CancellationToken);
 
-                if (declaration.IsValid == false)
+                string source;
+
+                if (declaration.Members.Count > 0)
                 {
-                    return;
+                    source = declaration.WriteCode();
+                }
+                else
+                {
+                    source = declaration.WriteCodeWithoutMember();
                 }
 
-                var source = declaration.WriteCode();
                 var sourceFilePath = syntaxTree.GetGeneratedSourceFilePath(compilation.Assembly.Name, GENERATOR_NAME);
                 var outputSource = TypeCreationHelpers.GenerateSourceTextForRootNodes(
                       sourceFilePath
@@ -105,10 +108,10 @@ namespace ZBase.Foundation.Mvvm
         }
 
         private static readonly DiagnosticDescriptor s_errorDescriptor
-            = new("SG_RELAY_COMMAND_01"
-                , "Relay Command Generator Error"
-                , "This error indicates a bug in the RelayCommand source generators. Error message: '{0}'."
-                , "ZBase.Foundation.Mvvm.IObservableObject"
+            = new("SG_BINDING_FIELD_01"
+                , "Binding Field Generator Error"
+                , "This error indicates a bug in the Binding Field source generators. Error message: '{0}'."
+                , "ZBase.Foundation.Mvvm.BindingAttribute"
                 , DiagnosticSeverity.Error
                 , isEnabledByDefault: true
                 , description: ""

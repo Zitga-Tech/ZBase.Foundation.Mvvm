@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Linq;
@@ -10,7 +9,7 @@ namespace ZBase.Foundation.Mvvm
     [Generator]
     public class ObservablePropertyGenerator : IIncrementalGenerator
     {
-        public const string OBSERVABLE_PROPERTY = "ObservableProperty";
+        public const string INTERFACE = "global::ZBase.Foundation.Mvvm.IObservableObject";
         public const string GENERATOR_NAME = nameof(ObservablePropertyGenerator);
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -18,8 +17,8 @@ namespace ZBase.Foundation.Mvvm
             var projectPathProvider = SourceGenHelpers.GetSourceGenConfigProvider(context);
             
             var candidateProvider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: (node, token) => GeneratorHelpers.IsSyntaxMatchByAttribute(node, token, SyntaxKind.FieldDeclaration, OBSERVABLE_PROPERTY),
-                transform: GeneratorHelpers.GetSemanticMatch
+                predicate: (node, token) => GeneratorHelpers.IsSyntaxMatch(node, token),
+                transform: (syntaxContext, token) => GeneratorHelpers.GetSemanticMatch(syntaxContext, token, INTERFACE)
             ).Where(t => t is { });
 
             var compilationProvider = context.CompilationProvider;
@@ -59,12 +58,17 @@ namespace ZBase.Foundation.Mvvm
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var declaration = new ObservablePropertyDeclaration(candidate, semanticModel, context.CancellationToken);
 
-                if (declaration.IsValid == false)
+                string source;
+
+                if (declaration.Members.Count > 0)
                 {
-                    return;
+                    source = declaration.WriteCode();
+                }
+                else
+                {
+                    source = declaration.WriteCodeWithoutMember();
                 }
 
-                var source = declaration.WriteCode();
                 var sourceFilePath = syntaxTree.GetGeneratedSourceFilePath(compilation.Assembly.Name, GENERATOR_NAME);
                 var outputSource = TypeCreationHelpers.GenerateSourceTextForRootNodes(
                       sourceFilePath

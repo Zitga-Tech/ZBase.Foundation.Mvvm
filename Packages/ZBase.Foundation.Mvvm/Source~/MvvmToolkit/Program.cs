@@ -50,10 +50,18 @@ namespace MvvmToolkit
     public partial class ModelB
     {
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(Tamper))]
         private string _name;
 
         [ObservableProperty]
         private TypeCode _type;
+
+        private int Tamper { get; }
+    }
+
+    public partial class ModelC : ModelB
+    {
+        private float _floatValue;
     }
 
     public enum MyEnum { A, B }

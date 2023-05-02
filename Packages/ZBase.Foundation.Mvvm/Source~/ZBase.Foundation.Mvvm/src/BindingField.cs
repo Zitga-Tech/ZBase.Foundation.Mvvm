@@ -14,17 +14,12 @@ namespace ZBase.Foundation.Mvvm
         public string Label { get; set; }
 
         /// <summary>
-        /// Property or method name bound to
+        /// The name of an observable property
+        /// whose container class is an <see cref="IObservableObject"/>.
         /// </summary>
 #if UNITY_5_3_OR_NEWER
         [field: UnityEngine.SerializeField]
 #endif
-        public string Member { get; set; }
-    }
-
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-    public sealed class BindingFieldAttribute : Attribute
-    {
-        public string Label { get; set; }
+        public string ObservablePropertyName { get; set; }
     }
 }

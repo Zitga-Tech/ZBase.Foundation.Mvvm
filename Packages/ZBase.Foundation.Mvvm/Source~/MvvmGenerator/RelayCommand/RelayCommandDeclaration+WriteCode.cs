@@ -7,12 +7,18 @@ namespace ZBase.Foundation.Mvvm
     {
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.RelayCommandGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
+        private const string RELAY_COMMAND = "[global::ZBase.Foundation.Mvvm.GeneratedRelayCommand]";
 
         public string WriteCode()
         {
             var scopePrinter = new SyntaxNodeScopePrinter(Printer.DefaultLarge, Syntax.Parent);
             var p = scopePrinter.printer;
             p = p.IncreasedIndent();
+
+            p.PrintLine("#pragma warning disable");
+            p.PrintEndLine();
+
+            WriteRelayCommandInfoAttributes(ref p);
 
             p.PrintBeginLine();
             p.Print("partial class ").Print(Syntax.Identifier.Text);
@@ -27,6 +33,28 @@ namespace ZBase.Foundation.Mvvm
 
             p = p.DecreasedIndent();
             return p.Result;
+        }
+
+        private void WriteRelayCommandInfoAttributes(ref Printer p)
+        {
+            var className = Syntax.Identifier.Text;
+
+            foreach (var member in Members)
+            {
+                var commandName = CommandPropertyName(member.Member);
+
+                if (member.Member.Parameters.Length > 0)
+                {
+                    var param = member.Member.Parameters[0];
+                    var paramType = param.Type.ToFullName();
+
+                    p.PrintLine($"[global::ZBase.Foundation.Mvvm.RelayCommandInfoAttribute(nameof({className}.{commandName}), typeof({paramType}))]");
+                }
+                else
+                {
+                    p.PrintLine($"[global::ZBase.Foundation.Mvvm.RelayCommandInfoAttribute(nameof({className}.{commandName}))]");
+                }
+            }
         }
 
         private void WriteFields(ref Printer p)
@@ -61,6 +89,7 @@ namespace ZBase.Foundation.Mvvm
                 p.PrintLine($"/// <summary>Gets an <see cref=\"{interfaceNameComment}\"/> instance wrapping <see cref=\"{method.Name}\"/>.</summary>");
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine(EXCLUDE_COVERAGE);
+                p.PrintLine(RELAY_COMMAND);
                 p.PrintLine($"public {interfaceName} {propertyName}");
                 p.OpenScope();
                 {
