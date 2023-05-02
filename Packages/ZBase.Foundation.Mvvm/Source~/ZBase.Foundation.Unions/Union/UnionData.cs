@@ -92,7 +92,7 @@ namespace ZBase.Foundation.Unions
     {
         private readonly ulong _l1;
 
-#if __UNION_STORAGE_ENABLE_L3__
+#if __UNION_STORAGE_ENABLE_L2__
         private readonly ulong _l2;
 #endif
 
