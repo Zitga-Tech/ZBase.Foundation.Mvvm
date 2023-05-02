@@ -4,11 +4,13 @@ namespace ZBase.Foundation.Unions
 {
     public readonly struct Union<T> : IUnion<T>
     {
+        public static readonly UnionTypeId TypeId = UnionTypeId.Of<T>();
+
         public readonly Union Value;
 
         public Union(in Union union)
         {
-            Value = new Union(union.Base, union.TypeKind, UnionTypeId.Of<T>());
+            Value = new Union(union.Base, union.TypeKind, TypeId);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

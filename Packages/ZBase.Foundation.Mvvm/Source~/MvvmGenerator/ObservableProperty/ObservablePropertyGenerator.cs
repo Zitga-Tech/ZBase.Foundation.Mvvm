@@ -18,8 +18,8 @@ namespace ZBase.Foundation.Mvvm
             var projectPathProvider = SourceGenHelpers.GetSourceGenConfigProvider(context);
             
             var candidateProvider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: (node, token) => ObservableObjectHelpers.IsSyntaxMatchByAttribute(node, token, SyntaxKind.FieldDeclaration, OBSERVABLE_PROPERTY),
-                transform: ObservableObjectHelpers.GetSemanticMatch
+                predicate: (node, token) => GeneratorHelpers.IsSyntaxMatchByAttribute(node, token, SyntaxKind.FieldDeclaration, OBSERVABLE_PROPERTY),
+                transform: GeneratorHelpers.GetSemanticMatch
             ).Where(t => t is { });
 
             var compilationProvider = context.CompilationProvider;

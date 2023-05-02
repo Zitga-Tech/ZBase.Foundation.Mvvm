@@ -56,7 +56,6 @@ namespace ZBase.Foundation.Mvvm
                 var typeName = CommandTypeName(method);
                 var interfaceName = CommandInterfaceName(method);
                 var interfaceNameComment = CommandInterfaceNameComment(method);
-                var delegateName = CommandDelegateTypeName(method);
                 var canExecuteArg = CanExecuteMethodArg(member.CanExecuteMethod);
 
                 p.PrintLine($"/// <summary>Gets an <see cref=\"{interfaceNameComment}\"/> instance wrapping <see cref=\"{method.Name}\"/>.</summary>");
@@ -70,7 +69,7 @@ namespace ZBase.Foundation.Mvvm
                     {
                         p.PrintLine($"if ({fieldName} == null)");
                         p = p.IncreasedIndent();
-                        p.PrintLine($"{fieldName} = new {typeName}(new {delegateName}({method.Name}){canExecuteArg});");
+                        p.PrintLine($"{fieldName} = new {typeName}({method.Name}{canExecuteArg});");
                         p = p.DecreasedIndent();
                         p.PrintEndLine();
 
@@ -118,22 +117,13 @@ namespace ZBase.Foundation.Mvvm
             return $"global::ZBase.Foundation.Mvvm.IRelayCommand{{{param.Type.ToFullName()}}}";
         }
 
-        private string CommandDelegateTypeName(IMethodSymbol method)
-        {
-            if (method.Parameters.Length < 1)
-                return "global::System.Action";
-
-            var param = method.Parameters[0];
-            return $"global::System.Action<{param.Type.ToFullName()}>";
-        }
-
         private string CanExecuteMethodArg(IMethodSymbol method)
         {
             if (method == null)
                 return string.Empty;
 
             if (method.Parameters.Length < 1)
-                return $", {method.Name}()";
+                return $", _ => {method.Name}()";
 
             return $", {method.Name}";
         }

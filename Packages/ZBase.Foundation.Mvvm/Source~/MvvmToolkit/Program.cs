@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using X.TY.Z;
 
 namespace MvvmToolkit
 {
@@ -26,6 +27,9 @@ namespace MvvmToolkit
         [NotifyCanExecuteChangedFor(nameof(GreetUserCommand))]
         private string? _lastName;
 
+        [ObservableProperty]
+        private MyStr<MyEnum> _customField;
+
         private string? FullName => $"{FirstName} {LastName}";
 
         [RelayCommand]
@@ -34,7 +38,7 @@ namespace MvvmToolkit
             Console.WriteLine($"Hello {x.FullName}");
         }
 
-        private static bool Validate(ModelA x) => false;
+        private static bool Validate() => false;
 
         [RelayCommand(CanExecute = nameof(Validate))]
         private void DoX(ModelA x)
@@ -51,4 +55,11 @@ namespace MvvmToolkit
         [ObservableProperty]
         private TypeCode _type;
     }
+
+    public enum MyEnum { A, B }
+}
+
+namespace X.TY.Z
+{
+    public struct MyStr<T> { }
 }

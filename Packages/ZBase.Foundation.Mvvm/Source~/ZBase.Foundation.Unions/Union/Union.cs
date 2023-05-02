@@ -74,7 +74,7 @@ namespace ZBase.Foundation.Unions
         public Union(string value) : this() { TypeKind = UnionTypeKind.String; TypeId = UnionTypeId.Of<string>(); GCHandle = GCHandle.Alloc(value); }
         public Union(object value) : this() { TypeKind = UnionTypeKind.Object; TypeId = UnionTypeId.Of<object>(); GCHandle = GCHandle.Alloc(value); }
         
-        public Union(object value, UnionTypeId typeId) : this()
+        public Union(UnionTypeId typeId, object value) : this()
         {
             TypeKind = UnionTypeKind.Object;
             TypeId = typeId;
@@ -507,6 +507,11 @@ namespace ZBase.Foundation.Unions
                 }
 
                 case UnionTypeKind.ValueType: return TypeId.AsType().ToString();
+            }
+
+            if (TypeId != UnionTypeId.Undefined)
+            {
+                return $"{UnionTypeKind.Undefined}: {TypeId.AsType()}";
             }
 
             return string.Empty;

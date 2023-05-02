@@ -1,16 +1,16 @@
-﻿#pragma warning disable IDE0044 // Add readonly modifier
-#pragma warning disable IDE0060 // Remove unused parameter
-#pragma warning disable IDE0090 // Use 'new(...)'
-#pragma warning disable CA1822 // Mark members as static
-#pragma warning disable IDE0051 // Remove unused private members
-#pragma warning disable IDE1006 // Naming Styles
-
+﻿
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using ZBase.Foundation.Mvvm;
 using ZBase.Foundation.Unions;
+
+namespace X.TY.Z
+{
+    public struct MyStr<T> { }
+}
 
 namespace MvvmTests
 {
@@ -21,13 +21,13 @@ namespace MvvmTests
         public static void Main()
         {
             var program = new Program();
-            var model = new MyViewModel();
+            var model = new TestViewModel();
 
             program._listener = new PropertyChangeEventListener<Program>(program) {
                 OnEventAction = (instance, args) => instance.Print(args.Value)
             };
 
-            model.PropertyChanged(nameof(MyViewModel.Age), program._listener);
+            model.PropertyChanged(nameof(TestViewModel.IntValue), program._listener);
 
             while (true)
             {
@@ -36,7 +36,7 @@ namespace MvvmTests
                 switch (key.Key)
                 {
                     case ConsoleKey.Spacebar:
-                        model.Age += 1;
+                        model.IntValue += 1;
                         break;
 
                     default:
@@ -60,7 +60,18 @@ namespace MvvmTests
         [ObservableProperty]
         private TypeCode _typeCode;
 
+        [ObservableProperty]
+        private X.TY.Z.MyStr<MyEnum[]> _customValue;
+
         private int Total { get; }
+        
+        private bool Validate(int x) => false;
+
+        [RelayCommand(CanExecute = nameof(Validate))]
+        private void DoX(int x)
+        {
+
+        }
     }
 
     public partial class MyViewModel : IObservableObject
@@ -154,6 +165,13 @@ namespace MvvmTests
 
         private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler _onChangedFullName;
 
+        private IUnionConverter<int> _unionConverterInt;
+
+        private IUnionConverter<int> UnionConverterInt
+        {
+            get => _unionConverterInt ??= UnionConverter.GetConverter<int>();
+        }
+
         /// <inheritdoc cref="global::MvvmTests.MyViewModel._age" />
         [global::System.CodeDom.Compiler.GeneratedCode("ZBase.Foundation.Mvvm.ObservablePropertyGenerator", "1.0.0")]
         [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
@@ -165,7 +183,7 @@ namespace MvvmTests
                 if (global::System.Collections.Generic.EqualityComparer<int>.Default.Equals(_age, value) == false)
                 {
                     OnAgeChanging(value);
-                    var args = new PropertyChangeEventArgs(this, nameof(this.Age), value);
+                    var args = new PropertyChangeEventArgs(this, nameof(this.Age), UnionConverterInt.ToUnion(value));
                     this._onChangingAge?.Invoke(args);
                     this._age = value;
                     OnAgeChanged(value);
@@ -381,19 +399,23 @@ namespace MvvmTests
     [StructLayout(LayoutKind.Explicit)]
     public readonly partial struct UnionMyEnum : IUnion<MyEnum>
     {
-        public static readonly UnionTypeId MyEnumTypeId = UnionTypeId.Of<MyEnum>();
-
-        [FieldOffset(UnionBase.META_OFFSET)] public readonly Union Union;
+        [FieldOffset(UnionBase.META_OFFSET)] public readonly Union<MyEnum> Union;
         [FieldOffset(UnionBase.DATA_OFFSET)] public readonly MyEnum Value;
 
         public UnionMyEnum(MyEnum value)
         {
-            Union = new Union(UnionTypeKind.ValueType, MyEnumTypeId);
+            Union = new Union(UnionTypeKind.ValueType, Union<MyEnum>.TypeId);
             Value = value;
+        }
+
+        public UnionMyEnum(in Union<MyEnum> union) : this()
+        {
+            Union = union;
         }
 
         public UnionMyEnum(in Union union) : this()
         {
+            ValidateTypeId(union);
             Union = union;
         }
 
@@ -404,6 +426,22 @@ namespace MvvmTests
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Union(in UnionMyEnum value)
             => value.Union;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Union<MyEnum>(in UnionMyEnum value)
+            => value.Union;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator UnionMyEnum(in Union<MyEnum> value)
+            => new UnionMyEnum(value);
+
+        [DoesNotReturn]
+        private static void ValidateTypeId(in Union union)
+        {
+            throw new InvalidCastException(
+                $"Cannot cast {union.TypeId.AsType()} to {Union<MyEnum>.TypeId.AsType()}"
+            );
+        }
 
         public sealed class Converter : IUnionConverter<MyEnum>
         {
@@ -436,7 +474,7 @@ namespace MvvmTests
 
             public bool TryGetValue(in Union union, out MyEnum result)
             {
-                if (union.TypeId == MyEnumTypeId)
+                if (union.TypeId == Union<MyEnum>.TypeId)
                 {
                     var unionMyEnum = new UnionMyEnum(union);
                     result = unionMyEnum.Value;
@@ -449,7 +487,7 @@ namespace MvvmTests
 
             public bool TrySetValue(in Union union, ref MyEnum result)
             {
-                if (union.TypeId == MyEnumTypeId)
+                if (union.TypeId == Union<MyEnum>.TypeId)
                 {
                     var unionMyEnum = new UnionMyEnum(union);
                     result = unionMyEnum.Value;

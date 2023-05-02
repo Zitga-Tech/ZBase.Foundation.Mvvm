@@ -124,7 +124,12 @@ namespace ZBase.Foundation.SourceGen
             => symbol.ToDisplayString(QualifiedFormatWithoutGlobalPrefix);
 
         public static string ToValidIdentifier(this ITypeSymbol symbol)
-            => symbol.ToDisplayString(QualifiedFormatWithoutGlobalPrefix).Replace('.', '_');
+            => symbol.ToDisplayString(QualifiedFormatWithoutGlobalPrefix)
+                .Replace('.', '_')
+                .Replace('<', 'ᐸ')
+                .Replace('>', 'ᐳ')
+                .Replace("[]", "Array")
+                ;
 
         public static bool ImplementsInterface(this ISymbol symbol, string interfaceName)
         {

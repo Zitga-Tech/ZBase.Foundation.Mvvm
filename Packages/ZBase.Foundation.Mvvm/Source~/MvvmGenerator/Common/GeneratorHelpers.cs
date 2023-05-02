@@ -7,7 +7,7 @@ using ZBase.Foundation.SourceGen;
 
 namespace ZBase.Foundation.Mvvm
 {
-    public static class ObservableObjectHelpers
+    public static class GeneratorHelpers
     {
         public const string NAMESPACE = "ZBase.Foundation.Mvvm";
         public const string IOBSERVABLE_OBJECT_NAME = "IObservableObject";
@@ -23,14 +23,14 @@ namespace ZBase.Foundation.Mvvm
         )
         {
             token.ThrowIfCancellationRequested();
-
+            
             if (syntaxNode is not ClassDeclarationSyntax classSyntax
                 || classSyntax.BaseList == null
             )
             {
                 return false;
             }
-
+            
             var implementInterface = false;
 
             foreach (var baseType in classSyntax.BaseList.Types)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using ZBase.Foundation.Unions.Converters;
 
 namespace ZBase.Foundation.Unions
@@ -47,75 +48,39 @@ namespace ZBase.Foundation.Unions
             return s_converters.TryAdd(UnionTypeId.Of<T>(), converter);
         }
 
-        public static bool TryGetConverter<T>(out IUnionConverter<T> converter)
+        public static IUnionConverter<T> GetConverter<T>()
         {
             if (s_converters.TryGetValue(UnionTypeId.Of<T>(), out var candidate))
             {
                 if (candidate is IUnionConverter<T> converterT)
                 {
-                    converter = converterT;
-                    return true;
+                    return converterT;
                 }
             }
 
             if (UnionTypeId.TypeOf<T>().IsValueType == false)
             {
-                converter = UnionConverterObject<T>.Default;
-                return true;
+                return UnionConverterObject<T>.Default;
             }
 
-            converter = default;
-            return false;
+            return UnionConverterUndefined<T>.Default;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Union ToUnion<T>(T value)
-        {
-            if (TryGetConverter<T>(out var converter) == false)
-            {
-                ThrowConverterException<T>();
-            }
+            => GetConverter<T>().ToUnion(value);
 
-            return converter.ToUnion(value);
-        }
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Union<T> ToUnionT<T>(T value)
-        {
-            if (TryGetConverter<T>(out var converter) == false)
-            {
-                ThrowConverterException<T>();
-            }
+            => GetConverter<T>().ToUnionT(value);
 
-            return converter.ToUnionT(value);
-        }
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryGetValue<T>(in Union union, out T result)
-        {
-            if (TryGetConverter<T>(out var converter) == false)
-            {
-                ThrowConverterException<T>();
-            }
+            => GetConverter<T>().TryGetValue(union, out result);
 
-            return converter.TryGetValue(union, out result);
-        }
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TrySetValue<T>(in Union union, ref T dest)
-        {
-            if (TryGetConverter<T>(out var converter) == false)
-            {
-                ThrowConverterException<T>();
-            }
-
-            return converter.TrySetValue(union, ref dest);
-        }
-
-        [DoesNotReturn]
-        private static void ThrowConverterException<T>()
-        {
-            throw new InvalidOperationException(
-                $"Cannot find any {typeof(IUnionConverter<T>).Name}. " +
-                $"Make sure to register the applicable converter before usage."
-            );
-        }
+            => GetConverter<T>().TrySetValue(union, ref dest);
 
         [DoesNotReturn]
         private static void ThrowUndefinedException<T>()

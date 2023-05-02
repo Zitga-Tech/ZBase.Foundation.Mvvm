@@ -1,4 +1,6 @@
-﻿namespace ZBase.Foundation.Unions.Converters
+﻿using System.Runtime.CompilerServices;
+
+namespace ZBase.Foundation.Unions.Converters
 {
     internal sealed class UnionConverterObject<T> : IUnionConverter<T>
     {
@@ -6,9 +8,13 @@
 
         private UnionConverterObject() { }
 
-        public Union ToUnion(T value) => new Union((object)value, UnionTypeId.Of<T>());
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Union ToUnion(T value)
+            => new Union(UnionTypeId.Of<T>(), (object)value);
 
-        public Union<T> ToUnionT(T value) => new Union((object)value, UnionTypeId.Of<T>());
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Union<T> ToUnionT(T value)
+            => new Union(UnionTypeId.Of<T>(), (object)value);
 
         public bool TryGetValue(in Union union, out T result)
         {

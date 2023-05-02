@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using ZBase.Foundation.SourceGen;
 
@@ -15,6 +16,8 @@ namespace ZBase.Foundation.Mvvm
             var scopePrinter = new SyntaxNodeScopePrinter(Printer.DefaultLarge, Syntax.Parent);
             var p = scopePrinter.printer;
             p = p.IncreasedIndent();
+
+            p.PrintLine("#pragma warning disable");
 
             WriteNotifyPropertyChangingAttributes(ref p);
             WriteNotifyPropertyChangedAttributes(ref p);
@@ -35,6 +38,7 @@ namespace ZBase.Foundation.Mvvm
                 WritePartialMethods(ref p);
                 WritePropertyChangingMethod(ref p);
                 WritePropertyChangedMethod(ref p);
+                WriteUnionConverters(ref p);
             }
             p.CloseScope();
 
@@ -71,6 +75,7 @@ namespace ZBase.Foundation.Mvvm
                 var propertyName = member.PropertyName;
                 var typeName = member.Member.Type.ToFullName();
                 var argsName = OnChangedArgsName(member);
+                var converterForField = GeneratorHelpers.ToTitleCase(member.Member.Type.ToValidIdentifier().AsSpan());
 
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine(EXCLUDE_COVERAGE);
@@ -86,7 +91,7 @@ namespace ZBase.Foundation.Mvvm
                         p.OpenScope();
                         {
                             p.PrintLine($"{OnChangingMethodName(member)}(value);");
-                            p.PrintLine($"var {argsName} = new global::ZBase.Foundation.Mvvm.PropertyChangeEventArgs(this, nameof(this.{propertyName}), global::ZBase.Foundation.Unions.UnionConverter.ToUnion(value));");
+                            p.PrintLine($"var {argsName} = new global::ZBase.Foundation.Mvvm.PropertyChangeEventArgs(this, nameof(this.{propertyName}), UnionConverters.{converterForField}.ToUnion(value));");
                             p.PrintLine($"this.{OnChangingEventName(member)}?.Invoke({argsName});");
                             p.PrintLine($"this.{fieldName} = value;");
                             p.PrintLine($"{OnChangedMethodName(member)}(value);");
@@ -95,9 +100,11 @@ namespace ZBase.Foundation.Mvvm
                             if (NotifyPropertyChangedForMap.TryGetValue(fieldName, out var property))
                             {
                                 var otherArgsName = OnChangedArgsName(property);
+                                var converterForProperty = GeneratorHelpers.ToTitleCase(property.Type.ToValidIdentifier().AsSpan());
+
                                 p.PrintEndLine();
                                 p.PrintLine($"{OnChangedMethodName(property)}(this.{propertyName});");
-                                p.PrintLine($"var {otherArgsName} = new global::ZBase.Foundation.Mvvm.PropertyChangeEventArgs(this, nameof(this.{propertyName}), global::ZBase.Foundation.Unions.UnionConverter.ToUnion(this.{propertyName}));");
+                                p.PrintLine($"var {otherArgsName} = new global::ZBase.Foundation.Mvvm.PropertyChangeEventArgs(this, nameof(this.{propertyName}), UnionConverters.{converterForProperty}.ToUnion(this.{propertyName}));");
                                 p.PrintLine($"this.{OnChangedEventName(property)}?.Invoke({otherArgsName});");
                             }
 
@@ -280,14 +287,72 @@ namespace ZBase.Foundation.Mvvm
             }
         }
 
+        private void WriteUnionConverters(ref Printer p)
+        {
+            var types = new Dictionary<string, ITypeSymbol>();
+
+            foreach (var member in Members)
+            {
+                var fieldName = member.Member.Name;
+                var name = member.Member.Type.ToFullName();
+
+                if (types.ContainsKey(name) == false)
+                {
+                    types.Add(name, member.Member.Type);
+                }
+
+                if (NotifyPropertyChangedForMap.TryGetValue(fieldName, out var property))
+                {
+                    name = property.Type.ToFullName();
+
+                    if (types.ContainsKey(name) == false)
+                    {
+                        types.Add(name, property.Type);
+                    }
+                }
+            }
+
+            p.PrintLine(GENERATED_CODE);
+            p.PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine("private static class UnionConverters");
+            p.OpenScope();
+            {
+                foreach (var type in types.Values)
+                {
+                    var typeName = type.ToFullName();
+                    var fieldName = type.ToValidIdentifier();
+
+                    p.PrintLine(GENERATED_CODE);
+                    p.PrintLine($"private static global::ZBase.Foundation.Unions.IUnionConverter<{typeName}> _{fieldName};");
+                    p.PrintEndLine();
+                }
+
+                foreach (var type in types.Values)
+                {
+                    var typeName = type.ToFullName();
+                    var fieldName = type.ToValidIdentifier();
+                    var propertyName = GeneratorHelpers.ToTitleCase(fieldName.AsSpan());
+
+                    p.PrintLine(GENERATED_CODE);
+                    p.PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine($"public static global::ZBase.Foundation.Unions.IUnionConverter<{typeName}> {propertyName}");
+                    p.OpenScope();
+                    {
+                        p.PrintLine($"get => _{fieldName} ??= global::ZBase.Foundation.Unions.UnionConverter.GetConverter<{typeName}>();");
+                    }
+                    p.CloseScope();
+                    p.PrintEndLine();
+                }
+            }
+            p.CloseScope();
+            p.PrintEndLine();
+        }
+
         private string OnChangingEventName(MemberRef member)
             => $"_onChanging{member.PropertyName}";
 
         private string OnChangedEventName(MemberRef member)
             => $"_onChanged{member.PropertyName}";
-
-        private string OnChangingEventName(ISymbol member)
-            => $"_onChanging{member.Name}";
 
         private string OnChangedEventName(ISymbol member)
             => $"_onChanged{member.Name}";
