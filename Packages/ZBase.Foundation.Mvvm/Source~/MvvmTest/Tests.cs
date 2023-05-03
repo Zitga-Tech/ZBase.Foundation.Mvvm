@@ -203,7 +203,7 @@ namespace MvvmTests
 {
     public enum MyEnum { A, B, C }
 
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Explicit, Size = global::ZBase.Foundation.Unions.UnionData.SIZE)]
     public readonly partial struct UnionMyEnum : IUnion<MyEnum>
     {
         [FieldOffset(UnionBase.META_OFFSET)] public readonly Union<MyEnum> Union;
@@ -242,29 +242,33 @@ namespace MvvmTests
         public static implicit operator UnionMyEnum(in Union<MyEnum> value)
             => new UnionMyEnum(value);
 
-        [DoesNotReturn]
+        [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ValidateTypeId(in Union union)
         {
-            throw new InvalidCastException(
-                $"Cannot cast {union.TypeId.AsType()} to {Union<MyEnum>.TypeId.AsType()}"
-            );
+            if (union.TypeId != Union<MyEnum>.TypeId)
+            {
+                throw new InvalidCastException(
+                    $"Cannot cast {union.TypeId.AsType()} to {Union<MyEnum>.TypeId.AsType()}"
+                );
+            }
         }
 
         public sealed class Converter : IUnionConverter<MyEnum>
         {
             public static readonly Converter Default = new Converter();
 
+            [global::UnityEngine.Scripting.Preserve]
             static Converter()
             {
                 Init();
             }
 
 #if UNITY_5_3_OR_NEWER && UNITY_EDITOR
-            [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+            [global::UnityEngine.RuntimeInitializeOnLoadMethod(global::UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
 #endif
             private static void Init()
             {
-                ZBase.Foundation.Unions.UnionConverter.TryRegister(Default);
+                global::ZBase.Foundation.Unions.UnionConverter.TryRegister(Default);
             }
 
             private Converter() { }

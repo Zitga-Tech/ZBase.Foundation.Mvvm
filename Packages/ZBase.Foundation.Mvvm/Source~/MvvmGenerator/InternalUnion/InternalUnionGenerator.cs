@@ -125,7 +125,13 @@ namespace ZBase.Foundation.Mvvm
 
             var declaration = new InternalUnionDeclaration(candidates, compilation, context.CancellationToken);
 
-            declaration.Generate(
+            declaration.GenerateUnionTypes(
+                  context
+                , compilation
+                , outputSourceGenFiles
+            );
+
+            declaration.GenerateStaticClass(
                   context
                 , compilation
                 , outputSourceGenFiles

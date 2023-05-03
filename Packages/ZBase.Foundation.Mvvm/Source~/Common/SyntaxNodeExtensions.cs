@@ -63,6 +63,17 @@ namespace ZBase.Foundation.SourceGen
             return fileName;
         }
 
+        public static string GetGeneratedSourceFileName(this SyntaxTree syntaxTree, string generatorName, string fileName, SyntaxNode node)
+            => GetGeneratedSourceFileName(syntaxTree, generatorName, fileName, node.GetLocation().GetLineSpan().StartLinePosition.Line);
+
+        public static string GetGeneratedSourceFileName(this SyntaxTree syntaxTree, string generatorName, string fileName, int salting = 0)
+        {
+            var stableHashCode = SourceGenHelpers.GetStableHashCode(syntaxTree.FilePath) & 0x7fffffff;
+            var postfix = generatorName.Length > 0 ? $"__{generatorName}" : string.Empty;
+
+            return $"{fileName}{postfix}_{stableHashCode}{salting}.g.cs";
+        }
+
         public static string GetGeneratedSourceFilePath(this SyntaxTree syntaxTree, string assemblyName, string generatorName)
         {
             var fileName = GetGeneratedSourceFileName(syntaxTree, generatorName);

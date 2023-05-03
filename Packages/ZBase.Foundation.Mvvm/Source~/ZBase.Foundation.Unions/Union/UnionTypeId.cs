@@ -72,7 +72,7 @@ namespace ZBase.Foundation.Unions
                 Init();
             }
 
-#if UNITY_5_3_OR_NEWER && UNITY_EDITOR
+#if UNITY_5_3_OR_NEWER
             [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
 #endif
             private static void Init()
@@ -140,7 +140,7 @@ namespace ZBase.Foundation.Unions
             {
                 s_value = Incrementer.Next;
 
-#if UNITY_5_3_OR_NEWER && UNITY_EDITOR
+#if UNITY_5_3_OR_NEWER && UNITY_EDITOR && LOG_UNION_TYP_ID_REGISTRATION
                 UnityEngine.Debug.Log(
                     $"{nameof(UnionTypeId)} {s_value} is assigned to {typeof(T)}. In case the value is overflowed, enabling Domain Reloading will reset it."
                 );

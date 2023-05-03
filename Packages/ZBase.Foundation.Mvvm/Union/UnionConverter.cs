@@ -12,12 +12,10 @@ namespace ZBase.Foundation.Unions
 
         static UnionConverter()
         {
-#if !UNITY_5_3_OR_NEWER || !UNITY_EDITOR
             Init();
-#endif
         }
 
-#if UNITY_5_3_OR_NEWER && UNITY_EDITOR
+#if UNITY_5_3_OR_NEWER
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
 #endif
         private static void Init()
