@@ -23,7 +23,6 @@
         <ProjectReference Include="../Common/ZBase.Foundation.SourceGen.Common.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <ProjectReference Include="../MvvmGenerator/MvvmGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <ProjectReference Include="../ZBase.Foundation.Mvvm/ZBase.Foundation.Mvvm.csproj" />
-        <ProjectReference Include="..\ZBase.Foundation.Unions\ZBase.Foundation.Unions.csproj" />
     </ItemGroup>
 
 </Project>

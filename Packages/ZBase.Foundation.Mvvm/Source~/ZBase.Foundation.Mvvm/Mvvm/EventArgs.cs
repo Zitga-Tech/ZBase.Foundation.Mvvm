@@ -1,4 +1,4 @@
-﻿using ZBase.Foundation.Unions;
+﻿using ZBase.Foundation.Mvvm.Unions;
 
 namespace ZBase.Foundation.Mvvm
 {

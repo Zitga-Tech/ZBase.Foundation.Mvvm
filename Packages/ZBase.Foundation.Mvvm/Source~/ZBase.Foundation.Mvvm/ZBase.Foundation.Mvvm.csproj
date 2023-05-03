@@ -7,11 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
         <PackageReference Include="Unity3D" Version="2.1.2" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\ZBase.Foundation.Unions\ZBase.Foundation.Unions.csproj" />
     </ItemGroup>
 
     <Target Name="CopySourceFiles" AfterTargets="Build">

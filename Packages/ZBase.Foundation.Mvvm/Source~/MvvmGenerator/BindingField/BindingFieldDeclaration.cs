@@ -11,7 +11,7 @@ namespace ZBase.Foundation.Mvvm
     {
         public const string IBINDER_INTERFACE = "global::ZBase.Foundation.Mvvm.IBinder";
         public const string BINDING_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.BindingAttribute";
-        public const string UNION_TYPE = "global::ZBase.Foundation.Unions.Union";
+        public const string UNION_TYPE = "global::ZBase.Foundation.Mvvm.Unions.Union";
         public const string MONO_BEHAVIOUR_TYPE = "global::UnityEngine.MonoBehaviour";
 
         public ClassDeclarationSyntax Syntax { get; }

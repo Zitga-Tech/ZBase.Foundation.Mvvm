@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using ZBase.Foundation.Mvvm;
-using ZBase.Foundation.Unions;
+using ZBase.Foundation.Mvvm.Unions;
 
 namespace MvvmTests
 {

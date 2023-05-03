@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using ZBase.Foundation.Mvvm;
-using ZBase.Foundation.Unions;
+using ZBase.Foundation.Mvvm.Unions;
 
 namespace X.TY.Z
 {
@@ -203,7 +203,7 @@ namespace MvvmTests
 {
     public enum MyEnum { A, B, C }
 
-    [StructLayout(LayoutKind.Explicit, Size = global::ZBase.Foundation.Unions.UnionData.SIZE)]
+    [StructLayout(LayoutKind.Explicit, Size = global::ZBase.Foundation.Mvvm.Unions.UnionData.SIZE)]
     public readonly partial struct UnionMyEnum : IUnion<MyEnum>
     {
         [FieldOffset(UnionBase.META_OFFSET)] public readonly Union<MyEnum> Union;
@@ -268,7 +268,7 @@ namespace MvvmTests
 #endif
             private static void Init()
             {
-                global::ZBase.Foundation.Unions.UnionConverter.TryRegister(Default);
+                global::ZBase.Foundation.Mvvm.Unions.UnionConverter.TryRegister(Default);
             }
 
             private Converter() { }

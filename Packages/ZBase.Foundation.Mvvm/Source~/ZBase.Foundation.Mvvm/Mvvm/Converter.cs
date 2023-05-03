@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using ZBase.Foundation.Unions;
+using ZBase.Foundation.Mvvm.Unions;
 
 namespace ZBase.Foundation.Mvvm
 {

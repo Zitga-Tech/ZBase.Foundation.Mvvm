@@ -467,7 +467,7 @@ namespace ZBase.Foundation.Mvvm
                     var fieldName = type.ToValidIdentifier();
 
                     p.PrintLine(GENERATED_CODE);
-                    p.PrintLine($"private global::ZBase.Foundation.Unions.IUnionConverter<{typeName}> _{fieldName};");
+                    p.PrintLine($"private global::ZBase.Foundation.Mvvm.Unions.IUnionConverter<{typeName}> _{fieldName};");
                     p.PrintEndLine();
                 }
 
@@ -478,10 +478,10 @@ namespace ZBase.Foundation.Mvvm
                     var propertyName = GeneratorHelpers.ToTitleCase(fieldName.AsSpan());
 
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public global::ZBase.Foundation.Unions.IUnionConverter<{typeName}> {propertyName}");
+                    p.PrintLine($"public global::ZBase.Foundation.Mvvm.Unions.IUnionConverter<{typeName}> {propertyName}");
                     p.OpenScope();
                     {
-                        p.PrintLine($"get => _{fieldName} ??= global::ZBase.Foundation.Unions.UnionConverter.GetConverter<{typeName}>();");
+                        p.PrintLine($"get => _{fieldName} ??= global::ZBase.Foundation.Mvvm.Unions.UnionConverter.GetConverter<{typeName}>();");
                     }
                     p.CloseScope();
                     p.PrintEndLine();

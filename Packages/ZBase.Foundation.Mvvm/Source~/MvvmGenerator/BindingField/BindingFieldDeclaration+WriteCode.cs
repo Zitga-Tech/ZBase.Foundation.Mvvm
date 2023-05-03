@@ -131,7 +131,7 @@ namespace ZBase.Foundation.Mvvm
 
         private void WriteBindingInfoAttributes(ref Printer p)
         {
-            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.BindingInfoAttribute({0}.{1}, typeof(global::ZBase.Foundation.Unions.Union))]";
+            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.BindingInfoAttribute({0}.{1}, typeof(global::ZBase.Foundation.Mvvm.Unions.Union))]";
 
             var className = Syntax.Identifier.Text;
 

@@ -1,0 +1,72 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+    string[] unionTypes = new string[] {
+        "bool",
+        "byte",
+        "sbyte",
+        "char",
+        "double",
+        "float",
+        "int",
+        "uint",
+        "long",
+        "ulong",
+        "short",
+        "ushort",
+        "string",
+        "object",
+    };
+
+    string[] unionTypeNames = new string[] {
+        "Bool",
+        "Byte",
+        "SByte",
+        "Char",
+        "Double",
+        "Float",
+        "Int",
+        "UInt",
+        "Long",
+        "ULong",
+        "Short",
+        "UShort",
+        "String",
+        "Object",
+    };
+#>
+///*****************************///
+///                             ///
+/// This file is auto-generated ///
+/// DO NOT manually modify it!  ///
+///                             ///
+///*****************************///
+
+namespace ZBase.Foundation.Mvvm.Unions.Converters
+{
+<#
+    for (var i = 0; i < unionTypes.Length; i++) {
+        var type = unionTypes[i];
+        var typeName = unionTypeNames[i];
+#>
+    internal sealed class UnionConverter<#= typeName #> : IUnionConverter<<#= type #>>
+    {
+        public static readonly UnionConverter<#= typeName #> Default = new UnionConverter<#= typeName #>();
+
+        private UnionConverter<#= typeName #>() { }
+
+        public Union ToUnion(<#= type #> value) => new Union(value);
+
+        public Union<<#= type #>> ToUnionT(<#= type #> value) => new Union(value);
+
+        public bool TryGetValue(in Union union, out <#= type #> result) => union.TryGetValue(out result);
+
+        public bool TrySetValue(in Union union, ref <#= type #> dest) => union.TrySetValue(ref dest);
+    }
+<# } #>
+
+}

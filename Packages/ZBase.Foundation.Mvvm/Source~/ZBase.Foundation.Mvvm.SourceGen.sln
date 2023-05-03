@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZBase.Foundation.SourceGen.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZBase.Foundation.Mvvm", "ZBase.Foundation.Mvvm\ZBase.Foundation.Mvvm.csproj", "{7A0B5F15-4F6B-4043-8F4A-2B4568ADCDEB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZBase.Foundation.Unions", "ZBase.Foundation.Unions\ZBase.Foundation.Unions.csproj", "{0813C76A-5877-4F8C-89C9-9C4970296B4A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,10 +33,6 @@ Global
 		{7A0B5F15-4F6B-4043-8F4A-2B4568ADCDEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A0B5F15-4F6B-4043-8F4A-2B4568ADCDEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A0B5F15-4F6B-4043-8F4A-2B4568ADCDEB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0813C76A-5877-4F8C-89C9-9C4970296B4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0813C76A-5877-4F8C-89C9-9C4970296B4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0813C76A-5877-4F8C-89C9-9C4970296B4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0813C76A-5877-4F8C-89C9-9C4970296B4A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

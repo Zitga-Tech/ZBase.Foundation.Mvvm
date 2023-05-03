@@ -1,6 +1,0 @@
-<Project>
-    <PropertyGroup>
-        <UnityInstallRootPath>$([System.Environment]::GetEnvironmentVariable('UNITY_OS_INSTALL_ROOT'))</UnityInstallRootPath>
-        <UnityVersion>2021.3.20f1</UnityVersion>
-    </PropertyGroup>
-</Project>

@@ -12,11 +12,11 @@ namespace ZBase.Foundation.Mvvm
         private const string AGGRESSIVE_INLINING = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]";
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.InternalUnionGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
-        public const string STRUCT_LAYOUT = "[global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Size = global::ZBase.Foundation.Unions.UnionData.SIZE)]";
-        public const string META_OFFSET = "[global::System.Runtime.InteropServices.FieldOffset(global::ZBase.Foundation.Unions.UnionBase.META_OFFSET)]";
-        public const string DATA_OFFSET = "[global::System.Runtime.InteropServices.FieldOffset(global::ZBase.Foundation.Unions.UnionBase.DATA_OFFSET)]";
-        public const string UNION_TYPE = "global::ZBase.Foundation.Unions.Union";
-        public const string UNION_TYPE_KIND = "global::ZBase.Foundation.Unions.UnionTypeKind";
+        public const string STRUCT_LAYOUT = "[global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Size = global::ZBase.Foundation.Mvvm.Unions.UnionData.SIZE)]";
+        public const string META_OFFSET = "[global::System.Runtime.InteropServices.FieldOffset(global::ZBase.Foundation.Mvvm.Unions.UnionBase.META_OFFSET)]";
+        public const string DATA_OFFSET = "[global::System.Runtime.InteropServices.FieldOffset(global::ZBase.Foundation.Mvvm.Unions.UnionBase.DATA_OFFSET)]";
+        public const string UNION_TYPE = "global::ZBase.Foundation.Mvvm.Unions.Union";
+        public const string UNION_TYPE_KIND = "global::ZBase.Foundation.Mvvm.Unions.UnionTypeKind";
         public const string DOES_NOT_RETURN = "[global::System.Diagnostics.CodeAnalysis.DoesNotReturn]";
         public const string RUNTIME_INITIALIZE_ON_LOAD_METHOD = "[global::UnityEngine.RuntimeInitializeOnLoadMethod(global::UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]";
 
@@ -145,7 +145,7 @@ namespace ZBase.Foundation.Mvvm
                 p.Print("#if !UNITY_5_3_OR_NEWER").PrintEndLine();
                 p.PrintLine("/// <remarks>");
                 p.PrintLine("/// Call the <see cref=\"Register()\"/> method to register unions inside this class");
-                p.PrintLine("/// to <see cref=\"ZBase.Foundation.Unions.UnionConverter\"/>.");
+                p.PrintLine("/// to <see cref=\"ZBase.Foundation.Mvvm.Unions.UnionConverter\"/>.");
                 p.PrintLine("/// </remarks>");
                 p.Print("#endif").PrintEndLine();
                 p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
@@ -164,7 +164,7 @@ namespace ZBase.Foundation.Mvvm
                     p.Print("#if !UNITY_5_3_OR_NEWER").PrintEndLine();
                     p.PrintLine("/// <summary>");
                     p.PrintLine("/// Register all unions inside this class");
-                    p.PrintLine("/// to <see cref=\"ZBase.Foundation.Unions.UnionConverter\"/>");
+                    p.PrintLine("/// to <see cref=\"ZBase.Foundation.Mvvm.Unions.UnionConverter\"/>");
                     p.PrintLine("/// </summary>");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
                     p.PrintLine("public static void Register() { }");
@@ -186,7 +186,7 @@ namespace ZBase.Foundation.Mvvm
                             var identifier = symbol.ToValidIdentifier();
                             var converterDefault = $"Union__{identifier}.Converter.Default";
 
-                            p.PrintLine($"global::ZBase.Foundation.Unions.UnionConverter.TryRegister<{typeName}>({converterDefault});");
+                            p.PrintLine($"global::ZBase.Foundation.Mvvm.Unions.UnionConverter.TryRegister<{typeName}>({converterDefault});");
                             p.PrintEndLine();
 
                             p.Print("#if UNITY_5_3_OR_NEWER && UNITY_EDITOR && LOG_INTERNAL_UNIONS_REGISTRATION").PrintEndLine();
@@ -248,7 +248,7 @@ namespace ZBase.Foundation.Mvvm
                     p.PrintLine(STRUCT_LAYOUT);
                     p.PrintBeginLine()
                         .Print("private partial struct ").Print(internalUnionName)
-                        .Print($" : global::ZBase.Foundation.Unions.IUnion<{typeName}>")
+                        .Print($" : global::ZBase.Foundation.Mvvm.Unions.IUnion<{typeName}>")
                         .PrintEndLine();
                     p.OpenScope();
                     {
@@ -360,7 +360,7 @@ namespace ZBase.Foundation.Mvvm
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
             p.PrintBeginLine()
                 .Print("public sealed class Converter")
-                .Print($": global::ZBase.Foundation.Unions.IUnionConverter<{typeName}>")
+                .Print($": global::ZBase.Foundation.Mvvm.Unions.IUnionConverter<{typeName}>")
                 .PrintEndLine();
             p.OpenScope();
             {
