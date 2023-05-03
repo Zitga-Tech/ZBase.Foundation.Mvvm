@@ -178,6 +178,7 @@ namespace ZBase.Foundation.Mvvm
                 var typeName = member.Member.Type.ToFullName();
                 var argsName = OnChangedArgsName(member);
                 var converterForField = GeneratorHelpers.ToTitleCase(member.Member.Type.ToValidIdentifier().AsSpan());
+                var willNotifyPropertyChanged = NotifyPropertyChangedForMap.TryGetValue(fieldName, out var property);
 
                 p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(OBSERVABLE_PROPERTY);
                 p.PrintLine($"public {typeName} {propertyName}");
@@ -191,23 +192,45 @@ namespace ZBase.Foundation.Mvvm
                         p.PrintLine($"if (global::System.Collections.Generic.EqualityComparer<{typeName}>.Default.Equals({fieldName}, value) == false)");
                         p.OpenScope();
                         {
+                            p.PrintLine($"var oldValue = this.{fieldName};");
+
+                            if (willNotifyPropertyChanged)
+                            {
+                                p.PrintLine($"var oldPropertyValue = this.{property.Name};");
+                            }
+
+                            p.PrintEndLine();
+
                             p.PrintLine($"{OnChangingMethodName(member)}(value);");
+                            p.PrintLine($"{OnChangingMethodName(member)}(oldValue, value);");
+                            p.PrintEndLine();
+
                             p.PrintLine($"var {argsName} = new global::ZBase.Foundation.Mvvm.PropertyChangeEventArgs(this, nameof(this.{propertyName}), this._unionConverters.{converterForField}.ToUnion(value));");
                             p.PrintLine($"this.{OnChangingEventName(member)}?.Invoke({argsName});");
+                            p.PrintEndLine();
+
                             p.PrintLine($"this.{fieldName} = value;");
+                            p.PrintEndLine();
+
                             p.PrintLine($"{OnChangedMethodName(member)}(value);");
+                            p.PrintLine($"{OnChangedMethodName(member)}(oldValue, value);");
                             p.PrintLine($"this.{OnChangedEventName(member)}?.Invoke({argsName});");
 
-                            if (NotifyPropertyChangedForMap.TryGetValue(fieldName, out var property))
+                            if (willNotifyPropertyChanged)
                             {
                                 var otherArgsName = OnChangedArgsName(property);
                                 var converterForProperty = GeneratorHelpers.ToTitleCase(property.Type.ToValidIdentifier().AsSpan());
 
                                 p.PrintEndLine();
                                 p.PrintLine($"{OnChangedMethodName(property)}(this.{property.Name});");
+                                p.PrintLine($"{OnChangedMethodName(property)}(oldPropertyValue, this.{property.Name});");
+                                p.PrintEndLine();
+
                                 p.PrintLine($"var {otherArgsName} = new global::ZBase.Foundation.Mvvm.PropertyChangeEventArgs(this, nameof(this.{property.Name}), this._unionConverters.{converterForProperty}.ToUnion(this.{property.Name}));");
                                 p.PrintLine($"this.{OnChangedEventName(property)}?.Invoke({otherArgsName});");
                             }
+
+                            p.PrintEndLine();
 
                             foreach (var commandName in member.CommandNames)
                             {
@@ -232,15 +255,36 @@ namespace ZBase.Foundation.Mvvm
             foreach (var member in Members)
             {
                 var typeName = member.Member.Type.ToFullName();
+                var propName = member.PropertyName;
 
-                p.PrintLine($"/// <summary>Executes the logic for when <see cref=\"{member.PropertyName}\"/> is changing.</summary>");
+                p.PrintLine($"/// <summary>Executes the logic for when <see cref=\"{propName}\"/> is changing.</summary>");
+                p.PrintLine("/// <param name=\"value\">The new property value being set.</param>");
+                p.PrintLine($"/// <remarks>This method is invoked right before the value of <see cref=\"{propName}\"/> is changed.</remarks>");
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine($"partial void {OnChangingMethodName(member)}({typeName} value);");
                 p.PrintEndLine();
 
-                p.PrintLine($"/// <summary>Executes the logic for when <see cref=\"{member.PropertyName}\"/> just changed.</summary>");
+                p.PrintLine($"/// <summary>Executes the logic for when <see cref=\"{propName}\"/> is changing.</summary>");
+                p.PrintLine("/// <param name=\"oldValue\">The previous property value that is being replaced.</param>");
+                p.PrintLine("/// <param name=\"newValue\">The new property value being set.</param>");
+                p.PrintLine($"/// <remarks>This method is invoked right before the value of <see cref=\"{propName}\"/> is changed.</remarks>");
+                p.PrintLine(GENERATED_CODE);
+                p.PrintLine($"partial void {OnChangingMethodName(member)}({typeName} oldValue, {typeName} newValue);");
+                p.PrintEndLine();
+
+                p.PrintLine($"/// <summary>Executes the logic for when <see cref=\"{propName}\"/> just changed.</summary>");
+                p.PrintLine("/// <param name=\"value\">The new property value that was set.</param>");
+                p.PrintLine($"/// <remarks>This method is invoked right after the value of <see cref=\"{propName}\"/> is changed.</remarks>");
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine($"partial void {OnChangedMethodName(member)}({typeName} value);");
+                p.PrintEndLine();
+
+                p.PrintLine($"/// <summary>Executes the logic for when <see cref=\"{propName}\"/> just changed.</summary>");
+                p.PrintLine("/// <param name=\"oldValue\">The previous property value that was replaced.</param>");
+                p.PrintLine("/// <param name=\"newValue\">The new property value that was set.</param>");
+                p.PrintLine($"/// <remarks>This method is invoked right after the value of <see cref=\"{propName}\"/> is changed.</remarks>");
+                p.PrintLine(GENERATED_CODE);
+                p.PrintLine($"partial void {OnChangedMethodName(member)}({typeName} oldValue, {typeName} newValue);");
                 p.PrintEndLine();
             }
 
@@ -256,9 +300,21 @@ namespace ZBase.Foundation.Mvvm
 
             foreach (var property in properties.Values)
             {
-                p.PrintLine($"/// <summary>Executes the logic for when <see cref=\"{property.Name}\"/> just changed.</summary>");
+                var propName = property.Name;
+                var typeName = property.Type.ToFullName();
+
+                p.PrintLine($"/// <summary>Executes the logic for when <see cref=\"{propName}\"/> just changed.</summary>");
+                p.PrintLine("/// <param name=\"value\">The new property value that was set.</param>");
+                p.PrintLine($"/// <remarks>This method is invoked right after the value of <see cref=\"{propName}\"/> is changed.</remarks>");
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"partial void {OnChangedMethodName(property)}({property.Type.ToFullName()} value);");
+                p.PrintLine($"partial void {OnChangedMethodName(property)}({typeName} value);");
+                p.PrintEndLine();
+
+                p.PrintLine($"/// <summary>Executes the logic for when <see cref=\"{propName}\"/> just changed.</summary>");
+                p.PrintLine("/// <param name=\"value\">The new property value that was set.</param>");
+                p.PrintLine($"/// <remarks>This method is invoked right after the value of <see cref=\"{propName}\"/> is changed.</remarks>");
+                p.PrintLine(GENERATED_CODE);
+                p.PrintLine($"partial void {OnChangedMethodName(property)}({typeName} oldValue, {typeName} newValue);");
                 p.PrintEndLine();
             }
         }

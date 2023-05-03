@@ -13,6 +13,8 @@ namespace ZBase.Foundation.Mvvm
 
         public ClassDeclarationSyntax Syntax { get; }
 
+        public ITypeSymbol Symbol { get; }
+
         public string FullyQualifiedName { get; private set; }
 
         public bool IsValid { get; }
@@ -21,13 +23,12 @@ namespace ZBase.Foundation.Mvvm
 
         public RelayCommandDeclaration(ClassDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
         {
-            var typeSymbol = semanticModel.GetDeclaredSymbol(candidate, token);
-
             Syntax = candidate;
-            FullyQualifiedName = typeSymbol.ToFullName();
+            Symbol = semanticModel.GetDeclaredSymbol(candidate, token);
+            FullyQualifiedName = Symbol.ToFullName();
             Members = new List<MemberRef>();
 
-            var members = typeSymbol.GetMembers();
+            var members = Symbol.GetMembers();
             var methodMap = new Dictionary<string, IMethodSymbol>();
             var methodCandidates = new List<(IMethodSymbol, string)>();
 

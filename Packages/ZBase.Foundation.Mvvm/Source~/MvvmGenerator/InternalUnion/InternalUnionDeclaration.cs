@@ -44,8 +44,8 @@ namespace ZBase.Foundation.Mvvm
                             var symbol = typeInfo.Type;
                             var typeName = symbol.ToFullName();
 
-                            if (symbol.IsValueType == true
-                                && typeName.ToUnionType().IsNativeUnionType() == false
+                            if (typeName.ToUnionType().IsNativeUnionType() == false
+                                && symbol.IsValueType == true
                                 && filtered.ContainsKey(typeName) == false
                             )
                             {
@@ -71,8 +71,8 @@ namespace ZBase.Foundation.Mvvm
                             var symbol = method.Parameters[0].Type;
                             var typeName = symbol.ToFullName();
 
-                            if (symbol.IsValueType == true
-                                && typeName.ToUnionType().IsNativeUnionType() == false
+                            if (typeName.ToUnionType().IsNativeUnionType() == false
+                                && symbol.IsValueType == true
                                 && filtered.ContainsKey(typeName) == false
                             )
                             {

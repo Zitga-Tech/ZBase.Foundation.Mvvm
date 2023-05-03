@@ -36,7 +36,9 @@ namespace ZBase.Foundation.Mvvm
 
                 var typeName = candidate.TypeArgument.ToFullName();
 
-                if (filtered.ContainsKey(typeName) == false)
+                if (typeName.ToUnionType().IsNativeUnionType() == false
+                    && filtered.ContainsKey(typeName) == false
+                )
                 {
                     filtered[typeName] = candidate;
                 }

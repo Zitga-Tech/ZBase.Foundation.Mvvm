@@ -140,15 +140,5 @@ namespace ZBase.Foundation.Mvvm
                 , outputSourceGenFiles
             );
         }
-
-        private static readonly DiagnosticDescriptor s_errorDescriptor
-            = new("SG_INTERNAL_UNION_01"
-                , "Internal Union Generator Error"
-                , "This error indicates a bug in the Internal Union source generators. Error message: '{0}'."
-                , "ZBase.Foundation.Mvvm.ObservablePropertyAttribute"
-                , DiagnosticSeverity.Error
-                , isEnabledByDefault: true
-                , description: ""
-            );
     }
 }

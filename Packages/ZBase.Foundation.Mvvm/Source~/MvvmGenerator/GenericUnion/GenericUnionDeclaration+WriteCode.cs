@@ -45,7 +45,7 @@ namespace ZBase.Foundation.Mvvm
                     );
 
                     context.AddSource(
-                          syntaxTree.GetGeneratedSourceFileName(GENERATOR_NAME, syntax)
+                          syntaxTree.GetGeneratedSourceFileName(GENERATOR_NAME, syntax, structRef.Symbol.ToValidIdentifier())
                         , outputSource
                     );
 
@@ -125,7 +125,7 @@ namespace ZBase.Foundation.Mvvm
             , bool outputSourceGenFiles
         )
         {
-            foreach (var structRef in Structs)
+            foreach (var structRef in Redundants)
             {
                 try
                 {
@@ -142,7 +142,7 @@ namespace ZBase.Foundation.Mvvm
                     );
 
                     context.AddSource(
-                          syntaxTree.GetGeneratedSourceFileName(GENERATOR_NAME, syntax)
+                          syntaxTree.GetGeneratedSourceFileName(GENERATOR_NAME, syntax, structRef.Symbol.ToValidIdentifier())
                         , outputSource
                     );
 

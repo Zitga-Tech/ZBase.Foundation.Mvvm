@@ -45,7 +45,7 @@ namespace ZBase.Foundation.Mvvm
                     );
 
                     context.AddSource(
-                          syntaxTree.GetGeneratedSourceFileName(GENERATOR_NAME, syntax)
+                          syntaxTree.GetGeneratedSourceFileName(GENERATOR_NAME, syntax, typeRef.Symbol.ToValidIdentifier())
                         , outputSource
                     );
 

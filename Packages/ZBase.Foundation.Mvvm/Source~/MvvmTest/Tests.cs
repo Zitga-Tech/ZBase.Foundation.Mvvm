@@ -16,9 +16,17 @@ namespace MvvmTest
         }
     }
 
-    public interface IUnionTypeCode : IUnion<TypeCode> { }
+    public partial class Model : IObservableObject
+    {
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(Index))]
+        private int _intField;
 
-    public partial struct UnionTypeCode2 : IUnion<TypeCode> { }
+        [ObservableProperty]
+        private TypeCode _typeCode;
 
-    public partial struct UnionTypeCode : IUnionTypeCode { }
+        public int Index { get; }
+    }
+
+    public partial struct UnionTypCode : IUnion<TypeCode> { }
 }

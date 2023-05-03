@@ -137,15 +137,5 @@ namespace ZBase.Foundation.Mvvm
                 , outputSourceGenFiles
             );
         }
-
-        private static readonly DiagnosticDescriptor s_errorDescriptor
-            = new("SG_GENERIC_UNION_01"
-                , "Generic Union Generator Error"
-                , "This error indicates a bug in the Generic Union source generators. Error message: '{0}'."
-                , "ZBase.Foundation.Mvvm.Unions.IUnion<T>"
-                , DiagnosticSeverity.Error
-                , isEnabledByDefault: true
-                , description: ""
-            );
     }
 }
