@@ -6,7 +6,7 @@ namespace ZBase.Foundation.SourceGen
     public static class ExceptionExtensions
     {
         public static string ToUnityPrintableString(this Exception exception)
-            => exception.StackTrace.ToString().Replace(Environment.NewLine, " |--| ");
+            => exception.ToString().Replace(Environment.NewLine, " |--| ");
     }
 }
 

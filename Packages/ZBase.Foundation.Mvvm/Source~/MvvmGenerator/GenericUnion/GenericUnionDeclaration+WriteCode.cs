@@ -7,7 +7,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace ZBase.Foundation.Mvvm
 {
-    partial class InternalUnionDeclaration
+    partial class GenericUnionDeclaration
     {
         private const string AGGRESSIVE_INLINING = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]";
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.InternalUnionGenerator\", \"1.0.0\")]";
@@ -20,7 +20,7 @@ namespace ZBase.Foundation.Mvvm
         public const string DOES_NOT_RETURN = "[global::System.Diagnostics.CodeAnalysis.DoesNotReturn]";
         public const string RUNTIME_INITIALIZE_ON_LOAD_METHOD = "[global::UnityEngine.RuntimeInitializeOnLoadMethod(global::UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]";
 
-        public const string GENERATOR_NAME = nameof(InternalUnionGenerator);
+        public const string GENERATOR_NAME = nameof(GenericUnionDeclaration);
 
         public void GenerateUnionTypes(
               SourceProductionContext context
@@ -28,13 +28,13 @@ namespace ZBase.Foundation.Mvvm
             , bool outputSourceGenFiles
         )
         {
-            foreach (var typeRef in Types)
+            foreach (var structRef in Structs)
             {
                 try
                 {
-                    var syntax = typeRef.Syntax;
+                    var syntax = structRef.Syntax;
                     var syntaxTree = syntax.SyntaxTree;
-                    var source = WriteInternalUnion(typeRef, compilation.Assembly.Name);
+                    var source = WriteGenericUnion(structRef);
                     var sourceFilePath = syntaxTree.GetGeneratedSourceFilePath(compilation.Assembly.Name, GENERATOR_NAME);
 
                     var outputSource = TypeCreationHelpers.GenerateSourceTextForRootNodes(
@@ -63,7 +63,7 @@ namespace ZBase.Foundation.Mvvm
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
                           s_errorDescriptor
-                        , typeRef.Syntax.GetLocation()
+                        , structRef.Syntax.GetLocation()
                         , e.ToUnityPrintableString()
                     ));
                 }
@@ -82,7 +82,7 @@ namespace ZBase.Foundation.Mvvm
             {
                 var syntaxTree = syntax.SyntaxTree;
                 var assemblyName = compilation.Assembly.Name;
-                var source = WriteInternalClass(Types, assemblyName);
+                var source = WriteStaticClass(Structs, assemblyName);
                 var sourceFilePath = syntaxTree.GetGeneratedSourceFilePath(assemblyName, GENERATOR_NAME);
 
                 var outputSource = TypeCreationHelpers.GenerateSourceTextForRootNodes(
@@ -92,7 +92,7 @@ namespace ZBase.Foundation.Mvvm
                     , context.CancellationToken
                 );
 
-                var fileName = $"InternalUnions_{assemblyName}";
+                var fileName = $"GenericUnions_{assemblyName}";
 
                 context.AddSource(
                       syntaxTree.GetGeneratedSourceFileName(GENERATOR_NAME, fileName, syntax)
@@ -119,39 +119,81 @@ namespace ZBase.Foundation.Mvvm
             }
         }
 
-        private static string WriteInternalClass(List<TypeRef> types, string assemblyName)
+        public void GenerateRedundantTypes(
+              SourceProductionContext context
+            , Compilation compilation
+            , bool outputSourceGenFiles
+        )
+        {
+            foreach (var structRef in Structs)
+            {
+                try
+                {
+                    var syntax = structRef.Syntax;
+                    var syntaxTree = syntax.SyntaxTree;
+                    var source = WriteRedundantType(structRef);
+                    var sourceFilePath = syntaxTree.GetGeneratedSourceFilePath(compilation.Assembly.Name, GENERATOR_NAME);
+
+                    var outputSource = TypeCreationHelpers.GenerateSourceTextForRootNodes(
+                          sourceFilePath
+                        , syntax
+                        , source
+                        , context.CancellationToken
+                    );
+
+                    context.AddSource(
+                          syntaxTree.GetGeneratedSourceFileName(GENERATOR_NAME, syntax)
+                        , outputSource
+                    );
+
+                    if (outputSourceGenFiles)
+                    {
+                        SourceGenHelpers.OutputSourceToFile(
+                              context
+                            , syntax.GetLocation()
+                            , sourceFilePath
+                            , outputSource
+                        );
+                    }
+                }
+                catch (Exception e)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(
+                          s_errorDescriptor
+                        , structRef.Syntax.GetLocation()
+                        , e.ToUnityPrintableString()
+                    ));
+                }
+            }
+        }
+
+        private static string WriteStaticClass(List<StructRef> structs, string assemblyName)
         {
             var p = Printer.DefaultLarge;
 
             p.PrintLine("#pragma warning disable");
             p.PrintEndLine();
 
-            p.PrintLine($"namespace ZBase.Foundation.Mvvm.Unions.__Internal.{assemblyName}");
+            p.PrintLine($"namespace ZBase.Foundation.Mvvm.Unions.__Generics.{assemblyName}");
             p.OpenScope();
             {
                 p.PrintLine("/// <summary>");
-                p.PrintLine("/// Contains auto-generated unions for types that are the type of either");
-                p.PrintLine("/// [ObservableProperty] properties or the parameter of [RelayCommand] methods.");
-                p.PrintLine("/// <br/>");
-                p.PrintLine("/// Automatically register these unions");
+                p.PrintLine("/// Automatically registers generic unions");
                 p.PrintLine("/// to <see cref=\"ZBase.Foundation.Mvvm.Unions.UnionConverter\"/>");
                 p.PrintLine("/// on Unity3D platform.");
-                p.PrintLine("/// <br/>");
-                p.PrintLine("/// These unions are not intended to be used directly by user-code");
-                p.PrintLine("/// thus they are declared <c>private</c> inside this class.");
                 p.PrintLine("/// </summary>");
                 p.Print("#if !UNITY_5_3_OR_NEWER").PrintEndLine();
                 p.PrintLine("/// <remarks>");
-                p.PrintLine("/// Call the <see cref=\"Register()\"/> method to register unions inside this class");
+                p.PrintLine("/// Call the <see cref=\"Register()\"/> method to register generic unions");
                 p.PrintLine("/// to <see cref=\"ZBase.Foundation.Mvvm.Unions.UnionConverter\"/>.");
                 p.PrintLine("/// </remarks>");
                 p.Print("#endif").PrintEndLine();
                 p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
-                p.PrintLine("public static partial class InternalUnions");
+                p.PrintLine("public static partial class GenericUnions");
                 p.OpenScope();
                 {
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
-                    p.PrintLine("static InternalUnions()");
+                    p.PrintLine("static GenericUnions()");
                     p.OpenScope();
                     {
                         p.PrintLine("Init();");
@@ -161,7 +203,7 @@ namespace ZBase.Foundation.Mvvm
 
                     p.Print("#if !UNITY_5_3_OR_NEWER").PrintEndLine();
                     p.PrintLine("/// <summary>");
-                    p.PrintLine("/// Register all unions inside this class");
+                    p.PrintLine("/// Register all generic unions");
                     p.PrintLine("/// to <see cref=\"ZBase.Foundation.Mvvm.Unions.UnionConverter\"/>");
                     p.PrintLine("/// </summary>");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
@@ -176,19 +218,19 @@ namespace ZBase.Foundation.Mvvm
                     p.PrintLine("private static void Init()");
                     p.OpenScope();
                     {
-                        foreach (var typeRef in types)
+                        foreach (var structRef in structs)
                         {
-                            var symbol = typeRef.Symbol;
-                            var typeName = symbol.ToFullName();
-                            var simpleTypeName = symbol.ToSimpleName();
-                            var identifier = symbol.ToValidIdentifier();
-                            var converterDefault = $"Union__{identifier}.Converter.Default";
+                            var symbol = structRef.Symbol;
+                            var typeName = structRef.TypeArgument.ToFullName();
+                            var simpleTypeName = structRef.TypeArgument.ToSimpleName();
+                            var identifier = symbol.ToFullName();
+                            var converterDefault = $"{identifier}.Converter.Default";
 
                             p.PrintLine($"global::ZBase.Foundation.Mvvm.Unions.UnionConverter.TryRegister<{typeName}>({converterDefault});");
                             p.PrintEndLine();
 
-                            p.Print("#if UNITY_5_3_OR_NEWER && UNITY_EDITOR && LOG_INTERNAL_UNIONS_REGISTRATION").PrintEndLine();
-                            p.PrintLine($"global::UnityEngine.Debug.Log(\"Register internal union for {simpleTypeName}\");");
+                            p.Print("#if UNITY_5_3_OR_NEWER && UNITY_EDITOR && LOG_GENERIC_UNIONS_REGISTRATION").PrintEndLine();
+                            p.PrintLine($"global::UnityEngine.Debug.Log(\"Register generic union for {simpleTypeName}\");");
                             p.Print("#endif").PrintEndLine();
                         }
                     }
@@ -204,65 +246,76 @@ namespace ZBase.Foundation.Mvvm
             return p.Result;
         }
 
-        private static string WriteInternalUnion(TypeRef typeRef, string assemblyName)
+        private static string WriteRedundantType(StructRef structRef)
         {
-            var symbol = typeRef.Symbol;
-            var typeName = symbol.ToFullName();
-            var identifier = symbol.ToValidIdentifier();
-            var internalUnionName = $"Union__{identifier}";
+            var typeName = structRef.TypeArgument.ToFullName();
+            var structName = structRef.Syntax.Identifier.Text;
+
+            var scopePrinter = new SyntaxNodeScopePrinter(Printer.DefaultLarge, structRef.Syntax.Parent);
+            var p = scopePrinter.printer;
+
+            p = p.IncreasedIndent();
+
+            p.PrintLine("/// <summary>");
+            p.PrintLine($"/// A union has already been implemented for <see cref=\"{typeName}\"/.");
+            p.PrintLine("/// This declaration is redundant and can be removed.");
+            p.PrintLine("/// </summary>");
+            p.PrintLine($"[global::System.Obsolete(\"A union has already been implemented for {typeName}. This declaration is redundant and can be removed.\")]");
+            p.PrintLine($"partial struct {structName} {{ }}");
+
+            p = p.DecreasedIndent();
+            return p.Result;
+        }
+
+        private static string WriteGenericUnion(StructRef structRef)
+        {
+            var typeName = structRef.TypeArgument.ToFullName();
+            var structName = structRef.Syntax.Identifier.Text;
             var unionName = $"Union<{typeName}>";
 
-            var p = Printer.DefaultLarge;
+            var scopePrinter = new SyntaxNodeScopePrinter(Printer.DefaultLarge, structRef.Syntax.Parent);
+            var p = scopePrinter.printer;
 
             p.PrintLine("#pragma warning disable");
             p.PrintEndLine();
 
-            p.PrintLine($"namespace ZBase.Foundation.Mvvm.Unions.__Internal.{assemblyName}");
+            p = p.IncreasedIndent();
+
+            p.PrintLine(STRUCT_LAYOUT);
+            p.PrintBeginLine()
+                .Print("partial struct ").Print(structName)
+                .PrintEndLine();
             p.OpenScope();
             {
-                p.PrintLine("static partial class InternalUnions");
-                p.OpenScope();
-                {
-                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
-                    p.PrintLine(STRUCT_LAYOUT);
-                    p.PrintBeginLine()
-                        .Print("private partial struct ").Print(internalUnionName)
-                        .Print($" : global::ZBase.Foundation.Mvvm.Unions.IUnion<{typeName}>")
-                        .PrintEndLine();
-                    p.OpenScope();
-                    {
-                        p = WriteFields(typeName, unionName, p);
-                        p = WriteConstructors(typeName, internalUnionName, unionName, p);
-                        p = WriteValidateTypeIdMethod(typeName, unionName, p);
-                        p = WirteImplicitConversions(typeName, internalUnionName, unionName, p);
-                        p = WriteConverterClass(typeName, internalUnionName, unionName, p);
-                    }
-                    p.CloseScope();
-                }
-                p.CloseScope();
+                p = WriteFields(typeName, unionName, p);
+                p = WriteConstructors(typeName, structName, unionName, p);
+                p = WriteValidateTypeIdMethod(typeName, unionName, p);
+                p = WirteImplicitConversions(typeName, structName, unionName, p);
+                p = WriteConverterClass(typeName, structName, unionName, p);
             }
             p.CloseScope();
 
+            p = p.DecreasedIndent();
             return p.Result;
         }
 
         private static Printer WriteFields(string typeName, string unionName, Printer p)
         {
-            p.PrintLine(META_OFFSET).PrintLine(GENERATED_CODE).PrintLine("[Preserve]");
+            p.PrintLine(META_OFFSET).PrintLine(GENERATED_CODE);
             p.PrintLine($"public readonly {unionName} Union;");
             p.PrintEndLine();
 
-            p.PrintLine(DATA_OFFSET).PrintLine(GENERATED_CODE).PrintLine("[Preserve]");
+            p.PrintLine(DATA_OFFSET).PrintLine(GENERATED_CODE);
             p.PrintLine($"public readonly {typeName} Value;");
             p.PrintEndLine();
 
             return p;
         }
 
-        private static Printer WriteConstructors(string typeName, string internalUnionName, string unionName, Printer p)
+        private static Printer WriteConstructors(string typeName, string structName, string unionName, Printer p)
         {
-            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
-            p.PrintLine($"public {internalUnionName}({typeName} value)");
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public {structName}({typeName} value)");
             p.OpenScope();
             {
                 p.PrintLine($"this.Union = new {UNION_TYPE}({UNION_TYPE_KIND}.ValueType, {unionName}.TypeId);");
@@ -271,8 +324,8 @@ namespace ZBase.Foundation.Mvvm
             p.CloseScope();
             p.PrintEndLine();
 
-            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
-            p.PrintLine($"public {internalUnionName}(in {unionName} union) : this()");
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public {structName}(in {unionName} union) : this()");
             p.OpenScope();
             {
                 p.PrintLine("this.Union = union;");
@@ -280,8 +333,8 @@ namespace ZBase.Foundation.Mvvm
             p.CloseScope();
             p.PrintEndLine();
 
-            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
-            p.PrintLine($"public {internalUnionName}(in {UNION_TYPE} union) : this()");
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public {structName}(in {UNION_TYPE} union) : this()");
             p.OpenScope();
             {
                 p.PrintLine("ValidateTypeId(union);");
@@ -294,7 +347,7 @@ namespace ZBase.Foundation.Mvvm
 
         private static Printer WriteValidateTypeIdMethod(string typeName, string unionName, Printer p)
         {
-            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(DOES_NOT_RETURN).PrintLine("[Preserve]");
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(DOES_NOT_RETURN);
             p.PrintLine($"private static void ValidateTypeId(in {UNION_TYPE} union)");
             p.OpenScope();
             {
@@ -314,59 +367,59 @@ namespace ZBase.Foundation.Mvvm
             return p;
         }
 
-        private static Printer WirteImplicitConversions(string typeName, string internalUnionName, string unionName, Printer p)
+        private static Printer WirteImplicitConversions(string typeName, string structName, string unionName, Printer p)
         {
-            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(AGGRESSIVE_INLINING).PrintLine("[Preserve]");
-            p.PrintLine($"public static implicit operator {internalUnionName}({typeName} value) => new {internalUnionName}(value);");
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(AGGRESSIVE_INLINING);
+            p.PrintLine($"public static implicit operator {structName}({typeName} value) => new {structName}(value);");
             p.PrintEndLine();
 
-            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(AGGRESSIVE_INLINING).PrintLine("[Preserve]");
-            p.PrintLine($"public static implicit operator {UNION_TYPE}(in {internalUnionName} value) => value.Union;");
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(AGGRESSIVE_INLINING);
+            p.PrintLine($"public static implicit operator {UNION_TYPE}(in {structName} value) => value.Union;");
             p.PrintEndLine();
 
-            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(AGGRESSIVE_INLINING).PrintLine("[Preserve]");
-            p.PrintLine($"public static implicit operator {unionName}(in {internalUnionName} value) => value.Union;");
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(AGGRESSIVE_INLINING);
+            p.PrintLine($"public static implicit operator {unionName}(in {structName} value) => value.Union;");
             p.PrintEndLine();
 
-            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(AGGRESSIVE_INLINING).PrintLine("[Preserve]");
-            p.PrintLine($"public static implicit operator {internalUnionName}(in {unionName} value) => new {internalUnionName}(value);");
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(AGGRESSIVE_INLINING);
+            p.PrintLine($"public static implicit operator {structName}(in {unionName} value) => new {structName}(value);");
             p.PrintEndLine();
             return p;
         }
 
-        private static Printer WriteConverterClass(string typeName, string internalUnionName, string unionName, Printer p)
+        private static Printer WriteConverterClass(string typeName, string structName, string unionName, Printer p)
         {
-            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
             p.PrintBeginLine()
                 .Print("public sealed class Converter")
                 .Print($": global::ZBase.Foundation.Mvvm.Unions.IUnionConverter<{typeName}>")
                 .PrintEndLine();
             p.OpenScope();
             {
-                p.PrintLine(GENERATED_CODE).PrintLine("[Preserve]");
+                p.PrintLine(GENERATED_CODE);
                 p.PrintLine("public static readonly Converter Default = new Converter();");
                 p.PrintEndLine();
 
-                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                 p.PrintLine("private Converter() { }");
                 p.PrintEndLine();
 
-                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(AGGRESSIVE_INLINING).PrintLine("[Preserve]");
-                p.PrintLine($"public {UNION_TYPE} ToUnion({typeName} value) => new {internalUnionName}(value);");
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(AGGRESSIVE_INLINING);
+                p.PrintLine($"public {UNION_TYPE} ToUnion({typeName} value) => new {structName}(value);");
                 p.PrintEndLine();
 
-                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(AGGRESSIVE_INLINING).PrintLine("[Preserve]");
-                p.PrintLine($"public {unionName} ToUnionT({typeName} value) => new {internalUnionName}(value).Union;");
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(AGGRESSIVE_INLINING);
+                p.PrintLine($"public {unionName} ToUnionT({typeName} value) => new {structName}(value).Union;");
                 p.PrintEndLine();
 
-                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                 p.PrintLine($"public bool TryGetValue(in {UNION_TYPE} union, out {typeName} result)");
                 p.OpenScope();
                 {
                     p.PrintLine($"if (union.TypeId == {unionName}.TypeId)");
                     p.OpenScope();
                     {
-                        p.PrintLine($"var temp = new {internalUnionName}(union);");
+                        p.PrintLine($"var temp = new {structName}(union);");
                         p.PrintLine("result = temp.Value;");
                         p.PrintLine("return true;");
                     }
@@ -379,14 +432,14 @@ namespace ZBase.Foundation.Mvvm
                 p.CloseScope();
                 p.PrintEndLine();
 
-                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                 p.PrintLine($"public bool TrySetValue(in {UNION_TYPE} union, ref {typeName} result)");
                 p.OpenScope();
                 {
                     p.PrintLine($"if (union.TypeId == {unionName}.TypeId)");
                     p.OpenScope();
                     {
-                        p.PrintLine($"var temp = new {internalUnionName}(union);");
+                        p.PrintLine($"var temp = new {structName}(union);");
                         p.PrintLine("result = temp.Value;");
                         p.PrintLine("return true;");
                     }
@@ -403,10 +456,10 @@ namespace ZBase.Foundation.Mvvm
         }
 
         private static readonly DiagnosticDescriptor s_errorDescriptor
-            = new("SG_INTERNAL_UNIONS_01"
-                , "Internal Union Generator Error"
-                , "This error indicates a bug in the Internal Union source generators. Error message: '{0}'."
-                , "ZBase.Foundation.Mvvm.IObservableObject"
+            = new("SG_GENERIC_UNIONS_01"
+                , "Generic Union Generator Error"
+                , "This error indicates a bug in the Generic Union source generators. Error message: '{0}'."
+                , "ZBase.Foundation.Mvvm.Unions.IUnion<T>"
                 , DiagnosticSeverity.Error
                 , isEnabledByDefault: true
                 , description: ""

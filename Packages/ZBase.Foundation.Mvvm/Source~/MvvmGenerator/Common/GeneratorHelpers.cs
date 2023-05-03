@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -9,32 +10,33 @@ namespace ZBase.Foundation.Mvvm
 {
     public static class GeneratorHelpers
     {
+        private const string AGGRESSIVE_INLINING = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]";
+        private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.InternalUnionGenerator\", \"1.0.0\")]";
+        private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
+
         public const string NAMESPACE = "ZBase.Foundation.Mvvm";
         public const string FIELD_PREFIX_UNDERSCORE = "_";
         public const string FIELD_PREFIX_M_UNDERSCORE = "m_";
 
-        public static bool IsSyntaxMatch(SyntaxNode syntaxNode , CancellationToken token)
+        public static bool IsClassSyntaxMatch(SyntaxNode syntaxNode , CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
 
-            if (syntaxNode is not ClassDeclarationSyntax classSyntax
-                || classSyntax.BaseList == null
-            )
-            {
-                return false;
-            }
-
-            var hasBaseTypes = classSyntax.BaseList.Types.Count > 0;
-
-            if (hasBaseTypes == false)
-            {
-                return false;
-            }
-
-            return true;
+            return syntaxNode is ClassDeclarationSyntax classSyntax
+                && classSyntax.BaseList != null
+                && classSyntax.BaseList.Types.Count > 0;
         }
 
-        public static bool IsSyntaxMatchByAttribute(
+        public static bool IsStructSyntaxMatch(SyntaxNode syntaxNode, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            return syntaxNode is StructDeclarationSyntax structSyntax
+                && structSyntax.BaseList != null
+                && structSyntax.BaseList.Types.Count > 0;
+        }
+
+        public static bool IsClassSyntaxMatchByAttribute(
               SyntaxNode syntaxNode
             , CancellationToken token
             , SyntaxKind syntaxKind
@@ -45,18 +47,12 @@ namespace ZBase.Foundation.Mvvm
             
             if (syntaxNode is not ClassDeclarationSyntax classSyntax
                 || classSyntax.BaseList == null
+                || classSyntax.BaseList.Types.Count < 1
             )
             {
                 return false;
             }
             
-            var hasBaseTypes = classSyntax.BaseList.Types.Count > 0;
-
-            if (hasBaseTypes == false)
-            {
-                return false;
-            }
-
             var members = classSyntax.Members;
 
             foreach (var member in members)
@@ -72,28 +68,28 @@ namespace ZBase.Foundation.Mvvm
             return false;
         }
 
-        public static ClassDeclarationSyntax GetSemanticMatch(
-              GeneratorSyntaxContext syntaxContext
+        public static ClassDeclarationSyntax GetClassSemanticMatch(
+              GeneratorSyntaxContext context
             , CancellationToken token
             , string interfaceName
         )
         {
             token.ThrowIfCancellationRequested();
 
-            if (syntaxContext.Node is not ClassDeclarationSyntax classSyntax
+            if (context.Node is not ClassDeclarationSyntax classSyntax
                 || classSyntax.BaseList == null
             )
             {
                 return null;
             }
 
-            var semanticModel = syntaxContext.SemanticModel;
+            var semanticModel = context.SemanticModel;
 
             foreach (var baseType in classSyntax.BaseList.Types)
             {
                 var typeInfo = semanticModel.GetTypeInfo(baseType.Type, token);
 
-                if (typeInfo.Type.ToFullName().StartsWith(interfaceName))
+                if (typeInfo.Type.ToFullName() == interfaceName)
                 {
                     return classSyntax;
                 }
@@ -102,9 +98,29 @@ namespace ZBase.Foundation.Mvvm
                 {
                     return classSyntax;
                 }
+
+                if (IsMatch(typeInfo.Type.Interfaces, interfaceName)
+                    || IsMatch(typeInfo.Type.AllInterfaces, interfaceName)
+                )
+                {
+                    return classSyntax;
+                }
             }
 
             return null;
+
+            static bool IsMatch(ImmutableArray<INamedTypeSymbol> interfaces, string interfaceName)
+            {
+                foreach (var interfaceSymbol in interfaces)
+                {
+                    if (interfaceSymbol.ToFullName() == interfaceName)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
         }
 
         public static string ToPropertyName(this IFieldSymbol field)
@@ -142,5 +158,30 @@ namespace ZBase.Foundation.Mvvm
                 Accessibility.ProtectedAndInternal => "private protected",
                 _ => ""
             };
+
+        public static Printer WritePreserveAttributeClass(Printer p)
+        {
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine("[global::System.AttributeUsage(");
+            p = p.IncreasedIndent();
+            {
+                p.PrintLine("  global::System.AttributeTargets.Assembly");
+                p.PrintLine("| global::System.AttributeTargets.Class");
+                p.PrintLine("| global::System.AttributeTargets.Struct");
+                p.PrintLine("| global::System.AttributeTargets.Enum");
+                p.PrintLine("| global::System.AttributeTargets.Constructor");
+                p.PrintLine("| global::System.AttributeTargets.Method");
+                p.PrintLine("| global::System.AttributeTargets.Property");
+                p.PrintLine("| global::System.AttributeTargets.Field");
+                p.PrintLine("| global::System.AttributeTargets.Event");
+                p.PrintLine("| global::System.AttributeTargets.Interface");
+                p.PrintLine("| global::System.AttributeTargets.Delegate");
+                p.PrintLine(", Inherited = false");
+            }
+            p = p.DecreasedIndent();
+            p.PrintLine(")]");
+            p.PrintLine("public sealed class PreserveAttribute : global::System.Attribute { }");
+            return p;
+        }
     }
 }

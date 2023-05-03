@@ -88,18 +88,21 @@ namespace ZBase.Foundation.Mvvm
                 return null;
             }
 
-            foreach (var baseType in classSyntax.BaseList.Types)
+            if (classSyntax.BaseList != null && classSyntax.BaseList.Types.Count > 0)
             {
-                var typeInfo = context.SemanticModel.GetTypeInfo(baseType.Type, token);
-
-                if (typeInfo.Type.ToFullName().StartsWith(INTERFACE))
+                foreach (var baseType in classSyntax.BaseList.Types)
                 {
-                    return classSyntax;
-                }
+                    var typeInfo = context.SemanticModel.GetTypeInfo(baseType.Type, token);
 
-                if (typeInfo.Type.ImplementsInterface(INTERFACE))
-                {
-                    return classSyntax;
+                    if (typeInfo.Type.ToFullName().StartsWith(INTERFACE))
+                    {
+                        return classSyntax;
+                    }
+
+                    if (typeInfo.Type.ImplementsInterface(INTERFACE))
+                    {
+                        return classSyntax;
+                    }
                 }
             }
 

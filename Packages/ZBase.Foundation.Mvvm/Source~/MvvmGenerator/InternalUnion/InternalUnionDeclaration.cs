@@ -17,17 +17,20 @@ namespace ZBase.Foundation.Mvvm
 
         public List<TypeRef> Types { get; }
 
-        public InternalUnionDeclaration(ImmutableArray<ClassDeclarationSyntax> candidates, Compilation compilation, CancellationToken token)
+        public InternalUnionDeclaration(
+              ImmutableArray<ClassDeclarationSyntax> candidates
+            , Compilation compilation
+            , CancellationToken token
+        )
         {
             Types = new List<TypeRef>();
 
-            var types = new Dictionary<string, TypeRef>();
+            var filtered = new Dictionary<string, TypeRef>();
 
             foreach (var candidate in candidates)
             {
                 var syntaxTree = candidate.SyntaxTree;
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-
                 var memberSyntaxes = candidate.Members;
 
                 foreach (var memberSyntax in memberSyntaxes)
@@ -37,20 +40,18 @@ namespace ZBase.Foundation.Mvvm
                         if (fieldSyntax.HasAttributeCandidate(NAMESPACE, OBSERVABLE_PROPERTY))
                         {
                             var syntax = fieldSyntax.Declaration.Type;
-                            var typeInfo = semanticModel.GetTypeInfo(syntax);
+                            var typeInfo = semanticModel.GetTypeInfo(syntax, token);
                             var symbol = typeInfo.Type;
                             var typeName = symbol.ToFullName();
 
                             if (symbol.IsValueType == true
                                 && typeName.ToUnionType().IsNativeUnionType() == false
-                                && types.ContainsKey(typeName) == false
+                                && filtered.ContainsKey(typeName) == false
                             )
                             {
-                                types[typeName] = new TypeRef {
+                                filtered[typeName] = new TypeRef {
                                     Symbol = symbol,
                                     Syntax = fieldSyntax.Declaration.Type,
-                                    SemanticModel = semanticModel,
-                                    Candidate = candidate,
                                 };
                             }
                         }
@@ -72,14 +73,12 @@ namespace ZBase.Foundation.Mvvm
 
                             if (symbol.IsValueType == true
                                 && typeName.ToUnionType().IsNativeUnionType() == false
-                                && types.ContainsKey(typeName) == false
+                                && filtered.ContainsKey(typeName) == false
                             )
                             {
-                                types[typeName] = new TypeRef {
+                                filtered[typeName] = new TypeRef {
                                     Symbol = symbol,
                                     Syntax = methodSyntax.ReturnType,
-                                    SemanticModel = semanticModel,
-                                    Candidate = candidate,
                                 };
                             }
                         }
@@ -89,7 +88,7 @@ namespace ZBase.Foundation.Mvvm
                 }
             }
 
-            Types.AddRange(types.Values);
+            Types.AddRange(filtered.Values);
         }
 
         public class TypeRef
@@ -97,10 +96,6 @@ namespace ZBase.Foundation.Mvvm
             public TypeSyntax Syntax { get; set; }
 
             public ITypeSymbol Symbol { get; set; }
-
-            public ClassDeclarationSyntax Candidate { get; set; }
-
-            public SemanticModel SemanticModel { get; set; }
         }
     }
 }

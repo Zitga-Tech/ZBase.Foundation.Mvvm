@@ -17,8 +17,8 @@ namespace ZBase.Foundation.Mvvm
             var projectPathProvider = SourceGenHelpers.GetSourceGenConfigProvider(context);
             
             var candidateProvider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: static (node, token) => GeneratorHelpers.IsSyntaxMatch(node, token),
-                transform: static (syntaxContext, token) => GeneratorHelpers.GetSemanticMatch(syntaxContext, token, INTERFACE)
+                predicate: static (node, token) => GeneratorHelpers.IsClassSyntaxMatch(node, token),
+                transform: static (syntaxContext, token) => GeneratorHelpers.GetClassSemanticMatch(syntaxContext, token, INTERFACE)
             ).Where(static t => t is { });
 
             var compilationProvider = context.CompilationProvider;

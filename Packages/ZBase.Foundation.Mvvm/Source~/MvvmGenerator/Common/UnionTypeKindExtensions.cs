@@ -1,6 +1,6 @@
 ﻿namespace ZBase.Foundation.Mvvm
 {
-    public static class InternalUnionExtensions
+    public static class UnionTypeKindExtensions
     {
         public static bool IsNativeUnionType(this UnionTypeKind value)
             => value switch {
