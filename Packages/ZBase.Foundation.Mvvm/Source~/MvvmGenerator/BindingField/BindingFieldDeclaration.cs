@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading;
 using ZBase.Foundation.SourceGen;
@@ -23,6 +24,8 @@ namespace ZBase.Foundation.Mvvm
         public bool ReferenceUnityEngine { get; }
 
         public ImmutableArray<MemberRef> MemberRefs { get; }
+
+        public ImmutableArray<ITypeSymbol> NonUnionTypes { get; }
 
         public BindingFieldDeclaration(ClassDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
         {
@@ -49,13 +52,20 @@ namespace ZBase.Foundation.Mvvm
             }
 
             var members = Symbol.GetMembers();
+            var filtered = new Dictionary<string, ITypeSymbol>(members.Length);
 
             foreach (var member in members)
             {
                 if (member is not IMethodSymbol method
                     || method.Parameters.Length != 1
-                    || method.Parameters[0].Type.ToFullName() != UNION_TYPE
                 )
+                {
+                    continue;
+                }
+
+                var parameter = method.Parameters[0];
+
+                if (parameter.RefKind is not (RefKind.None or RefKind.In))
                 {
                     continue;
                 }
@@ -77,13 +87,33 @@ namespace ZBase.Foundation.Mvvm
                     }
                 }
 
+                var argumentType = parameter.Type;
+                var isNotUnion = argumentType.ToFullName() != UNION_TYPE;
+
                 memberRefs.Add(new MemberRef {
                     Member = method,
                     Label = label,
+                    NonUnionArgumentType = isNotUnion ? argumentType : null,
                 });
+
+                if (isNotUnion == false)
+                {
+                    continue;
+                }
+
+                var typeName = argumentType.ToFullName();
+                
+                if (filtered.ContainsKey(typeName) == false)
+                {
+                    filtered[typeName] = argumentType;
+                }
             }
 
+            using var nonUnionTypes = ImmutableArrayBuilder<ITypeSymbol>.Rent();
+            nonUnionTypes.AddRange(filtered.Values);
+
             MemberRefs = memberRefs.ToImmutable();
+            NonUnionTypes = nonUnionTypes.ToImmutable();
         }
 
         public class MemberRef
@@ -91,6 +121,8 @@ namespace ZBase.Foundation.Mvvm
             public IMethodSymbol Member { get; set; }
 
             public string Label { get; set; }
+
+            public ITypeSymbol NonUnionArgumentType { get; set; }
         }
     }
 }

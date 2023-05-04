@@ -1,4 +1,5 @@
-﻿using ZBase.Foundation.SourceGen;
+﻿using System;
+using ZBase.Foundation.SourceGen;
 
 namespace ZBase.Foundation.Mvvm
 {
@@ -6,7 +7,7 @@ namespace ZBase.Foundation.Mvvm
     {
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.BindingFieldGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
-
+        private const string OBSOLETE_METHOD = "[global::System.Obsolete(\"This method is not intended to be use directly by user code.\")]";
         public string WriteCodeWithoutMember()
         {
             var scopePrinter = new SyntaxNodeScopePrinter(Printer.DefaultLarge, Syntax.Parent);
@@ -114,6 +115,13 @@ namespace ZBase.Foundation.Mvvm
 
             p.OpenScope();
             {
+                if (NonUnionTypes.Length > 0)
+                {
+                    p.PrintLine(GENERATED_CODE);
+                    p.PrintLine("private readonly UnionConverters _unionConverters = new UnionConverters();");
+                    p.PrintEndLine();
+                }
+
                 WriteConstantFields(ref p);
                 WriteBindingFields(ref p);
                 WriteConverters(ref p);
@@ -122,6 +130,12 @@ namespace ZBase.Foundation.Mvvm
                 WriteStartBindingMethod(ref p);
                 WriteStopBindingMethod(ref p);
                 WriteSetPropertyNameMethod(ref p);
+
+                if (NonUnionTypes.Length > 0)
+                {
+                    WriteUnionOverloads(ref p);
+                    WriteUnionConverters(ref p);
+                }
             }
             p.CloseScope();
 
@@ -167,10 +181,6 @@ namespace ZBase.Foundation.Mvvm
                 if (ReferenceUnityEngine)
                 {
                     readonlyKeyword = "";
-
-                    p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
-                    p.PrintLine("[global::UnityEngine.SerializeField]");
-                    p.Print("#endif").PrintEndLine();
                 }
                 else
                 {
@@ -189,6 +199,9 @@ namespace ZBase.Foundation.Mvvm
                 }
 
                 p.PrintLine($"/// <summary>The binding field for <see cref=\"{member.Member.Name}\"/></summary>");
+                p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
+                p.PrintLine("[global::UnityEngine.SerializeField]");
+                p.Print("#endif").PrintEndLine();
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.BindingField {FieldName(member)} =  new global::ZBase.Foundation.Mvvm.ViewBinding.BindingField() {{ Label = {label} }};");
                 p.PrintEndLine();
@@ -206,10 +219,6 @@ namespace ZBase.Foundation.Mvvm
                 if (ReferenceUnityEngine)
                 {
                     readonlyKeyword = "";
-
-                    p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
-                    p.PrintLine("[global::UnityEngine.SerializeReference]");
-                    p.Print("#endif").PrintEndLine();
                 }
                 else
                 {
@@ -228,6 +237,9 @@ namespace ZBase.Foundation.Mvvm
                 }
 
                 p.PrintLine($"/// <summary>The converter for the parameter of <see cref=\"{member.Member.Name}\"/></summary>");
+                p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
+                p.PrintLine("[global::UnityEngine.SerializeReference]");
+                p.Print("#endif").PrintEndLine();
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.Conversion.Converter {ConverterName(member)} = new global::ZBase.Foundation.Mvvm.Conversion.Converter() {{ Label = {label} }};");
                 p.PrintEndLine();
@@ -272,7 +284,7 @@ namespace ZBase.Foundation.Mvvm
             {
                 foreach (var member in MemberRefs)
                 {
-                    var methodName = member.Member.Name;
+                    var methodName = MethodName(member);
 
                     p.PrintLine($"this.{ListenerName(member)} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener<{className}>(this)");
                     p.OpenScope();
@@ -285,7 +297,7 @@ namespace ZBase.Foundation.Mvvm
             }
             p.CloseScope();
             p.PrintEndLine();
-            
+
             p.PrintLine($"/// <summary>Executes the logic at the end of the default constructor.</summary>");
             p.PrintLine($"/// <remarks>This method is invoked at the end of the default constructor.</remarks>");
             p.PrintLine(GENERATED_CODE);
@@ -386,6 +398,79 @@ namespace ZBase.Foundation.Mvvm
             p.PrintEndLine();
         }
 
+        private void WriteUnionOverloads(ref Printer p)
+        {
+            foreach (var member in MemberRefs)
+            {
+                if (member.NonUnionArgumentType == null)
+                {
+                    continue;
+                }
+
+                var origName = member.Member.Name;
+                var typeName = member.NonUnionArgumentType.ToFullName();
+                var methodName = MethodName(member);
+                var converter = GeneratorHelpers.ToTitleCase(member.NonUnionArgumentType.ToValidIdentifier().AsSpan());
+
+                p.PrintLine($"/// <summary>");
+                p.PrintLine($"/// This overload will try to get the value of type <see cref=\"{typeName}\"/>");
+                p.PrintLine($"/// from <see cref=\"global::ZBase.Foundation.Mvvm.Unions.Union\"/>");
+                p.PrintLine($"/// to pass into <see cref=\"{origName}\"/>.");
+                p.PrintLine($"/// </summary>");
+                p.PrintLine($"/// <remarks>This method is not intended to be use directly by user code.</remarks>");
+                p.PrintLine(OBSOLETE_METHOD).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintLine($"private void {methodName}(in global::ZBase.Foundation.Mvvm.Unions.Union union)");
+                p.OpenScope();
+                {
+                    p.PrintLine($"if (this._unionConverters.{converter}.TryGetValue(union, out {typeName} value))");
+                    p.OpenScope();
+                    {
+                        p.PrintLine($"{origName}(value);");
+                    }
+                    p.CloseScope();
+                }
+                p.CloseScope();
+            }
+
+            p.PrintEndLine();
+        }
+
+        private void WriteUnionConverters(ref Printer p)
+        {
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine("private class UnionConverters");
+            p.OpenScope();
+            {
+                foreach (var type in NonUnionTypes)
+                {
+                    var typeName = type.ToFullName();
+                    var fieldName = type.ToValidIdentifier();
+
+                    p.PrintLine(GENERATED_CODE);
+                    p.PrintLine($"private global::ZBase.Foundation.Mvvm.Unions.IUnionConverter<{typeName}> _{fieldName};");
+                    p.PrintEndLine();
+                }
+
+                foreach (var type in NonUnionTypes)
+                {
+                    var typeName = type.ToFullName();
+                    var fieldName = type.ToValidIdentifier();
+                    var propertyName = GeneratorHelpers.ToTitleCase(fieldName.AsSpan());
+
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine($"public global::ZBase.Foundation.Mvvm.Unions.IUnionConverter<{typeName}> {propertyName}");
+                    p.OpenScope();
+                    {
+                        p.PrintLine($"get => this._{fieldName} ??= global::ZBase.Foundation.Mvvm.Unions.UnionConverter.GetConverter<{typeName}>();");
+                    }
+                    p.CloseScope();
+                    p.PrintEndLine();
+                }
+            }
+            p.CloseScope();
+            p.PrintEndLine();
+        }
+
         private string ConstName(MemberRef member)
             => $"BindingField_{member.Member.Name}";
 
@@ -397,5 +482,17 @@ namespace ZBase.Foundation.Mvvm
 
         private string ListenerName(MemberRef member)
             => $"_listener{member.Member.Name}";
+
+        private string MethodName(MemberRef member)
+        {
+            var name = member.Member.Name;
+
+            if (member.NonUnionArgumentType != null)
+            {
+                return $"{name}__Union";
+            }
+
+            return name;
+        }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using System;
 using ZBase.Foundation.Mvvm.ComponentModel;
-using ZBase.Foundation.Mvvm.Input;
-using ZBase.Foundation.Mvvm.Unions;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace MvvmTest
@@ -46,9 +44,9 @@ namespace MvvmTest
         public IDataContext DataContext { get; set; }
 
         [Binding]
-        private void OnUpdate(in Union value)
+        private void OnUpdate(int value)
         {
-            Console.WriteLine(value.Int);
+            Console.WriteLine(value);
         }
     }
 }

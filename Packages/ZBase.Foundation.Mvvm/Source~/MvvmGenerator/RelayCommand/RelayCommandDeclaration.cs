@@ -37,9 +37,21 @@ namespace ZBase.Foundation.Mvvm
 
             foreach (var member in members)
             {
-                if (member is not IMethodSymbol method || method.Parameters.Length > 1)
+                if (member is not IMethodSymbol method
+                    || method.Parameters.Length > 1
+                )
                 {
                     continue;
+                }
+
+                if (method.Parameters.Length == 1)
+                {
+                    var parameter = method.Parameters[0];
+
+                    if (parameter.RefKind is not (RefKind.None or RefKind.In))
+                    {
+                        continue;
+                    }
                 }
 
                 var relayCommandAttrib = method.GetAttribute(RELAY_COMMAND_ATTRIBUTE);
@@ -68,11 +80,11 @@ namespace ZBase.Foundation.Mvvm
                 methodMap[method.Name] = method;
             }
 
-            var paramSet = new HashSet<string>();
+            var filtered = new HashSet<string>();
 
             foreach (var (method, canExecuteName) in methodCandidates)
             {
-                paramSet.Clear();
+                filtered.Clear();
 
                 if (methodMap.TryGetValue(canExecuteName, out var canExecuteMethod) == false
                     || canExecuteMethod.ReturnType.SpecialType != SpecialType.System_Boolean
@@ -92,12 +104,12 @@ namespace ZBase.Foundation.Mvvm
 
                     foreach (var param in method.Parameters)
                     {
-                        paramSet.Add(param.Type.ToFullName());
+                        filtered.Add(param.Type.ToFullName());
                     }
 
                     foreach (var param in canExecuteMethod.Parameters)
                     {
-                        if (paramSet.Contains(param.Type.ToFullName()) == false)
+                        if (filtered.Contains(param.Type.ToFullName()) == false)
                         {
                             isValid = false;
                             break;
