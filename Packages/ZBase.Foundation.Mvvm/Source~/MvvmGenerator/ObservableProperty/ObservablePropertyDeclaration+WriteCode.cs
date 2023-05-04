@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using ZBase.Foundation.SourceGen;
 
-namespace ZBase.Foundation.Mvvm
+namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 {
     partial class ObservablePropertyDeclaration
     {

@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using ZBase.Foundation.SourceGen;
 
-namespace ZBase.Foundation.Mvvm
+namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
 {
     [Generator]
     public class BindingFieldGenerator : IIncrementalGenerator

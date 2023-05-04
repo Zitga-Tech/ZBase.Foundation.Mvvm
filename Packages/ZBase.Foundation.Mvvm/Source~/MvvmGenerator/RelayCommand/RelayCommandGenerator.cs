@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using ZBase.Foundation.SourceGen;
 
-namespace ZBase.Foundation.Mvvm
+namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
 {
     [Generator]
     public class RelayCommandGenerator : IIncrementalGenerator

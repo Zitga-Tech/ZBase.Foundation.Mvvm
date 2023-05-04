@@ -77,36 +77,45 @@ namespace ZBase.Foundation.Mvvm
 
             if (context.Node is not ClassDeclarationSyntax classSyntax
                 || classSyntax.BaseList == null
+                || classSyntax.DoesSemanticMatch(interfaceName, context.SemanticModel, token) == false
             )
             {
                 return null;
             }
 
-            var semanticModel = context.SemanticModel;
+            return classSyntax;
+        }
 
+        public static bool DoesSemanticMatch(
+              this ClassDeclarationSyntax classSyntax
+            , string interfaceName
+            , SemanticModel semanticModel
+            , CancellationToken token
+        )
+        {
             foreach (var baseType in classSyntax.BaseList.Types)
             {
                 var typeInfo = semanticModel.GetTypeInfo(baseType.Type, token);
 
                 if (typeInfo.Type.ToFullName() == interfaceName)
                 {
-                    return classSyntax;
+                    return true;
                 }
 
                 if (typeInfo.Type.ImplementsInterface(interfaceName))
                 {
-                    return classSyntax;
+                    return true;
                 }
 
                 if (IsMatch(typeInfo.Type.Interfaces, interfaceName)
                     || IsMatch(typeInfo.Type.AllInterfaces, interfaceName)
                 )
                 {
-                    return classSyntax;
+                    return true;
                 }
             }
 
-            return null;
+            return false;
 
             static bool IsMatch(ImmutableArray<INamedTypeSymbol> interfaces, string interfaceName)
             {

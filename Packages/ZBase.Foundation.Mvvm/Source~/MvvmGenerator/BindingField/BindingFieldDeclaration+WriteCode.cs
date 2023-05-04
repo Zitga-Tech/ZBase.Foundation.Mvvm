@@ -1,7 +1,7 @@
 ﻿using System;
 using ZBase.Foundation.SourceGen;
 
-namespace ZBase.Foundation.Mvvm
+namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
 {
     partial class BindingFieldDeclaration
     {

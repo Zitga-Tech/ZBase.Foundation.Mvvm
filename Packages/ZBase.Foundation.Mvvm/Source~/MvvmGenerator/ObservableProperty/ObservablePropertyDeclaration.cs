@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 using System.Threading;
 using ZBase.Foundation.SourceGen;
 
-namespace ZBase.Foundation.Mvvm
+namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 {
     public partial class ObservablePropertyDeclaration
     {

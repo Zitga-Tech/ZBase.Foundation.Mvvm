@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using ZBase.Foundation.SourceGen;
 
-namespace ZBase.Foundation.Mvvm
+namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
 {
     [Generator]
     public class GenericUnionGenerator : IIncrementalGenerator

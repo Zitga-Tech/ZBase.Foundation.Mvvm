@@ -11,7 +11,7 @@ using ZBase.Foundation.SourceGen;
 
 using static ZBase.Foundation.Mvvm.SuppressionDescriptors;
 
-namespace ZBase.Foundation.Mvvm
+namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
 {
     /// <summary>
     /// <para>

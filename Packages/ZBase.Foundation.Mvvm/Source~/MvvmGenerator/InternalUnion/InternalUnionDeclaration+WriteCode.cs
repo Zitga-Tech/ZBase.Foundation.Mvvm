@@ -5,7 +5,7 @@ using ZBase.Foundation.SourceGen;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace ZBase.Foundation.Mvvm
+namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
 {
     partial class InternalUnionDeclaration
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using ZBase.Foundation.SourceGen;
 
-namespace ZBase.Foundation.Mvvm
+namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
 {
     partial class RelayCommandDeclaration
     {
