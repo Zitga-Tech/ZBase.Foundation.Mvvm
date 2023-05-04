@@ -10,8 +10,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
     [Generator]
     public class InternalUnionGenerator : IIncrementalGenerator
     {
-        public const string INTERFACE = "global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject";
-        public const string OBSERVABLE_PROPERTY_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ComponentModel.ObservablePropertyAttribute";
+        private const string IOBSERVABLE_OBJECT = "global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject";
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
@@ -41,69 +40,69 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
         {
             token.ThrowIfCancellationRequested();
             
-            return syntaxNode is FieldDeclarationSyntax field
-                && field.AttributeLists.Count > 0
-                && field.Parent is ClassDeclarationSyntax;
+            if (syntaxNode is FieldDeclarationSyntax field)
+            {
+                if (field.HasAttributeCandidate("ZBase.Foundation.Mvvm.ComponentModel", "ObservableProperty"))
+                {
+                    return true;
+                }
+            }
+
+            if (syntaxNode is MethodDeclarationSyntax method && method.ParameterList.Parameters.Count == 1)
+            {
+                if (method.HasAttributeCandidate("ZBase.Foundation.Mvvm.Input", "RelayCommand")
+                    || method.HasAttributeCandidate("ZBase.Foundation.Mvvm.ViewBinding", "Binding")
+                )
+                {
+                    return true;
+                }
+            }
+
+            if (syntaxNode is PropertyDeclarationSyntax property
+                && property.Parent is ClassDeclarationSyntax classSyntax
+                && classSyntax.BaseList.Types.Count > 0
+            )
+            {
+                return true;
+            }
+
+            return false;
         }
 
-        public static ClassDeclarationSyntax GetSemanticMatch(
+        public static TypeRef GetSemanticMatch(
               GeneratorSyntaxContext context
             , CancellationToken token
         )
         {
-            var fieldSyntax = (FieldDeclarationSyntax)context.Node;
-            var isCandidate = false;
+            var semanticModel = context.SemanticModel;
 
-            foreach (var attributeListSyntax in fieldSyntax.AttributeLists)
+            if (context.Node is FieldDeclarationSyntax field)
             {
-                foreach (var attributeSyntax in attributeListSyntax.Attributes)
-                {
-                    var typeInfo = context.SemanticModel.GetSymbolInfo(attributeSyntax, token);
-
-                    if (typeInfo.Symbol is not IMethodSymbol attributeSymbol)
-                    {
-                        continue;
-                    }
-
-                    var attributeContainingTypeSymbol = attributeSymbol.ContainingType;
-                    var fullName = attributeContainingTypeSymbol.ToFullName();
-
-                    if (fullName.StartsWith(OBSERVABLE_PROPERTY_ATTRIBUTE))
-                    {
-                        isCandidate = true;
-                        goto PROCESS_CANDIDATE;
-                    }
-                }
+                return new TypeRef {
+                    Syntax = field.Declaration.Type,
+                    Symbol = semanticModel.GetTypeInfo(field.Declaration.Type).Type,
+                };
             }
 
-            PROCESS_CANDIDATE:
-
-            if (isCandidate == false)
+            if (context.Node is MethodDeclarationSyntax method)
             {
-                return null;
+                var typeSyntax = method.ParameterList.Parameters[0].Type;
+
+                return new TypeRef {
+                    Syntax = typeSyntax,
+                    Symbol = semanticModel.GetTypeInfo(typeSyntax).Type,
+                };
             }
 
-            if (fieldSyntax.Parent is not ClassDeclarationSyntax classSyntax)
+            if (context.Node is PropertyDeclarationSyntax property
+                && property.Parent is ClassDeclarationSyntax classSyntax
+                && classSyntax.DoesSemanticMatch(IOBSERVABLE_OBJECT, context.SemanticModel, token)
+            )
             {
-                return null;
-            }
-
-            if (classSyntax.BaseList != null && classSyntax.BaseList.Types.Count > 0)
-            {
-                foreach (var baseType in classSyntax.BaseList.Types)
-                {
-                    var typeInfo = context.SemanticModel.GetTypeInfo(baseType.Type, token);
-
-                    if (typeInfo.Type.ToFullName().StartsWith(INTERFACE))
-                    {
-                        return classSyntax;
-                    }
-
-                    if (typeInfo.Type.ImplementsInterface(INTERFACE))
-                    {
-                        return classSyntax;
-                    }
-                }
+                return new TypeRef {
+                    Syntax = property.Type,
+                    Symbol = semanticModel.GetTypeInfo(property.Type).Type,
+                };
             }
 
             return null;
@@ -112,7 +111,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
         private static void GenerateOutput(
               SourceProductionContext context
             , Compilation compilation
-            , ImmutableArray<ClassDeclarationSyntax> candidates
+            , ImmutableArray<TypeRef> candidates
             , string projectPath
             , bool outputSourceGenFiles
         )
@@ -126,7 +125,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
 
             SourceGenHelpers.ProjectPath = projectPath;
 
-            var declaration = new InternalUnionDeclaration(candidates, compilation, context.CancellationToken);
+            var declaration = new InternalUnionDeclaration(candidates);
 
             declaration.GenerateUnionTypes(
                   context

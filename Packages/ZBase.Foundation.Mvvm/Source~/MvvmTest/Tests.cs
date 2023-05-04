@@ -36,6 +36,8 @@ namespace MvvmTest
         [ObservableProperty]
         private int _intField;
 
+        public TypeCode Type { get; }
+
         public IObservableObject ViewModel => this;
     }
 

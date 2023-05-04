@@ -1,9 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Threading;
 using ZBase.Foundation.SourceGen;
 
 namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
@@ -17,72 +15,21 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
 
         public ImmutableArray<TypeRef> TypeRefs { get; }
 
-        public InternalUnionDeclaration(
-              ImmutableArray<ClassDeclarationSyntax> candidates
-            , Compilation compilation
-            , CancellationToken token
-        )
+        public InternalUnionDeclaration(ImmutableArray<TypeRef> candidates)
         {
             var filtered = new Dictionary<string, TypeRef>();
 
             foreach (var candidate in candidates)
             {
-                var syntaxTree = candidate.SyntaxTree;
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var memberSyntaxes = candidate.Members;
+                var symbol = candidate.Symbol;
+                var typeName = symbol.ToFullName();
 
-                foreach (var memberSyntax in memberSyntaxes)
+                if (typeName.ToUnionType().IsNativeUnionType() == false
+                    && symbol.IsValueType == true
+                    && filtered.ContainsKey(typeName) == false
+                )
                 {
-                    if (memberSyntax is FieldDeclarationSyntax fieldSyntax)
-                    {
-                        if (fieldSyntax.HasAttributeCandidate(COMPONENT_MODEL_NAMESPACE, OBSERVABLE_PROPERTY))
-                        {
-                            var syntax = fieldSyntax.Declaration.Type;
-                            var typeInfo = semanticModel.GetTypeInfo(syntax, token);
-                            var symbol = typeInfo.Type;
-                            var typeName = symbol.ToFullName();
-
-                            if (typeName.ToUnionType().IsNativeUnionType() == false
-                                && symbol.IsValueType == true
-                                && filtered.ContainsKey(typeName) == false
-                            )
-                            {
-                                filtered[typeName] = new TypeRef {
-                                    Symbol = symbol,
-                                    Syntax = fieldSyntax.Declaration.Type,
-                                };
-                            }
-                        }
-
-                        continue;
-                    }
-
-                    if (memberSyntax is MethodDeclarationSyntax methodSyntax)
-                    {
-                        var info = semanticModel.GetDeclaredSymbol(methodSyntax, token);
-
-                        if (info is IMethodSymbol method
-                            && method.Parameters.Length == 1
-                            && method.HasAttribute(RELAY_COMMAND_ATTRIBUTE)
-                        )
-                        {
-                            var symbol = method.Parameters[0].Type;
-                            var typeName = symbol.ToFullName();
-
-                            if (typeName.ToUnionType().IsNativeUnionType() == false
-                                && symbol.IsValueType == true
-                                && filtered.ContainsKey(typeName) == false
-                            )
-                            {
-                                filtered[typeName] = new TypeRef {
-                                    Symbol = symbol,
-                                    Syntax = methodSyntax.ReturnType,
-                                };
-                            }
-                        }
-
-                        continue;
-                    }
+                    filtered[typeName] = candidate;
                 }
             }
 
@@ -91,12 +38,12 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
 
             TypeRefs = typeRefs.ToImmutable();
         }
+    }
 
-        public class TypeRef
-        {
-            public TypeSyntax Syntax { get; set; }
+    public class TypeRef
+    {
+        public TypeSyntax Syntax { get; set; }
 
-            public ITypeSymbol Symbol { get; set; }
-        }
+        public ITypeSymbol Symbol { get; set; }
     }
 }
