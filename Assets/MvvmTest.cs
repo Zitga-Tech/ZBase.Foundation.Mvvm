@@ -4,45 +4,28 @@ using UnityEngine;
 using ZBase.Foundation.Mvvm.ComponentModel;
 using ZBase.Foundation.Mvvm.Input;
 using ZBase.Foundation.Mvvm.Unions;
+using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace MvvmTests
 {
-    public class MvvmTest : MonoBehaviour
+    public class MvvmTest : MonoBehaviour, IDataContext
     {
+        private readonly TextModel _textModel = new TextModel();
+
+        [SerializeField]
+        private TMP_TextBinder _textBinder;
+
+        public IObservableObject ViewModel => _textModel;
+
         private void Awake()
         {
         }
     }
 
-    public partial class MyModel : IObservableObject
-    {
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(FloatValue))]
-        private int _intValue;
-
-        private int FloatValue => default;
-
-        [RelayCommand]
-        private void Work(int value)
-        {
-
-        }
-
-        private bool Validate() => false;
-
-        [RelayCommand(CanExecute = nameof(Validate))]
-        private void Process(int x)
-        {
-
-        }
-    }
-
-    public partial class MyModelX : IObservableObject
+    [Serializable]
+    public partial class TextModel : IObservableObject
     {
         [ObservableProperty]
         private int _intValue;
-
-        [ObservableProperty]
-        private string _stringValue;
     }
 }
