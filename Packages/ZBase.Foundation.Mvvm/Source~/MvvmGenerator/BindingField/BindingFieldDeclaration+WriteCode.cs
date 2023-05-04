@@ -97,7 +97,7 @@ namespace ZBase.Foundation.Mvvm
 
             p = p.IncreasedIndent();
 
-            WriteBindingInfoAttributes(ref p);
+            WriteBindingMethodInfoAttributes(ref p);
 
             p.PrintBeginLine();
             p.Print("partial class ").Print(Syntax.Identifier.Text);
@@ -121,7 +121,7 @@ namespace ZBase.Foundation.Mvvm
                 WriteConstructor(ref p);
                 WriteStartBindingMethod(ref p);
                 WriteStopBindingMethod(ref p);
-                WriteBindPropertyToMethod(ref p);
+                WriteSetPropertyNameMethod(ref p);
             }
             p.CloseScope();
 
@@ -129,9 +129,9 @@ namespace ZBase.Foundation.Mvvm
             return p.Result;
         }
 
-        private void WriteBindingInfoAttributes(ref Printer p)
+        private void WriteBindingMethodInfoAttributes(ref Printer p)
         {
-            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ViewBinding.BindingInfo({0}.{1}, typeof(global::ZBase.Foundation.Mvvm.Unions.Union))]";
+            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ViewBinding.BindingMethodInfo({0}.{1}, typeof(global::ZBase.Foundation.Mvvm.Unions.Union))]";
 
             var className = Syntax.Identifier.Text;
 
@@ -167,7 +167,10 @@ namespace ZBase.Foundation.Mvvm
                 if (ReferenceUnityEngine)
                 {
                     readonlyKeyword = "";
+
+                    p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
                     p.PrintLine("[global::UnityEngine.SerializeField]");
+                    p.Print("#endif").PrintEndLine();
                 }
                 else
                 {
@@ -203,7 +206,10 @@ namespace ZBase.Foundation.Mvvm
                 if (ReferenceUnityEngine)
                 {
                     readonlyKeyword = "";
+
+                    p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
                     p.PrintLine("[global::UnityEngine.SerializeReference]");
+                    p.Print("#endif").PrintEndLine();
                 }
                 else
                 {
@@ -257,8 +263,10 @@ namespace ZBase.Foundation.Mvvm
 
             if (IsBaseBinder)
             {
-                p.Print(" : base()").PrintEndLine();
+                p.Print(" : base()");
             }
+
+            p.PrintEndLine();
 
             p.OpenScope();
             {
@@ -305,7 +313,7 @@ namespace ZBase.Foundation.Mvvm
 
                 foreach (var member in MemberRefs)
                 {
-                    p.PrintLine($"inpc.PropertyChanged(this.{FieldName(member)}.ObservablePropertyName, this.{ListenerName(member)});");
+                    p.PrintLine($"inpc.PropertyChanged(this.{FieldName(member)}.PropertyName, this.{ListenerName(member)});");
                 }
             }
             p.CloseScope();
@@ -338,25 +346,22 @@ namespace ZBase.Foundation.Mvvm
             p.PrintEndLine();
         }
 
-        private void WriteBindPropertyToMethod(ref Printer p)
+        private void WriteSetPropertyNameMethod(ref Printer p)
         {
             var keyword = IsBaseBinder ? "override " : Symbol.IsSealed ? "" : "virtual ";
 
             p.PrintLine("/// <inheritdoc/>");
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-            p.PrintLine($"public {keyword}bool BindPropertyTo(string propertyName, string bindingMethodName)");
+            p.PrintLine($"public {keyword}bool SetPropertyName(string bindingField, string propertyName)");
             p.OpenScope();
             {
                 if (IsBaseBinder)
                 {
-                    p.PrintLine("if (base.BindPropertyTo(propertyName, bindingMethodName)) return true;");
+                    p.PrintLine("if (base.SetPropertyName(bindingField, propertyName)) return true;");
                     p.PrintEndLine();
                 }
 
-                p.PrintLine("if (this.DataContext.ViewModel is not global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged inpc) return false;");
-                p.PrintEndLine();
-
-                p.PrintLine("switch (bindingMethodName)");
+                p.PrintLine("switch (bindingField)");
                 p.OpenScope();
                 {
                     foreach (var member in MemberRefs)
@@ -364,9 +369,7 @@ namespace ZBase.Foundation.Mvvm
                         p.PrintLine($"case {ConstName(member)}:");
                         p.OpenScope();
                         {
-                            p.PrintLine($"this.{ListenerName(member)}.Detach();");
-                            p.PrintLine($"this.{FieldName(member)}.ObservablePropertyName = propertyName;");
-                            p.PrintLine($"inpc.PropertyChanged(this.{FieldName(member)}.ObservablePropertyName, this.{ListenerName(member)});");
+                            p.PrintLine($"this.{FieldName(member)}.PropertyName = propertyName;");
                             p.PrintLine("return true;");
                         }
                         p.CloseScope();
@@ -384,7 +387,7 @@ namespace ZBase.Foundation.Mvvm
         }
 
         private string ConstName(MemberRef member)
-            => $"Binding_{member.Member.Name}";
+            => $"BindingField_{member.Member.Name}";
 
         private string FieldName(MemberRef member)
             => $"_field{member.Member.Name}";

@@ -10,11 +10,15 @@
         IDataContext DataContext { get; }
 
         /// <summary>
-        /// Binds an observable property to a binding field.
+        /// Sets the property name to a binding field.
         /// </summary>
-        /// <param name="propertyName">The name of an observable property whose container class is an <see cref="IObservableObject"/>.</param>
-        /// <param name="bindingMethodName">The name of a [Binding] method of this binder.</param>
-        bool BindPropertyTo(string propertyName, string bindingMethodName);
+        /// <param name="bindingField">The binding field whose <see cref="BindingField.PropertyName"/> will be set.</param>
+        /// <param name="propertyName">
+        /// The property whose container class is an <see cref="ZBase.Foundation.Mvvm.ComponentModel.IObservableObject"/>.
+        /// <br/>
+        /// See <see cref="ZBase.Foundation.Mvvm.ViewBinding.BindingField.PropertyName"/>
+        /// </param>
+        bool SetPropertyName(string bindingField, string propertyName);
 
         /// <summary>
         /// Start receiving events from the <see cref="DataContext"/>.

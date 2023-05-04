@@ -12,13 +12,13 @@ namespace ZBase.Foundation.Mvvm.ViewBinding
     /// </remarks>
     /// <seealso cref="BindingAttribute"/>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
-    public sealed class BindingInfoAttribute : Attribute
+    public sealed class BindingMethodInfoAttribute : Attribute
     {
         public string MethodName { get; }
 
         public Type ParameterType { get; }
 
-        public BindingInfoAttribute(string methodName, Type parameterType)
+        public BindingMethodInfoAttribute(string methodName, Type parameterType)
         {
             this.MethodName = methodName;
             this.ParameterType = parameterType;

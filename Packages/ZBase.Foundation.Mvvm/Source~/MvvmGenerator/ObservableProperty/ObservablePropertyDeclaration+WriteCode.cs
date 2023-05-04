@@ -125,6 +125,7 @@ namespace ZBase.Foundation.Mvvm
                 p.PrintLine("private readonly UnionConverters _unionConverters = new UnionConverters();");
                 p.PrintEndLine();
 
+                WriteConstantFields(ref p);
                 WriteEvents(ref p);
                 WriteProperties(ref p);
                 WritePartialMethods(ref p);
@@ -136,6 +137,43 @@ namespace ZBase.Foundation.Mvvm
 
             p = p.DecreasedIndent();
             return p.Result;
+        }
+
+        private void WriteConstantFields(ref Printer p)
+        {
+            var className = Syntax.Identifier.Text;
+            var additionalProperties = new Dictionary<string, IPropertySymbol>();
+
+            foreach (var member in MemberRefs)
+            {
+                var fieldName = member.Member.Name;
+                var name = member.PropertyName;
+
+                p.PrintLine($"/// <summary>The name of <see cref=\"{name}\"/></summary>");
+                p.PrintLine(GENERATED_CODE);
+                p.PrintLine($"public const string {ConstName(member)} = nameof({className}.{name});");
+                p.PrintEndLine();
+
+                if (NotifyPropertyChangedForMap.TryGetValue(fieldName, out var property))
+                {
+                    if (additionalProperties.ContainsKey(property.Name) == false)
+                    {
+                        additionalProperties[property.Name] = property;
+                    }
+                }
+            }
+
+            foreach (var property in additionalProperties.Values)
+            {
+                var name = property.Name;
+
+                p.PrintLine($"/// <summary>The name of <see cref=\"{name}\"/></summary>");
+                p.PrintLine(GENERATED_CODE);
+                p.PrintLine($"public const string {ConstName(property)} = nameof({className}.{name});");
+                p.PrintEndLine();
+            }
+
+            p.PrintEndLine();
         }
 
         private void WriteEvents(ref Printer p)
@@ -452,22 +490,22 @@ namespace ZBase.Foundation.Mvvm
 
         private void WriteNotifyPropertyChangingInfoAttributes(ref Printer p)
         {
-            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ComponentModel.NotifyPropertyChangingInfo(nameof({0}.{1}), typeof({2}))]";
+            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ComponentModel.NotifyPropertyChangingInfo({0}.{1}, typeof({2}))]";
 
             var className = Syntax.Identifier.Text;
 
             foreach (var member in MemberRefs)
             {
-                var propertyName = member.PropertyName;
+                var constName = ConstName(member);
                 var typeName = member.Member.Type.ToFullName();
 
-                p.PrintLine(string.Format(ATTRIBUTE, className, propertyName, typeName));
+                p.PrintLine(string.Format(ATTRIBUTE, className, constName, typeName));
             }
         }
 
         private void WriteNotifyPropertyChangedInfoAttributes(ref Printer p)
         {
-            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ComponentModel.NotifyPropertyChangedInfo(nameof({0}.{1}), typeof({2}))]";
+            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ComponentModel.NotifyPropertyChangedInfo({0}.{1}, typeof({2}))]";
 
             var className = Syntax.Identifier.Text;
             var additionalProperties = new Dictionary<string, IPropertySymbol>();
@@ -475,10 +513,10 @@ namespace ZBase.Foundation.Mvvm
             foreach (var member in MemberRefs)
             {
                 var fieldName = member.Member.Name;
-                var propertyName = member.PropertyName;
+                var constName = ConstName(member);
                 var typeName = member.Member.Type.ToFullName();
 
-                p.PrintLine(string.Format(ATTRIBUTE, className, propertyName, typeName));
+                p.PrintLine(string.Format(ATTRIBUTE, className, constName, typeName));
 
                 if (NotifyPropertyChangedForMap.TryGetValue(fieldName, out var property))
                 {
@@ -491,7 +529,7 @@ namespace ZBase.Foundation.Mvvm
 
             foreach (var property in additionalProperties.Values)
             {
-                p.PrintLine(string.Format(ATTRIBUTE, className, property.Name, property.Type.ToFullName()));
+                p.PrintLine(string.Format(ATTRIBUTE, className, ConstName(property), property.Type.ToFullName()));
             }
         }
 
@@ -553,6 +591,12 @@ namespace ZBase.Foundation.Mvvm
             p.CloseScope();
             p.PrintEndLine();
         }
+
+        private string ConstName(MemberRef member)
+            => $"PropertyName_{member.PropertyName}";
+
+        private string ConstName(IPropertySymbol member)
+            => $"PropertyName_{member.Name}";
 
         private string OnChangingEventName(MemberRef member)
             => $"_onChanging{member.PropertyName}";
