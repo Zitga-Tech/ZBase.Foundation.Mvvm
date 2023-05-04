@@ -2,7 +2,7 @@
   "name": "com.zbase.foundation.mvvm",
   "displayName": "ZBase.Foundation.Mvvm",
   "version": "1.0.0",
-  "unity": "2021.3",
+  "unity": "2022.2",
   "documentationUrl": "https://github.com/Zitga-Tech/ZBase.Foundation.Mvvm/blob/main/README.md",
   "type": "library",
   "dependencies": {
