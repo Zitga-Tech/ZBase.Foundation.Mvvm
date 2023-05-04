@@ -4,13 +4,13 @@ using System;
 using System.Linq;
 using ZBase.Foundation.SourceGen;
 
-namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
+namespace ZBase.Foundation.Mvvm.BinderSourceGen
 {
     [Generator]
-    public class BindingFieldGenerator : IIncrementalGenerator
+    public class BinderGenerator : IIncrementalGenerator
     {
         public const string INTERFACE = "global::ZBase.Foundation.Mvvm.ViewBinding.IBinder";
-        public const string GENERATOR_NAME = nameof(BindingFieldGenerator);
+        public const string GENERATOR_NAME = nameof(BinderGenerator);
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
@@ -56,7 +56,7 @@ namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
 
                 var syntaxTree = candidate.SyntaxTree;
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var declaration = new BindingFieldDeclaration(candidate, semanticModel, context.CancellationToken);
+                var declaration = new BinderDeclaration(candidate, semanticModel, context.CancellationToken);
 
                 string source;
 

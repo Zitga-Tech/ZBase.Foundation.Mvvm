@@ -6,9 +6,9 @@ using System.Collections.Immutable;
 using System.Threading;
 using ZBase.Foundation.SourceGen;
 
-namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
+namespace ZBase.Foundation.Mvvm.BinderSourceGen
 {
-    public partial class BindingFieldDeclaration
+    public partial class BinderDeclaration
     {
         public const string IBINDER_INTERFACE = "global::ZBase.Foundation.Mvvm.ViewBinding.IBinder";
         public const string BINDING_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ViewBinding.BindingAttribute";
@@ -27,7 +27,7 @@ namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
 
         public ImmutableArray<ITypeSymbol> NonUnionTypes { get; }
 
-        public BindingFieldDeclaration(ClassDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
+        public BinderDeclaration(ClassDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
         {
             using var memberRefs = ImmutableArrayBuilder<MemberRef>.Rent();
 

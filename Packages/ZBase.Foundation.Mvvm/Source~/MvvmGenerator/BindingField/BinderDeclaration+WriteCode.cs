@@ -1,11 +1,11 @@
 ﻿using System;
 using ZBase.Foundation.SourceGen;
 
-namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
+namespace ZBase.Foundation.Mvvm.BinderSourceGen
 {
-    partial class BindingFieldDeclaration
+    partial class BinderDeclaration
     {
-        private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.BindingFieldGenerator\", \"1.0.0\")]";
+        private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.BinderGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
         private const string OBSOLETE_METHOD = "[global::System.Obsolete(\"This method is not intended to be use directly by user code.\")]";
         public string WriteCodeWithoutMember()
@@ -269,14 +269,9 @@ namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
 
         private void WriteFlags(ref Printer p)
         {
-            foreach (var member in MemberRefs)
-            {
-                p.PrintLine($"/// <summary>A flag indicates whether <see cref=\"{member.Member.Name}\"/> is listening.</summary>");
-                p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"private bool {FlagName(member)};");
-                p.PrintEndLine();
-            }
-
+            p.PrintLine($"/// <summary>A flag indicates whether this binder is listening to events from <see cref=\"DataContext\"/>.</summary>");
+            p.PrintLine(GENERATED_CODE);
+            p.PrintLine($"private bool _isListening;");
             p.PrintEndLine();
         }
 
@@ -337,17 +332,15 @@ namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
                 p.PrintLine("if (this.DataContext.ViewModel is not global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged inpc) return;");
                 p.PrintEndLine();
 
+                p.PrintLine($"if (this._isListening) return;");
+                p.PrintEndLine();
+
+                p.PrintLine($"this._isListening = true;");
+                p.PrintEndLine();
+
                 foreach (var member in MemberRefs)
                 {
-                    var flagName = FlagName(member);
-
-                    p.PrintLine($"if (this.{flagName} == false)");
-                    p.OpenScope();
-                    {
-                        p.PrintLine($"inpc.PropertyChanged(this.{FieldName(member)}.PropertyName, this.{ListenerName(member)});");
-                        p.PrintLine($"this.{flagName} = true;");
-                    }
-                    p.CloseScope();
+                    p.PrintLine($"inpc.PropertyChanged(this.{FieldName(member)}.PropertyName, this.{ListenerName(member)});");
                 }
             }
             p.CloseScope();
@@ -370,17 +363,15 @@ namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
                     p.PrintEndLine();
                 }
 
+                p.PrintLine($"if (this._isListening == false) return;");
+                p.PrintEndLine();
+
+                p.PrintLine($"this._isListening = false;");
+                p.PrintEndLine();
+
                 foreach (var member in MemberRefs)
                 {
-                    var flagName = FlagName(member);
-
-                    p.PrintLine($"if (this.{flagName})");
-                    p.OpenScope();
-                    {
-                        p.PrintLine($"this.{ListenerName(member)}.Detach();");
-                        p.PrintLine($"this.{flagName} = false;");
-                    }
-                    p.CloseScope();
+                    p.PrintLine($"this.{ListenerName(member)}.Detach();");
                 }
             }
             p.CloseScope();
@@ -512,9 +503,6 @@ namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
 
         private string ListenerName(MemberRef member)
             => $"_listener{member.Member.Name}";
-
-        private string FlagName(MemberRef member)
-            => $"_is{member.Member.Name}Listening";
 
         private string MethodName(MemberRef member)
         {
