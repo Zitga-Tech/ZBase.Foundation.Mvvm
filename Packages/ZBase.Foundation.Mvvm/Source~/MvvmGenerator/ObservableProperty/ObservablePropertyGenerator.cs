@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm
     [Generator]
     public class ObservablePropertyGenerator : IIncrementalGenerator
     {
-        public const string INTERFACE = "global::ZBase.Foundation.Mvvm.IObservableObject";
+        public const string INTERFACE = "global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject";
         public const string GENERATOR_NAME = nameof(ObservablePropertyGenerator);
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -60,7 +60,7 @@ namespace ZBase.Foundation.Mvvm
 
                 string source;
 
-                if (declaration.Members.Count > 0)
+                if (declaration.MemberRefs.Length > 0)
                 {
                     source = declaration.WriteCode();
                 }

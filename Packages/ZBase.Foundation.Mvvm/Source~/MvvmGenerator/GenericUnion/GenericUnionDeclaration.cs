@@ -10,12 +10,11 @@ namespace ZBase.Foundation.Mvvm
 {
     public partial class GenericUnionDeclaration
     {
-        public const string NAMESPACE = "ZBase.Foundation.Mvvm";
         public const string INTERFACE = "global::ZBase.Foundation.Mvvm.Unions.IUnion<";
 
-        public List<StructRef> Structs { get; }
+        public ImmutableArray<StructRef> StructRefs { get; }
 
-        public List<StructRef> Redundants { get; }
+        public ImmutableArray<StructRef> Redundants { get; }
 
         public GenericUnionDeclaration(
               ImmutableArray<StructRef> candidates
@@ -23,9 +22,7 @@ namespace ZBase.Foundation.Mvvm
             , CancellationToken token
         )
         {
-            Structs = new List<StructRef>();
-            Redundants = new List<StructRef>();
-
+            using var redundants = ImmutableArrayBuilder<StructRef>.Rent();
             var filtered = new Dictionary<string, StructRef>();
 
             foreach (var candidate in candidates)
@@ -44,11 +41,16 @@ namespace ZBase.Foundation.Mvvm
                 }
                 else
                 {
-                    Redundants.Add(candidate);
+                    redundants.Add(candidate);
                 }
             }
 
-            Structs.AddRange(filtered.Values);
+            using var structRefs = ImmutableArrayBuilder<StructRef>.Rent();
+            structRefs.AddRange(filtered.Values);
+
+            StructRefs = structRefs.ToImmutable();
+            Redundants = redundants.ToImmutable();
+
         }
     }
 

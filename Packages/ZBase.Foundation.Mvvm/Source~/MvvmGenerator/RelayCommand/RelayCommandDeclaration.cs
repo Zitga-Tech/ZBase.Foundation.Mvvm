@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading;
 using ZBase.Foundation.SourceGen;
 
@@ -9,7 +10,7 @@ namespace ZBase.Foundation.Mvvm
 {
     public partial class RelayCommandDeclaration
     {
-        public const string RELAY_COMMAND_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.RelayCommandAttribute";
+        public const string RELAY_COMMAND_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.Input.RelayCommandAttribute";
 
         public ClassDeclarationSyntax Syntax { get; }
 
@@ -19,14 +20,16 @@ namespace ZBase.Foundation.Mvvm
 
         public bool IsValid { get; }
 
-        public List<MemberRef> Members { get; }
+        public ImmutableArray<MemberRef> MemberRefs { get; }
 
         public RelayCommandDeclaration(ClassDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
         {
+            using var memberRefs = ImmutableArrayBuilder<MemberRef>.Rent();
+            using var diagnosticBuilder = ImmutableArrayBuilder<DiagnosticInfo>.Rent();
+
             Syntax = candidate;
             Symbol = semanticModel.GetDeclaredSymbol(candidate, token);
             FullyQualifiedName = Symbol.ToFullName();
-            Members = new List<MemberRef>();
 
             var members = Symbol.GetMembers();
             var methodMap = new Dictionary<string, IMethodSymbol>();
@@ -58,7 +61,7 @@ namespace ZBase.Foundation.Mvvm
                     }
                     else
                     {
-                        Members.Add(new MemberRef { Member = method });
+                        memberRefs.Add(new MemberRef { Member = method });
                     }
                 }
 
@@ -104,14 +107,30 @@ namespace ZBase.Foundation.Mvvm
 
                 if (isValid)
                 {
-                    Members.Add(new MemberRef {
+                    memberRefs.Add(new MemberRef {
                         Member = method,
                         CanExecuteMethod = canExecuteMethod,
                     });
                 }
             }
 
-            IsValid = Members.Count > 0;
+            MemberRefs = memberRefs.ToImmutable();
+            IsValid = MemberRefs.Length > 0;
+
+            foreach (var memberRef in MemberRefs)
+            {
+                memberRef.Member.GatherForwardedAttributes(
+                      semanticModel
+                    , token
+                    , diagnosticBuilder
+                    , out var fieldAttributes
+                    , out var propertyAttributes
+                    , DiagnosticDescriptors.InvalidFieldOrPropertyTargetedAttributeOnRelayCommandMethod
+                );
+
+                memberRef.ForwardedFieldAttributes = fieldAttributes;
+                memberRef.ForwardedPropertyAttributes = propertyAttributes;
+            }
         }
 
         public class MemberRef
@@ -119,6 +138,10 @@ namespace ZBase.Foundation.Mvvm
             public IMethodSymbol Member { get; set; }
 
             public IMethodSymbol CanExecuteMethod { get; set; }
+
+            public ImmutableArray<AttributeInfo> ForwardedFieldAttributes { get; set; }
+
+            public ImmutableArray<AttributeInfo> ForwardedPropertyAttributes { get; set; }
         }
     }
 }

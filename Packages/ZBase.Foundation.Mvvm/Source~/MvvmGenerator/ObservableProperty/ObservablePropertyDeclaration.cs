@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading;
 using ZBase.Foundation.SourceGen;
 
@@ -9,11 +10,11 @@ namespace ZBase.Foundation.Mvvm
 {
     public partial class ObservablePropertyDeclaration
     {
-        public const string IOBSERVABLE_OBJECT_INTERFACE = "global::ZBase.Foundation.Mvvm.IObservableObject";
-        public const string OBSERVABLE_PROPERTY_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ObservablePropertyAttribute";
-        public const string NOTIFY_PROPERTY_CHANGED_FOR_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.NotifyPropertyChangedForAttribute";
-        public const string NOTIFY_CAN_EXECUTE_CHANGED_FOR_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.NotifyCanExecuteChangedForAttribute";
-        public const string RELAY_COMMAND_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.RelayCommandAttribute";
+        public const string IOBSERVABLE_OBJECT_INTERFACE = "global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject";
+        public const string OBSERVABLE_PROPERTY_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ComponentModel.ObservablePropertyAttribute";
+        public const string NOTIFY_PROPERTY_CHANGED_FOR_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ComponentModel.NotifyPropertyChangedForAttribute";
+        public const string NOTIFY_CAN_EXECUTE_CHANGED_FOR_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ComponentModel.NotifyCanExecuteChangedForAttribute";
+        public const string RELAY_COMMAND_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.Input.RelayCommandAttribute";
 
         public ClassDeclarationSyntax Syntax { get; }
 
@@ -23,7 +24,7 @@ namespace ZBase.Foundation.Mvvm
 
         public bool IsBaseObservableObject { get; }
 
-        public List<MemberRef> Members { get; }
+        public ImmutableArray<MemberRef> MemberRefs { get; }
 
         /// <summary>
         /// Key is <c>Field.Name</c>
@@ -37,10 +38,12 @@ namespace ZBase.Foundation.Mvvm
 
         public ObservablePropertyDeclaration(ClassDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
         {
+            using var memberRefs = ImmutableArrayBuilder<MemberRef>.Rent();
+            using var diagnosticBuilder = ImmutableArrayBuilder<DiagnosticInfo>.Rent();
+
             Syntax = candidate;
             Symbol = semanticModel.GetDeclaredSymbol(candidate, token);
             FullyQualifiedName = Symbol.ToFullName();
-            Members = new List<MemberRef>();
             NotifyPropertyChangedForMap = new Dictionary<string, IPropertySymbol>();
             NotifyCanExecuteChangedForSet = new HashSet<string>();
             
@@ -69,6 +72,7 @@ namespace ZBase.Foundation.Mvvm
                             PropertyName = field.ToPropertyName(),
                         };
 
+                        var uniqueCommandNames = new HashSet<string>();
                         var notifyPropChangedFor = field.GetAttribute(NOTIFY_PROPERTY_CHANGED_FOR_ATTRIBUTE);
 
                         if (notifyPropChangedFor != null
@@ -91,13 +95,17 @@ namespace ZBase.Foundation.Mvvm
                             {
                                 if (arg.Value is string commandName)
                                 {
-                                    memberRef.CommandNames.Add(commandName);
+                                    uniqueCommandNames.Add(commandName);
                                     commandSet.Add(commandName);
                                 }
                             }
                         }
 
-                        Members.Add(memberRef);
+                        using var commandNames = ImmutableArrayBuilder<string>.Rent();
+                        commandNames.AddRange(uniqueCommandNames);
+
+                        memberRef.CommandNames = commandNames.ToImmutable();
+                        memberRefs.Add(memberRef);
                     }
 
                     continue;
@@ -140,6 +148,21 @@ namespace ZBase.Foundation.Mvvm
                     NotifyCanExecuteChangedForSet.Add(commandName);
                 }
             }
+
+            MemberRefs = memberRefs.ToImmutable();
+
+            foreach (var memberRef in MemberRefs)
+            {
+                memberRef.Member.GatherForwardedAttributes(
+                      semanticModel
+                    , token
+                    , diagnosticBuilder
+                    , out var propertyAttributes
+                    , DiagnosticDescriptors.InvalidFieldOrPropertyTargetedAttributeOnRelayCommandMethod
+                );
+
+                memberRef.ForwardedPropertyAttributes = propertyAttributes;
+            }
         }
 
         public class MemberRef
@@ -148,7 +171,9 @@ namespace ZBase.Foundation.Mvvm
 
             public string PropertyName { get; set; }
 
-            public HashSet<string> CommandNames { get; } = new();
+            public ImmutableArray<string> CommandNames { get; set; }
+
+            public ImmutableArray<AttributeInfo> ForwardedPropertyAttributes { get; set; }
         }
     }
 }

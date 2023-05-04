@@ -237,7 +237,7 @@ namespace ZBase.Foundation.SourceGen
             {
                 if (@using.ContainsDirectives)
                 {
-                    int numberOfNotClosedIfDirectives = 0;
+                    var numberOfNotClosedIfDirectives = 0;
                     foreach (var token in @using.ChildTokens())
                         foreach (var trivia in token.LeadingTrivia)
                             if (trivia.IsDirective)

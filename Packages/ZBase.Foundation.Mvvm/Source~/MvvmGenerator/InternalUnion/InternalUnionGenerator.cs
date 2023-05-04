@@ -10,8 +10,8 @@ namespace ZBase.Foundation.Mvvm
     [Generator]
     public class InternalUnionGenerator : IIncrementalGenerator
     {
-        public const string INTERFACE = "global::ZBase.Foundation.Mvvm.IObservableObject";
-        public const string OBSERVABLE_PROPERTY_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ObservablePropertyAttribute";
+        public const string INTERFACE = "global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject";
+        public const string OBSERVABLE_PROPERTY_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ComponentModel.ObservablePropertyAttribute";
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {

@@ -10,7 +10,7 @@ namespace ZBase.Foundation.Mvvm
         private const string AGGRESSIVE_INLINING = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]";
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.ObservablePropertyGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
-        private const string OBSERVABLE_PROPERTY = "[global::ZBase.Foundation.Mvvm.GeneratedObservableProperty]";
+        private const string OBSERVABLE_PROPERTY = "[global::ZBase.Foundation.Mvvm.ComponentModel.GeneratedObservableProperty]";
 
         public string WriteCodeWithoutMember()
         {
@@ -30,15 +30,15 @@ namespace ZBase.Foundation.Mvvm
 
             if (IsBaseObservableObject)
             {
-                p.PrintLine(": global::ZBase.Foundation.Mvvm.IObservableObject");
-                p.PrintLine(", global::ZBase.Foundation.Mvvm.INotifyPropertyChanging");
+                p.PrintLine(": global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject");
+                p.PrintLine(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
             }
             else
             {
-                p.PrintLine(": global::ZBase.Foundation.Mvvm.INotifyPropertyChanging");
+                p.PrintLine(": global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
             }
 
-            p.PrintLine(", global::ZBase.Foundation.Mvvm.INotifyPropertyChanged");
+            p.PrintLine(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged");
             p = p.DecreasedIndent();
 
             p.OpenScope();
@@ -47,9 +47,9 @@ namespace ZBase.Foundation.Mvvm
                 {
                     var keyword = Symbol.IsSealed ? "" : "virtual ";
 
-                    p.PrintLine($"/// <inheritdoc cref=\"global::ZBase.Foundation.Mvvm.INotifyPropertyChanging.PropertyChanging{{TInstance}}(string, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener{{TInstance}})\" />");
+                    p.PrintLine($"/// <inheritdoc cref=\"global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging.PropertyChanging{{TInstance}}(string, global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener{{TInstance}})\" />");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public {keyword}bool PropertyChanging<TInstance>(string propertyName, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener<TInstance> listener) where TInstance : class");
+                    p.PrintLine($"public {keyword}bool PropertyChanging<TInstance>(string propertyName, global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener<TInstance> listener) where TInstance : class");
                     p.OpenScope();
                     {
                         if (IsBaseObservableObject)
@@ -65,9 +65,9 @@ namespace ZBase.Foundation.Mvvm
 
                     p.PrintEndLine();
 
-                    p.PrintLine($"/// <inheritdoc cref=\"global::ZBase.Foundation.Mvvm.INotifyPropertyChanged.PropertyChanged{{TInstance}}(string, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener{{TInstance}})\" />");
+                    p.PrintLine($"/// <inheritdoc cref=\"global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged.PropertyChanged{{TInstance}}(string, global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener{{TInstance}})\" />");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public {keyword}bool PropertyChanged<TInstance>(string propertyName, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener<TInstance> listener) where TInstance : class");
+                    p.PrintLine($"public {keyword}bool PropertyChanged<TInstance>(string propertyName, global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener<TInstance> listener) where TInstance : class");
                     p.OpenScope();
                     {
                         if (IsBaseObservableObject)
@@ -108,15 +108,15 @@ namespace ZBase.Foundation.Mvvm
 
             if (IsBaseObservableObject)
             {
-                p.PrintLine(": global::ZBase.Foundation.Mvvm.IObservableObject");
-                p.PrintLine(", global::ZBase.Foundation.Mvvm.INotifyPropertyChanging");
+                p.PrintLine(": global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject");
+                p.PrintLine(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
             }
             else
             {
-                p.PrintLine(": global::ZBase.Foundation.Mvvm.INotifyPropertyChanging");
+                p.PrintLine(": global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
             }
 
-            p.PrintLine(", global::ZBase.Foundation.Mvvm.INotifyPropertyChanged");
+            p.PrintLine(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged");
             p = p.DecreasedIndent();
 
             p.OpenScope();
@@ -140,14 +140,14 @@ namespace ZBase.Foundation.Mvvm
 
         private void WriteEvents(ref Printer p)
         {
-            foreach (var member in Members)
+            foreach (var member in MemberRefs)
             {
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"private event global::ZBase.Foundation.Mvvm.PropertyChangingEventHandler {OnChangingEventName(member)};");
+                p.PrintLine($"private event global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangingEventHandler {OnChangingEventName(member)};");
                 p.PrintEndLine();
 
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler {OnChangedEventName(member)};");
+                p.PrintLine($"private event global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangedEventHandler {OnChangedEventName(member)};");
                 p.PrintEndLine();
             }
 
@@ -164,14 +164,14 @@ namespace ZBase.Foundation.Mvvm
             foreach (var property in properties.Values)
             {
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"private event global::ZBase.Foundation.Mvvm.PropertyChangedEventHandler {OnChangedEventName(property)};");
+                p.PrintLine($"private event global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangedEventHandler {OnChangedEventName(property)};");
                 p.PrintEndLine();
             }
         }
 
         private void WriteProperties(ref Printer p)
         {
-            foreach (var member in Members)
+            foreach (var member in MemberRefs)
             {
                 var fieldName = member.Member.Name;
                 var propertyName = member.PropertyName;
@@ -180,16 +180,23 @@ namespace ZBase.Foundation.Mvvm
                 var converterForField = GeneratorHelpers.ToTitleCase(member.Member.Type.ToValidIdentifier().AsSpan());
                 var willNotifyPropertyChanged = NotifyPropertyChangedForMap.TryGetValue(fieldName, out var property);
 
+                p.PrintLine($"/// <inheritdoc cref=\"{fieldName}\"/>");
+
+                foreach (var attribute in member.ForwardedPropertyAttributes)
+                {
+                    p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
+                }
+
                 p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(OBSERVABLE_PROPERTY);
                 p.PrintLine($"public {typeName} {propertyName}");
                 p.OpenScope();
                 {
                     p.PrintLine(AGGRESSIVE_INLINING);
-                    p.PrintLine($"get => {fieldName};");
+                    p.PrintLine($"get => this.{fieldName};");
                     p.PrintLine("set");
                     p.OpenScope();
                     {
-                        p.PrintLine($"if (global::System.Collections.Generic.EqualityComparer<{typeName}>.Default.Equals({fieldName}, value) == false)");
+                        p.PrintLine($"if (global::System.Collections.Generic.EqualityComparer<{typeName}>.Default.Equals(this.{fieldName}, value) == false)");
                         p.OpenScope();
                         {
                             p.PrintLine($"var oldValue = this.{fieldName};");
@@ -205,7 +212,7 @@ namespace ZBase.Foundation.Mvvm
                             p.PrintLine($"{OnChangingMethodName(member)}(oldValue, value);");
                             p.PrintEndLine();
 
-                            p.PrintLine($"var {argsName} = new global::ZBase.Foundation.Mvvm.PropertyChangeEventArgs(this, nameof(this.{propertyName}), this._unionConverters.{converterForField}.ToUnion(value));");
+                            p.PrintLine($"var {argsName} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventArgs(this, nameof(this.{propertyName}), this._unionConverters.{converterForField}.ToUnion(value));");
                             p.PrintLine($"this.{OnChangingEventName(member)}?.Invoke({argsName});");
                             p.PrintEndLine();
 
@@ -226,7 +233,7 @@ namespace ZBase.Foundation.Mvvm
                                 p.PrintLine($"{OnChangedMethodName(property)}(oldPropertyValue, this.{property.Name});");
                                 p.PrintEndLine();
 
-                                p.PrintLine($"var {otherArgsName} = new global::ZBase.Foundation.Mvvm.PropertyChangeEventArgs(this, nameof(this.{property.Name}), this._unionConverters.{converterForProperty}.ToUnion(this.{property.Name}));");
+                                p.PrintLine($"var {otherArgsName} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventArgs(this, nameof(this.{property.Name}), this._unionConverters.{converterForProperty}.ToUnion(this.{property.Name}));");
                                 p.PrintLine($"this.{OnChangedEventName(property)}?.Invoke({otherArgsName});");
                             }
 
@@ -252,7 +259,7 @@ namespace ZBase.Foundation.Mvvm
 
         private void WritePartialMethods(ref Printer p)
         {
-            foreach (var member in Members)
+            foreach (var member in MemberRefs)
             {
                 var typeName = member.Member.Type.ToFullName();
                 var propName = member.PropertyName;
@@ -323,9 +330,9 @@ namespace ZBase.Foundation.Mvvm
         {
             var keyword = IsBaseObservableObject ? "override " : Symbol.IsSealed ? "" : "virtual ";
 
-            p.PrintLine($"/// <inheritdoc cref=\"global::ZBase.Foundation.Mvvm.INotifyPropertyChanging.PropertyChanging{{TInstance}}(string, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener{{TInstance}})\" />");
+            p.PrintLine($"/// <inheritdoc cref=\"global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging.PropertyChanging{{TInstance}}(string, global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener{{TInstance}})\" />");
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-            p.PrintLine($"public {keyword}bool PropertyChanging<TInstance>(string propertyName, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener<TInstance> listener) where TInstance : class");
+            p.PrintLine($"public {keyword}bool PropertyChanging<TInstance>(string propertyName, global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener<TInstance> listener) where TInstance : class");
             p.OpenScope();
             {
                 if (IsBaseObservableObject)
@@ -343,7 +350,7 @@ namespace ZBase.Foundation.Mvvm
                 p.PrintLine("switch (propertyName)");
                 p.OpenScope();
                 {
-                    foreach (var member in Members)
+                    foreach (var member in MemberRefs)
                     {
                         var propertyName = member.PropertyName;
                         var eventName = OnChangingEventName(member);
@@ -372,9 +379,9 @@ namespace ZBase.Foundation.Mvvm
         {
             var keyword = IsBaseObservableObject ? "override " : Symbol.IsSealed ? "" : "virtual ";
 
-            p.PrintLine($"/// <inheritdoc cref=\"global::ZBase.Foundation.Mvvm.INotifyPropertyChanged.PropertyChanged{{TInstance}}(string, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener{{TInstance}})\" />");
+            p.PrintLine($"/// <inheritdoc cref=\"global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged.PropertyChanged{{TInstance}}(string, global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener{{TInstance}})\" />");
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-            p.PrintLine($"public {keyword}bool PropertyChanged<TInstance>(string propertyName, global::ZBase.Foundation.Mvvm.PropertyChangeEventListener<TInstance> listener) where TInstance : class");
+            p.PrintLine($"public {keyword}bool PropertyChanged<TInstance>(string propertyName, global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener<TInstance> listener) where TInstance : class");
             p.OpenScope();
             {
                 if (IsBaseObservableObject)
@@ -392,7 +399,7 @@ namespace ZBase.Foundation.Mvvm
                 p.PrintLine("switch (propertyName)");
                 p.OpenScope();
                 {
-                    foreach (var member in Members)
+                    foreach (var member in MemberRefs)
                     {
                         var propertyName = member.PropertyName;
                         var eventName = OnChangedEventName(member);
@@ -445,11 +452,11 @@ namespace ZBase.Foundation.Mvvm
 
         private void WriteNotifyPropertyChangingInfoAttributes(ref Printer p)
         {
-            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.NotifyPropertyChangingInfoAttribute(nameof({0}.{1}), typeof({2}))]";
+            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ComponentModel.NotifyPropertyChangingInfo(nameof({0}.{1}), typeof({2}))]";
 
             var className = Syntax.Identifier.Text;
 
-            foreach (var member in Members)
+            foreach (var member in MemberRefs)
             {
                 var propertyName = member.PropertyName;
                 var typeName = member.Member.Type.ToFullName();
@@ -460,12 +467,12 @@ namespace ZBase.Foundation.Mvvm
 
         private void WriteNotifyPropertyChangedInfoAttributes(ref Printer p)
         {
-            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.NotifyPropertyChangedInfoAttribute(nameof({0}.{1}), typeof({2}))]";
+            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ComponentModel.NotifyPropertyChangedInfo(nameof({0}.{1}), typeof({2}))]";
 
             var className = Syntax.Identifier.Text;
             var additionalProperties = new Dictionary<string, IPropertySymbol>();
 
-            foreach (var member in Members)
+            foreach (var member in MemberRefs)
             {
                 var fieldName = member.Member.Name;
                 var propertyName = member.PropertyName;
@@ -492,7 +499,7 @@ namespace ZBase.Foundation.Mvvm
         {
             var types = new Dictionary<string, ITypeSymbol>();
 
-            foreach (var member in Members)
+            foreach (var member in MemberRefs)
             {
                 var fieldName = member.Member.Name;
                 var name = member.Member.Type.ToFullName();
@@ -537,7 +544,7 @@ namespace ZBase.Foundation.Mvvm
                     p.PrintLine($"public global::ZBase.Foundation.Mvvm.Unions.IUnionConverter<{typeName}> {propertyName}");
                     p.OpenScope();
                     {
-                        p.PrintLine($"get => _{fieldName} ??= global::ZBase.Foundation.Mvvm.Unions.UnionConverter.GetConverter<{typeName}>();");
+                        p.PrintLine($"get => this._{fieldName} ??= global::ZBase.Foundation.Mvvm.Unions.UnionConverter.GetConverter<{typeName}>();");
                     }
                     p.CloseScope();
                     p.PrintEndLine();

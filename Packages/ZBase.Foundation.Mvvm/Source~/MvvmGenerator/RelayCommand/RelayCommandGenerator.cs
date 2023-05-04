@@ -11,7 +11,8 @@ namespace ZBase.Foundation.Mvvm
     public class RelayCommandGenerator : IIncrementalGenerator
     {
         public const string ATTRIBUTE = "RelayCommand";
-        public const string INTERFACE = "global::ZBase.Foundation.Mvvm.IObservableObject";
+        public const string NAMESPACE = "ZBase.Foundation.Mvvm.Input";
+        public const string INTERFACE = "global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject";
         public const string GENERATOR_NAME = nameof(RelayCommandGenerator);
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -19,7 +20,7 @@ namespace ZBase.Foundation.Mvvm
             var projectPathProvider = SourceGenHelpers.GetSourceGenConfigProvider(context);
 
             var candidateProvider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: static (node, token) => GeneratorHelpers.IsClassSyntaxMatchByAttribute(node, token, SyntaxKind.MethodDeclaration, ATTRIBUTE),
+                predicate: static (node, token) => GeneratorHelpers.IsClassSyntaxMatchByAttribute(node, token, SyntaxKind.MethodDeclaration, NAMESPACE, ATTRIBUTE),
                 transform: static (syntaxContext, token) => GeneratorHelpers.GetClassSemanticMatch(syntaxContext, token, INTERFACE)
             ).Where(static t => t is { });
 

@@ -200,7 +200,7 @@ namespace ZBase.Foundation.SourceGen
 
         public static SyntaxNode NodeAfter(this SyntaxNode node, Func<SyntaxNodeOrToken, bool> predicate)
         {
-            bool nodeFound = false;
+            var nodeFound = false;
             var descendents = node.DescendantNodesAndTokens().ToArray();
 
             for (var i = 0; i < descendents.Count(); ++i)

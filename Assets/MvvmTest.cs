@@ -1,7 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
-using ZBase.Foundation.Mvvm;
+using ZBase.Foundation.Mvvm.ComponentModel;
+using ZBase.Foundation.Mvvm.Input;
 using ZBase.Foundation.Mvvm.Unions;
 
 namespace MvvmTests
@@ -27,7 +28,7 @@ namespace MvvmTests
 
         }
 
-        private bool Validate(int x) => false;
+        private bool Validate() => false;
 
         [RelayCommand(CanExecute = nameof(Validate))]
         private void Process(int x)

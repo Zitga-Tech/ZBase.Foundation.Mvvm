@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading;
 using ZBase.Foundation.SourceGen;
 
@@ -9,8 +9,8 @@ namespace ZBase.Foundation.Mvvm
 {
     public partial class BindingFieldDeclaration
     {
-        public const string IBINDER_INTERFACE = "global::ZBase.Foundation.Mvvm.IBinder";
-        public const string BINDING_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.BindingAttribute";
+        public const string IBINDER_INTERFACE = "global::ZBase.Foundation.Mvvm.ViewBinding.IBinder";
+        public const string BINDING_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ViewBinding.BindingAttribute";
         public const string UNION_TYPE = "global::ZBase.Foundation.Mvvm.Unions.Union";
         public const string MONO_BEHAVIOUR_TYPE = "global::UnityEngine.MonoBehaviour";
 
@@ -22,13 +22,14 @@ namespace ZBase.Foundation.Mvvm
 
         public bool ReferenceUnityEngine { get; }
 
-        public List<MemberRef> Members { get; }
+        public ImmutableArray<MemberRef> MemberRefs { get; }
 
         public BindingFieldDeclaration(ClassDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
         {
+            using var memberRefs = ImmutableArrayBuilder<MemberRef>.Rent();
+
             Syntax = candidate;
             Symbol = semanticModel.GetDeclaredSymbol(candidate, token);
-            Members = new List<MemberRef>();
 
             if (Symbol.BaseType != null && Symbol.BaseType.TypeKind == TypeKind.Class)
             {
@@ -76,11 +77,13 @@ namespace ZBase.Foundation.Mvvm
                     }
                 }
 
-                Members.Add(new MemberRef {
+                memberRefs.Add(new MemberRef {
                     Member = method,
                     Label = label,
                 });
             }
+
+            MemberRefs = memberRefs.ToImmutable();
         }
 
         public class MemberRef

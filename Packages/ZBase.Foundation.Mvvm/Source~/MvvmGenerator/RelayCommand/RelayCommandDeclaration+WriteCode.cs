@@ -7,7 +7,7 @@ namespace ZBase.Foundation.Mvvm
     {
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.RelayCommandGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
-        private const string RELAY_COMMAND = "[global::ZBase.Foundation.Mvvm.GeneratedRelayCommand]";
+        private const string RELAY_COMMAND = "[global::ZBase.Foundation.Mvvm.Input.GeneratedRelayCommand]";
 
         public string WriteCode()
         {
@@ -40,7 +40,7 @@ namespace ZBase.Foundation.Mvvm
         {
             var className = Syntax.Identifier.Text;
 
-            foreach (var member in Members)
+            foreach (var member in MemberRefs)
             {
                 var commandName = CommandPropertyName(member.Member);
 
@@ -49,24 +49,30 @@ namespace ZBase.Foundation.Mvvm
                     var param = member.Member.Parameters[0];
                     var paramType = param.Type.ToFullName();
 
-                    p.PrintLine($"[global::ZBase.Foundation.Mvvm.RelayCommandInfoAttribute(nameof({className}.{commandName}), typeof({paramType}))]");
+                    p.PrintLine($"[global::ZBase.Foundation.Mvvm.Input.RelayCommandInfo(nameof({className}.{commandName}), typeof({paramType}))]");
                 }
                 else
                 {
-                    p.PrintLine($"[global::ZBase.Foundation.Mvvm.RelayCommandInfoAttribute(nameof({className}.{commandName}))]");
+                    p.PrintLine($"[global::ZBase.Foundation.Mvvm.Input.RelayCommandInfo(nameof({className}.{commandName}))]");
                 }
             }
         }
 
         private void WriteFields(ref Printer p)
         {
-            foreach (var member in Members)
+            foreach (var member in MemberRefs)
             {
                 var propertyName = CommandPropertyName(member.Member);
                 var fieldName = CommandFieldName(member.Member);
                 var typeName = CommandTypeName(member.Member);
 
                 p.PrintLine($"/// <summary>The backing field for <see cref=\"{propertyName}\"/>.</summary>");
+
+                foreach (var attribute in member.ForwardedFieldAttributes)
+                {
+                    p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
+                }
+
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine($"private {typeName} {fieldName};");
                 p.PrintEndLine();
@@ -77,7 +83,7 @@ namespace ZBase.Foundation.Mvvm
 
         private void WriteProperties(ref Printer p)
         {
-            foreach (var member in Members)
+            foreach (var member in MemberRefs)
             {
                 var method = member.Member;
                 var propertyName = CommandPropertyName(method);
@@ -88,6 +94,12 @@ namespace ZBase.Foundation.Mvvm
                 var canExecuteArg = CanExecuteMethodArg(member.CanExecuteMethod);
 
                 p.PrintLine($"/// <summary>Gets an <see cref=\"{interfaceNameComment}\"/> instance wrapping <see cref=\"{method.Name}\"/>.</summary>");
+
+                foreach (var attribute in member.ForwardedPropertyAttributes)
+                {
+                    p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
+                }
+
                 p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(RELAY_COMMAND);
                 p.PrintLine($"public {interfaceName} {propertyName}");
                 p.OpenScope();
@@ -95,13 +107,13 @@ namespace ZBase.Foundation.Mvvm
                     p.PrintLine("get");
                     p.OpenScope();
                     {
-                        p.PrintLine($"if ({fieldName} == null)");
+                        p.PrintLine($"if (this.{fieldName} == null)");
                         p = p.IncreasedIndent();
-                        p.PrintLine($"{fieldName} = new {typeName}({method.Name}{canExecuteArg});");
+                        p.PrintLine($"this.{fieldName} = new {typeName}({method.Name}{canExecuteArg});");
                         p = p.DecreasedIndent();
                         p.PrintEndLine();
 
-                        p.PrintLine($"return {fieldName};");
+                        p.PrintLine($"return this.{fieldName};");
                     }
                     p.CloseScope();
                 }
@@ -121,28 +133,28 @@ namespace ZBase.Foundation.Mvvm
         private string CommandTypeName(IMethodSymbol method)
         {
             if (method.Parameters.Length < 1)
-                return "global::ZBase.Foundation.Mvvm.RelayCommand";
+                return "global::ZBase.Foundation.Mvvm.Input.RelayCommand";
 
             var param = method.Parameters[0];
-            return $"global::ZBase.Foundation.Mvvm.RelayCommand<{param.Type.ToFullName()}>";
+            return $"global::ZBase.Foundation.Mvvm.Input.RelayCommand<{param.Type.ToFullName()}>";
         }
 
         private string CommandInterfaceName(IMethodSymbol method)
         {
             if (method.Parameters.Length < 1)
-                return "global::ZBase.Foundation.Mvvm.IRelayCommand";
+                return "global::ZBase.Foundation.Mvvm.Input.IRelayCommand";
 
             var param = method.Parameters[0];
-            return $"global::ZBase.Foundation.Mvvm.IRelayCommand<{param.Type.ToFullName()}>";
+            return $"global::ZBase.Foundation.Mvvm.Input.IRelayCommand<{param.Type.ToFullName()}>";
         }
 
         private string CommandInterfaceNameComment(IMethodSymbol method)
         {
             if (method.Parameters.Length < 1)
-                return "global::ZBase.Foundation.Mvvm.IRelayCommand";
+                return "global::ZBase.Foundation.Mvvm.Input.IRelayCommand";
 
             var param = method.Parameters[0];
-            return $"global::ZBase.Foundation.Mvvm.IRelayCommand{{{param.Type.ToFullName()}}}";
+            return $"global::ZBase.Foundation.Mvvm.Input.IRelayCommand{{{param.Type.ToFullName()}}}";
         }
 
         private string CanExecuteMethodArg(IMethodSymbol method)

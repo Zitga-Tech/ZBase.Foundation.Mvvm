@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm
     [Generator]
     public class BindingFieldGenerator : IIncrementalGenerator
     {
-        public const string INTERFACE = "global::ZBase.Foundation.Mvvm.IBinder";
+        public const string INTERFACE = "global::ZBase.Foundation.Mvvm.ViewBinding.IBinder";
         public const string GENERATOR_NAME = nameof(BindingFieldGenerator);
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -60,7 +60,7 @@ namespace ZBase.Foundation.Mvvm
 
                 string source;
 
-                if (declaration.Members.Count > 0)
+                if (declaration.MemberRefs.Length > 0)
                 {
                     source = declaration.WriteCode();
                 }

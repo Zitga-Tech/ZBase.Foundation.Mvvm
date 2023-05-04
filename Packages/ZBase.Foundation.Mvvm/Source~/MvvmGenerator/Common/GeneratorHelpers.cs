@@ -10,11 +10,9 @@ namespace ZBase.Foundation.Mvvm
 {
     public static class GeneratorHelpers
     {
-        private const string AGGRESSIVE_INLINING = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]";
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.InternalUnionGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
 
-        public const string NAMESPACE = "ZBase.Foundation.Mvvm";
         public const string FIELD_PREFIX_UNDERSCORE = "_";
         public const string FIELD_PREFIX_M_UNDERSCORE = "m_";
 
@@ -40,6 +38,7 @@ namespace ZBase.Foundation.Mvvm
               SyntaxNode syntaxNode
             , CancellationToken token
             , SyntaxKind syntaxKind
+            , string attributeNamespace
             , string attributeName
         )
         {
@@ -58,7 +57,7 @@ namespace ZBase.Foundation.Mvvm
             foreach (var member in members)
             {
                 if (member.Kind() == syntaxKind
-                    && member.HasAttributeCandidate(NAMESPACE, attributeName)
+                    && member.HasAttributeCandidate(attributeNamespace, attributeName)
                 )
                 {
                     return true;

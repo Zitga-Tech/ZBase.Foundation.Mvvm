@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 // Everything in this file was copied from Unity's source generators.
 namespace ZBase.Foundation.SourceGen
@@ -301,6 +305,244 @@ namespace ZBase.Foundation.SourceGen
             => typeOrNamespaceName.StartsWith("global::") == false
             ? $"global::{typeOrNamespaceName}"
             : typeOrNamespaceName;
+
+        /// <summary>
+        /// Checks whether or not a given symbol has an attribute with the specified fully qualified metadata name.
+        /// </summary>
+        /// <param name="symbol">The input <see cref="ISymbol"/> instance to check.</param>
+        /// <param name="typeSymbol">The <see cref="ITypeSymbol"/> instance for the attribute type to look for.</param>
+        /// <returns>Whether or not <paramref name="symbol"/> has an attribute with the specified type.</returns>
+        public static bool HasAttributeWithType(this ISymbol symbol, ITypeSymbol typeSymbol)
+        {
+            foreach (AttributeData attribute in symbol.GetAttributes())
+            {
+                if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, typeSymbol))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Gathers all forwarded attributes for the generated field and property.
+        /// </summary>
+        /// <param name="methodSymbol">The input <see cref="IMethodSymbol"/> instance to process.</param>
+        /// <param name="semanticModel">The <see cref="SemanticModel"/> instance for the current run.</param>
+        /// <param name="token">The cancellation token for the current operation.</param>
+        /// <param name="diagnostics">The current collection of gathered diagnostics.</param>
+        /// <param name="fieldAttributes">The resulting field attributes to forward.</param>
+        /// <param name="propertyAttributes">The resulting property attributes to forward.</param>
+        public static void GatherForwardedAttributes(
+              this IMethodSymbol methodSymbol
+            , SemanticModel semanticModel
+            , CancellationToken token
+            , in ImmutableArrayBuilder<DiagnosticInfo> diagnostics
+            , out ImmutableArray<AttributeInfo> fieldAttributes
+            , out ImmutableArray<AttributeInfo> propertyAttributes
+            , DiagnosticDescriptor diagnostic
+        )
+        {
+            using var fieldAttributesInfo = ImmutableArrayBuilder<AttributeInfo>.Rent();
+            using var propertyAttributesInfo = ImmutableArrayBuilder<AttributeInfo>.Rent();
+
+            // If the method is a partial definition, also gather attributes from the implementation part
+            if (methodSymbol is { IsPartialDefinition: true } or { PartialDefinitionPart: not null })
+            {
+                IMethodSymbol partialDefinition = methodSymbol.PartialDefinitionPart ?? methodSymbol;
+                IMethodSymbol partialImplementation = methodSymbol.PartialImplementationPart ?? methodSymbol;
+
+                // We always give priority to the partial definition, to ensure a predictable and testable ordering
+                GatherForwardedAttributes(
+                      partialDefinition
+                    , semanticModel
+                    , token
+                    , in diagnostics
+                    , in fieldAttributesInfo
+                    , in propertyAttributesInfo
+                    , diagnostic
+                );
+
+                GatherForwardedAttributes(
+                      partialImplementation
+                    , semanticModel
+                    , token
+                    , in diagnostics
+                    , in fieldAttributesInfo
+                    , in propertyAttributesInfo
+                    , diagnostic
+                );
+            }
+            else
+            {
+                // If the method is not a partial definition/implementation, just gather attributes from the method with no modifications
+                GatherForwardedAttributes(
+                      methodSymbol
+                    , semanticModel
+                    , token
+                    , in diagnostics
+                    , in fieldAttributesInfo
+                    , in propertyAttributesInfo
+                    , diagnostic
+                );
+            }
+
+            fieldAttributes = fieldAttributesInfo.ToImmutable();
+            propertyAttributes = propertyAttributesInfo.ToImmutable();
+
+            static void GatherForwardedAttributes(
+                  IMethodSymbol symbol
+                , SemanticModel semanticModel
+                , CancellationToken token
+                , in ImmutableArrayBuilder<DiagnosticInfo> diagnostics
+                , in ImmutableArrayBuilder<AttributeInfo> fieldAttributesInfo
+                , in ImmutableArrayBuilder<AttributeInfo> propertyAttributesInfo
+                , DiagnosticDescriptor diagnostic
+            )
+            {
+                // Get the single syntax reference for the input method symbol (there should be only one)
+                if (symbol.DeclaringSyntaxReferences.Length != 1
+                    || symbol.DeclaringSyntaxReferences[0] is not SyntaxReference syntaxReference
+                )
+                {
+                    return;
+                }
+
+                // Try to get the target method declaration syntax node
+                if (syntaxReference.GetSyntax(token) is not MethodDeclarationSyntax methodDeclaration)
+                {
+                    return;
+                }
+
+                // Gather explicit forwarded attributes info
+                foreach (AttributeListSyntax attributeList in methodDeclaration.AttributeLists)
+                {
+                    // Same as in the [ObservableProperty] generator, except we're also looking for fields here
+                    if (attributeList.Target == null
+                        || attributeList.Target.Identifier.Kind() is not (SyntaxKind.PropertyKeyword or SyntaxKind.FieldKeyword)
+                    )
+                    {
+                        continue;
+                    }
+
+                    foreach (AttributeSyntax attribute in attributeList.Attributes)
+                    {
+                        // Get the symbol info for the attribute (once again just like in the [ObservableProperty] generator)
+                        if (!semanticModel.GetSymbolInfo(attribute, token).TryGetAttributeTypeSymbol(out INamedTypeSymbol attributeTypeSymbol))
+                        {
+                            diagnostics.Add(diagnostic, attribute, symbol, attribute.Name);
+                            continue;
+                        }
+
+                        var attributeInfo = AttributeInfo.From(attributeTypeSymbol, semanticModel, attribute.ArgumentList?.Arguments ?? Enumerable.Empty<AttributeArgumentSyntax>(), token);
+
+                        // Add the new attribute info to the right builder
+                        if (attributeList.Target != null)
+                        {
+                            if (attributeList.Target.Identifier.IsKind(SyntaxKind.FieldKeyword))
+                            {
+                                fieldAttributesInfo.Add(attributeInfo);
+                            }
+                            else
+                            {
+                                propertyAttributesInfo.Add(attributeInfo);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gathers all forwarded attributes for the generated field and property.
+        /// </summary>
+        /// <param name="fieldSymbol">The input <see cref="IMethodSymbol"/> instance to process.</param>
+        /// <param name="semanticModel">The <see cref="SemanticModel"/> instance for the current run.</param>
+        /// <param name="token">The cancellation token for the current operation.</param>
+        /// <param name="diagnostics">The current collection of gathered diagnostics.</param>
+        /// <param name="fieldAttributes">The resulting field attributes to forward.</param>
+        /// <param name="propertyAttributes">The resulting property attributes to forward.</param>
+        public static void GatherForwardedAttributes(
+              this IFieldSymbol fieldSymbol
+            , SemanticModel semanticModel
+            , CancellationToken token
+            , in ImmutableArrayBuilder<DiagnosticInfo> diagnostics
+            , out ImmutableArray<AttributeInfo> propertyAttributes
+            , DiagnosticDescriptor diagnostic
+        )
+        {
+            using var propertyAttributesInfo = ImmutableArrayBuilder<AttributeInfo>.Rent();
+
+            GatherForwardedAttributes(
+                  fieldSymbol
+                , semanticModel
+                , token
+                , in diagnostics
+                , in propertyAttributesInfo
+                , diagnostic
+            );
+
+            propertyAttributes = propertyAttributesInfo.ToImmutable();
+
+            static void GatherForwardedAttributes(
+                  IFieldSymbol symbol
+                , SemanticModel semanticModel
+                , CancellationToken token
+                , in ImmutableArrayBuilder<DiagnosticInfo> diagnostics
+                , in ImmutableArrayBuilder<AttributeInfo> propertyAttributesInfo
+                , DiagnosticDescriptor diagnostic
+            )
+            {
+                // Get the single syntax reference for the input method symbol (there should be only one)
+                if (symbol.DeclaringSyntaxReferences.Length != 1
+                    || symbol.DeclaringSyntaxReferences[0] is not SyntaxReference syntaxReference
+                )
+                {
+                    return;
+                }
+
+                var syntax = syntaxReference.GetSyntax(token);
+
+                if (syntax.Parent?.Parent is not FieldDeclarationSyntax fieldDeclaration)
+                {
+                    return;
+                }
+
+                // Gather explicit forwarded attributes info
+                foreach (AttributeListSyntax attributeList in fieldDeclaration.AttributeLists)
+                {
+                    // Same as in the [ObservableProperty] generator, except we're also looking for fields here
+                    if (attributeList.Target == null
+                        || attributeList.Target.Identifier.Kind() is not SyntaxKind.PropertyKeyword
+                    )
+                    {
+                        continue;
+                    }
+
+                    foreach (AttributeSyntax attribute in attributeList.Attributes)
+                    {
+                        // Get the symbol info for the attribute (once again just like in the [ObservableProperty] generator)
+                        if (!semanticModel.GetSymbolInfo(attribute, token).TryGetAttributeTypeSymbol(out INamedTypeSymbol attributeTypeSymbol))
+                        {
+                            diagnostics.Add(diagnostic, attribute, symbol, attribute.Name);
+                            continue;
+                        }
+
+                        var attributeInfo = AttributeInfo.From(attributeTypeSymbol, semanticModel, attribute.ArgumentList?.Arguments ?? Enumerable.Empty<AttributeArgumentSyntax>(), token);
+
+                        // Add the new attribute info to the right builder
+                        if (attributeList.Target != null)
+                        {
+                            if (attributeList.Target.Identifier.IsKind(SyntaxKind.PropertyKeyword))
+                            {
+                                propertyAttributesInfo.Add(attributeInfo);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

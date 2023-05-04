@@ -10,12 +10,12 @@ namespace ZBase.Foundation.Mvvm
 {
     public partial class InternalUnionDeclaration
     {
-        public const string NAMESPACE = "ZBase.Foundation.Mvvm";
+        public const string COMPONENT_MODEL_NAMESPACE = "ZBase.Foundation.Mvvm.ComponentModel";
         public const string OBSERVABLE_PROPERTY = "ObservableProperty";
-        public const string OBSERVABLE_PROPERTY_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ObservablePropertyAttribute";
-        public const string RELAY_COMMAND_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.RelayCommandAttribute";
+        public const string OBSERVABLE_PROPERTY_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ComponentModel.ObservablePropertyAttribute";
+        public const string RELAY_COMMAND_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.Input.RelayCommandAttribute";
 
-        public List<TypeRef> Types { get; }
+        public ImmutableArray<TypeRef> TypeRefs { get; }
 
         public InternalUnionDeclaration(
               ImmutableArray<ClassDeclarationSyntax> candidates
@@ -23,8 +23,6 @@ namespace ZBase.Foundation.Mvvm
             , CancellationToken token
         )
         {
-            Types = new List<TypeRef>();
-
             var filtered = new Dictionary<string, TypeRef>();
 
             foreach (var candidate in candidates)
@@ -37,7 +35,7 @@ namespace ZBase.Foundation.Mvvm
                 {
                     if (memberSyntax is FieldDeclarationSyntax fieldSyntax)
                     {
-                        if (fieldSyntax.HasAttributeCandidate(NAMESPACE, OBSERVABLE_PROPERTY))
+                        if (fieldSyntax.HasAttributeCandidate(COMPONENT_MODEL_NAMESPACE, OBSERVABLE_PROPERTY))
                         {
                             var syntax = fieldSyntax.Declaration.Type;
                             var typeInfo = semanticModel.GetTypeInfo(syntax, token);
@@ -88,7 +86,10 @@ namespace ZBase.Foundation.Mvvm
                 }
             }
 
-            Types.AddRange(filtered.Values);
+            using var typeRefs = ImmutableArrayBuilder<TypeRef>.Rent();
+            typeRefs.AddRange(filtered.Values);
+
+            TypeRefs = typeRefs.ToImmutable();
         }
 
         public class TypeRef

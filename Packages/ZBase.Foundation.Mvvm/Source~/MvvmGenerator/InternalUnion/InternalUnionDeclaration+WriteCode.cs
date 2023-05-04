@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using ZBase.Foundation.SourceGen;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -28,7 +29,7 @@ namespace ZBase.Foundation.Mvvm
             , bool outputSourceGenFiles
         )
         {
-            foreach (var typeRef in Types)
+            foreach (var typeRef in TypeRefs)
             {
                 try
                 {
@@ -82,7 +83,7 @@ namespace ZBase.Foundation.Mvvm
             {
                 var syntaxTree = syntax.SyntaxTree;
                 var assemblyName = compilation.Assembly.Name;
-                var source = WriteInternalClass(Types, assemblyName);
+                var source = WriteInternalClass(TypeRefs, assemblyName);
                 var sourceFilePath = syntaxTree.GetGeneratedSourceFilePath(assemblyName, GENERATOR_NAME);
 
                 var outputSource = TypeCreationHelpers.GenerateSourceTextForRootNodes(
@@ -119,7 +120,7 @@ namespace ZBase.Foundation.Mvvm
             }
         }
 
-        private static string WriteInternalClass(List<TypeRef> types, string assemblyName)
+        private static string WriteInternalClass(ImmutableArray<TypeRef> types, string assemblyName)
         {
             var p = Printer.DefaultLarge;
 

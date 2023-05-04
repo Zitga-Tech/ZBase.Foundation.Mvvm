@@ -25,7 +25,7 @@ namespace ZBase.Foundation.Mvvm
 
             if (IsBaseBinder)
             {
-                p.PrintLine(": global::ZBase.Foundation.Mvvm.IBinder");
+                p.PrintLine(": global::ZBase.Foundation.Mvvm.ViewBinding.IBinder");
             }
 
             p = p.DecreasedIndent();
@@ -107,7 +107,7 @@ namespace ZBase.Foundation.Mvvm
 
             if (IsBaseBinder)
             {
-                p.PrintLine(": global::ZBase.Foundation.Mvvm.IBinder");
+                p.PrintLine(": global::ZBase.Foundation.Mvvm.ViewBinding.IBinder");
             }
 
             p = p.DecreasedIndent();
@@ -131,11 +131,11 @@ namespace ZBase.Foundation.Mvvm
 
         private void WriteBindingInfoAttributes(ref Printer p)
         {
-            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.BindingInfoAttribute({0}.{1}, typeof(global::ZBase.Foundation.Mvvm.Unions.Union))]";
+            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ViewBinding.BindingInfo({0}.{1}, typeof(global::ZBase.Foundation.Mvvm.Unions.Union))]";
 
             var className = Syntax.Identifier.Text;
 
-            foreach (var member in Members)
+            foreach (var member in MemberRefs)
             {
                 p.PrintLine(string.Format(ATTRIBUTE, className, ConstName(member)));
             }
@@ -145,10 +145,11 @@ namespace ZBase.Foundation.Mvvm
         {
             var className = Syntax.Identifier.Text;
 
-            foreach (var member in Members)
+            foreach (var member in MemberRefs)
             {
                 var name = member.Member.Name;
 
+                p.PrintLine($"/// <summary>The name of <see cref=\"{name}\"/></summary>");
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine($"public const string {ConstName(member)} = nameof({className}.{name});");
                 p.PrintEndLine();
@@ -159,7 +160,7 @@ namespace ZBase.Foundation.Mvvm
 
         private void WriteBindingFields(ref Printer p)
         {
-            foreach (var member in Members)
+            foreach (var member in MemberRefs)
             {
                 string readonlyKeyword;
 
@@ -184,8 +185,9 @@ namespace ZBase.Foundation.Mvvm
                     label = $"\"{member.Label}\"";
                 }
 
+                p.PrintLine($"/// <summary>The binding field for <see cref=\"{member.Member.Name}\"/></summary>");
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.BindingField {FieldName(member)} =  new global::ZBase.Foundation.Mvvm.BindingField() {{ Label = {label} }};");
+                p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.BindingField {FieldName(member)} =  new global::ZBase.Foundation.Mvvm.ViewBinding.BindingField() {{ Label = {label} }};");
                 p.PrintEndLine();
             }
 
@@ -194,7 +196,7 @@ namespace ZBase.Foundation.Mvvm
 
         private void WriteConverters(ref Printer p)
         {
-            foreach (var member in Members)
+            foreach (var member in MemberRefs)
             {
                 string readonlyKeyword;
 
@@ -219,8 +221,9 @@ namespace ZBase.Foundation.Mvvm
                     label = $"\"{member.Label}\"";
                 }
 
+                p.PrintLine($"/// <summary>The converter for the parameter of <see cref=\"{member.Member.Name}\"/></summary>");
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.Converter {ConverterName(member)} = new global::ZBase.Foundation.Mvvm.Converter() {{ Label = {label} }};");
+                p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.Conversion.Converter {ConverterName(member)} = new global::ZBase.Foundation.Mvvm.Conversion.Converter() {{ Label = {label} }};");
                 p.PrintEndLine();
             }
 
@@ -231,10 +234,14 @@ namespace ZBase.Foundation.Mvvm
         {
             var className = Syntax.Identifier.Text;
 
-            foreach (var member in Members)
+            foreach (var member in MemberRefs)
             {
+                p.PrintLine($"/// <summary>");
+                p.PrintLine($"/// The listener that binds <see cref=\"{member.Member.Name}\"/>");
+                p.PrintLine($"/// to the property chosen by {FieldName(member)}.");
+                p.PrintLine($"/// </summary>");
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"private readonly global::ZBase.Foundation.Mvvm.PropertyChangeEventListener<{className}> {ListenerName(member)};");
+                p.PrintLine($"private readonly global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener<{className}> {ListenerName(member)};");
                 p.PrintEndLine();
             }
 
@@ -246,26 +253,35 @@ namespace ZBase.Foundation.Mvvm
             var className = Syntax.Identifier.Text;
 
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-            p.PrintLine($"public {className}()");
+            p.PrintBeginLine().Print($"public {className}()");
+
+            if (IsBaseBinder)
+            {
+                p.Print(" : base()").PrintEndLine();
+            }
+
             p.OpenScope();
             {
-                foreach (var member in Members)
+                foreach (var member in MemberRefs)
                 {
                     var methodName = member.Member.Name;
 
-                    p.PrintLine($"this.{ListenerName(member)} = new global::ZBase.Foundation.Mvvm.PropertyChangeEventListener<{className}>(this)");
+                    p.PrintLine($"this.{ListenerName(member)} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener<{className}>(this)");
                     p.OpenScope();
                     p.PrintLine($"OnEventAction = (instance, args) => instance.{methodName}(this.{ConverterName(member)}.Convert(args.Value))");
                     p.CloseScope("};");
                     p.PrintEndLine();
                 }
 
-                p.PrintLine($"OnConstruct{className}();");
+                p.PrintLine($"OnConstructor();");
             }
             p.CloseScope();
             p.PrintEndLine();
-
-            p.PrintLine($"partial void OnConstruct{className}();");
+            
+            p.PrintLine($"/// <summary>Executes the logic at the end of the default constructor.</summary>");
+            p.PrintLine($"/// <remarks>This method is invoked at the end of the default constructor.</remarks>");
+            p.PrintLine(GENERATED_CODE);
+            p.PrintLine($"partial void OnConstructor();");
             p.PrintEndLine();
         }
 
@@ -284,10 +300,10 @@ namespace ZBase.Foundation.Mvvm
                     p.PrintEndLine();
                 }
 
-                p.PrintLine("if (this.DataContext.ViewModel is not global::ZBase.Foundation.Mvvm.INotifyPropertyChanged inpc) return;");
+                p.PrintLine("if (this.DataContext.ViewModel is not global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged inpc) return;");
                 p.PrintEndLine();
 
-                foreach (var member in Members)
+                foreach (var member in MemberRefs)
                 {
                     p.PrintLine($"inpc.PropertyChanged(this.{FieldName(member)}.ObservablePropertyName, this.{ListenerName(member)});");
                 }
@@ -312,7 +328,7 @@ namespace ZBase.Foundation.Mvvm
                     p.PrintEndLine();
                 }
 
-                foreach (var member in Members)
+                foreach (var member in MemberRefs)
                 {
                     p.PrintLine($"this.{ListenerName(member)}.Detach();");
                 }
@@ -337,13 +353,13 @@ namespace ZBase.Foundation.Mvvm
                     p.PrintEndLine();
                 }
 
-                p.PrintLine("if (this.DataContext.ViewModel is not global::ZBase.Foundation.Mvvm.INotifyPropertyChanged inpc) return false;");
+                p.PrintLine("if (this.DataContext.ViewModel is not global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged inpc) return false;");
                 p.PrintEndLine();
 
                 p.PrintLine("switch (bindingMethodName)");
                 p.OpenScope();
                 {
-                    foreach (var member in Members)
+                    foreach (var member in MemberRefs)
                     {
                         p.PrintLine($"case {ConstName(member)}:");
                         p.OpenScope();
