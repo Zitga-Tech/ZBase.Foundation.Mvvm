@@ -18,16 +18,16 @@
         /// <br/>
         /// See <see cref="ZBase.Foundation.Mvvm.ViewBinding.BindingField.PropertyName"/>
         /// </param>
-        bool SetPropertyName(string bindingField, string propertyName);
+        public bool SetPropertyName(string bindingField, string propertyName) => false;
 
         /// <summary>
         /// Start listening to events from the <see cref="DataContext"/>.
         /// </summary>
-        void StartListening();
+        public void StartListening() { }
 
         /// <summary>
         /// Stop listening to events from the <see cref="DataContext"/>.
         /// </summary>
-        void StopListening();
+        public void StopListening() { }
     }
 }

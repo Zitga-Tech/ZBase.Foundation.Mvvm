@@ -67,12 +67,12 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                     p.PrintLine("/// <inheritdoc/>");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public {keyword}bool BindPropertyTo(string propertyName, string bindingMethodName)");
+                    p.PrintLine($"public {keyword}bool SetPropertyName(string bindingField, string propertyName)");
                     p.OpenScope();
                     {
                         if (IsBaseBinder)
                         {
-                            p.PrintLine("return base.BindPropertyTo(propertyName, bindingMethodName);");
+                            p.PrintLine("return base.SetPropertyName(bindingField, propertyName);");
                         }
                         else
                         {
