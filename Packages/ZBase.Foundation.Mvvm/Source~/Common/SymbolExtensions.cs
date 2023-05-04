@@ -128,19 +128,14 @@ namespace ZBase.Foundation.SourceGen
             => symbol.ToDisplayString(QualifiedFormatWithoutGlobalPrefix);
 
         public static string ToValidIdentifier(this ITypeSymbol symbol)
-            => symbol.ToDisplayString(QualifiedFormatWithoutGlobalPrefix)
-                .Replace('.', '_')
-                .Replace('<', 'ᐸ')
-                .Replace('>', 'ᐳ')
-                .Replace("[]", "Array")
-                ;
+            => symbol.ToDisplayString(QualifiedFormatWithoutGlobalPrefix).ToValidIdentifier();
 
         public static bool ImplementsInterface(this ISymbol symbol, string interfaceName)
         {
             interfaceName = PrependGlobalIfMissing(interfaceName);
 
-            return symbol is ITypeSymbol typeSymbol &&
-                   typeSymbol.AllInterfaces.Any(i => i.ToFullName() == interfaceName || i.InheritsFromInterface(interfaceName));
+            return symbol is ITypeSymbol typeSymbol
+                && typeSymbol.AllInterfaces.Any(i => i.ToFullName() == interfaceName || i.InheritsFromInterface(interfaceName));
         }
 
         public static bool Is(this ITypeSymbol symbol, string nameSpace, string typeName, bool checkBaseType = true)

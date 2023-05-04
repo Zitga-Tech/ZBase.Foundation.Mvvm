@@ -175,7 +175,7 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
             p.PrintLine("#pragma warning disable");
             p.PrintEndLine();
 
-            p.PrintLine($"namespace ZBase.Foundation.Mvvm.Unions.__Generics.{assemblyName}");
+            p.PrintLine($"namespace ZBase.Foundation.Mvvm.Unions.__Generics.{assemblyName.ToValidIdentifier()}");
             p.OpenScope();
             {
                 p.PrintLine("/// <summary>");

@@ -16,6 +16,9 @@ namespace ZBase.Foundation.Mvvm
         public const string FIELD_PREFIX_UNDERSCORE = "_";
         public const string FIELD_PREFIX_M_UNDERSCORE = "m_";
 
+        public static bool IsValidCompilation(this Compilation compilation)
+            => string.Equals(compilation?.AssemblyName, "ZBase.Foundation.Mvvm") == false;
+
         public static bool IsClassSyntaxMatch(SyntaxNode syntaxNode , CancellationToken token)
         {
             token.ThrowIfCancellationRequested();

@@ -127,7 +127,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
             p.PrintLine("#pragma warning disable");
             p.PrintEndLine();
 
-            p.PrintLine($"namespace ZBase.Foundation.Mvvm.Unions.__Internal.{assemblyName}");
+            p.PrintLine($"namespace ZBase.Foundation.Mvvm.Unions.__Internal.{assemblyName.ToValidIdentifier()}");
             p.OpenScope();
             {
                 p.PrintLine("/// <summary>");
@@ -218,7 +218,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
             p.PrintLine("#pragma warning disable");
             p.PrintEndLine();
 
-            p.PrintLine($"namespace ZBase.Foundation.Mvvm.Unions.__Internal.{assemblyName}");
+            p.PrintLine($"namespace ZBase.Foundation.Mvvm.Unions.__Internal.{assemblyName.ToValidIdentifier()}");
             p.OpenScope();
             {
                 p.PrintLine("static partial class InternalUnions");

@@ -24,8 +24,10 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
                 transform: static (syntaxContext, token) => GeneratorHelpers.GetClassSemanticMatch(syntaxContext, token, INTERFACE)
             ).Where(static t => t is { });
 
-            var compilationProvider = context.CompilationProvider;
-            var combined = candidateProvider.Combine(compilationProvider).Combine(projectPathProvider);
+            var combined = candidateProvider
+                .Combine(context.CompilationProvider)
+                .Combine(projectPathProvider)
+                .Where(static t => t.Left.Right.IsValidCompilation());
 
             context.RegisterSourceOutput(combined, static (sourceProductionContext, source) => {
                 GenerateOutput(

@@ -21,15 +21,15 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
                 transform: static (syntaxContext, token) => GetStructSemanticMatch(syntaxContext, token)
             ).Where(static t => t is { });
 
-            var combined = context.CompilationProvider
-                .Combine(candidateProvider.Collect())
+            var combined = candidateProvider.Collect()
+                .Combine(context.CompilationProvider)
                 .Combine(projectPathProvider);
 
             context.RegisterSourceOutput(combined, static (sourceProductionContext, source) => {
                 GenerateOutput(
                     sourceProductionContext
-                    , source.Left.Left
                     , source.Left.Right
+                    , source.Left.Left
                     , source.Right.projectPath
                     , source.Right.outputSourceGenFiles
                 );
@@ -41,11 +41,12 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
             , CancellationToken token
         )
         {
-            if (context.Node is not StructDeclarationSyntax structSyntax
+            if (context.SemanticModel.Compilation.IsValidCompilation() == false
+                || context.Node is not StructDeclarationSyntax structSyntax
                 || structSyntax.BaseList == null
             )
             {
-                return default;
+                return null;
             }
 
             var semanticModel = context.SemanticModel;
@@ -79,7 +80,7 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
                 }
             }
 
-            return default;
+            return null;
 
             static bool TryGetMatchTypeArgument(ImmutableArray<INamedTypeSymbol> interfaces, out ITypeSymbol typeArgument)
             {

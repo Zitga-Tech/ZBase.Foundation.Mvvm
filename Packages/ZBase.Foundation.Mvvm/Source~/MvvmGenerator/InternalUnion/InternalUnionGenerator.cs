@@ -21,15 +21,15 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
                 transform: static (syntaxContext, token) => GetSemanticMatch(syntaxContext, token)
             ).Where(static t => t is { });
 
-            var combined = context.CompilationProvider
-                .Combine(candidateProvider.Collect())
+            var combined = candidateProvider.Collect()
+                .Combine(context.CompilationProvider)
                 .Combine(projectPathProvider);
 
             context.RegisterSourceOutput(combined, static (sourceProductionContext, source) => {
                 GenerateOutput(
                     sourceProductionContext
-                    , source.Left.Left
                     , source.Left.Right
+                    , source.Left.Left
                     , source.Right.projectPath
                     , source.Right.outputSourceGenFiles
                 );
@@ -74,6 +74,11 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
             , CancellationToken token
         )
         {
+            if (context.SemanticModel.Compilation.IsValidCompilation() == false)
+            {
+                return null;
+            }
+
             var semanticModel = context.SemanticModel;
 
             if (context.Node is FieldDeclarationSyntax field)
