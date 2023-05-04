@@ -10,42 +10,35 @@ namespace MvvmTest
     {
         public static void Main()
         {
+            var model = new Model();
+            var binder = new Binder();
 
+            binder.DataContext = model;
+            binder.SetPropertyName(Binder.BindingField_OnUpdate, Model.PropertyName_IntField);
+            binder.StartBinding();
+
+            while (true)
+            {
+                var key = Console.ReadKey();
+
+                if (key.Key == ConsoleKey.Spacebar)
+                {
+                    model.IntField += 1;
+                }
+                else
+                {
+                    break;
+                }
+            }
         }
     }
 
-    public partial class Model : IObservableObject
+    public partial class Model : IObservableObject, IDataContext
     {
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(Index))]
-        [property: Custom]
         private int _intField;
 
-        [ObservableProperty]
-        private TypeCode _typeCode;
-
-        public int Index { get; }
-
-        [RelayCommand]
-        [field: Custom2(typeof(int))]
-        [property: Custom2(typeof(int), AdditionType2 = typeof(float))]
-        private void Process(TypeCode code)
-        {
-
-        }
-    }
-
-    public partial struct UnionTypCode : IUnion<TypeCode> { }
-
-    [AttributeUsage(AttributeTargets.All)]
-    public sealed class CustomAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.All)]
-    public sealed class Custom2Attribute : Attribute
-    {
-        public Type AdditionType2 { get; set; }
-
-        public Custom2Attribute(Type type, Type additionType1 = null) { }
+        public IObservableObject ViewModel => this;
     }
 
     public partial class Binder : IBinder
@@ -53,12 +46,9 @@ namespace MvvmTest
         public IDataContext DataContext { get; set; }
 
         [Binding]
-        private void OnUpdate(in Union value) { }
-    }
-
-    public partial class XBinder : Binder
-    {
-        [Binding]
-        private void OnNewUpdate(in Union value) { }
+        private void OnUpdate(in Union value)
+        {
+            Console.WriteLine(value.Int);
+        }
     }
 }
