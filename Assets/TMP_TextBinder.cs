@@ -18,7 +18,7 @@ namespace MvvmTests
             _text = GetComponent<TMP_Text>();
         }
 
-        [Binding]
+        [Binding("Text Field", "Text Converter")]
         private void UpdateText(string value)
         {
             _text.text = value;

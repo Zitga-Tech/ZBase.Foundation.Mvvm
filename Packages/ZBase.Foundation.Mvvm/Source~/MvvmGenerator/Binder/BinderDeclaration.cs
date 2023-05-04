@@ -79,14 +79,28 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                             continue;
                         }
 
-                        var label = string.Empty;
+                        var bindingFieldLabel = "";
+                        var converterLabel = "";
+                        var args = attribute.ConstructorArguments;
 
-                        foreach (var kv in attribute.NamedArguments)
+                        for (var i = 0; i < args.Length; i++)
                         {
-                            if (kv.Key == "Label" && kv.Value.Value is string lbl)
+                            var arg = args[i];
+
+                            if (arg.Value is string label)
                             {
-                                label = lbl;
+                                if (i == 0)
+                                    bindingFieldLabel = label;
+                                else if (i == 1)
+                                    converterLabel = label;
                             }
+                        }
+
+                        if (string.IsNullOrEmpty(bindingFieldLabel) == false
+                            && string.IsNullOrEmpty(converterLabel)
+                        )
+                        {
+                            converterLabel = bindingFieldLabel;
                         }
 
                         var argumentType = parameter.Type;
@@ -94,7 +108,8 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                         memberRefs.Add(new MemberRef {
                             Member = method,
-                            Label = label,
+                            BindingFieldLabel = bindingFieldLabel,
+                            ConverterLabel = converterLabel,
                             NonUnionArgumentType = isNotUnion ? argumentType : null,
                         });
 
@@ -148,7 +163,9 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         {
             public IMethodSymbol Member { get; set; }
 
-            public string Label { get; set; }
+            public string BindingFieldLabel { get; set; }
+
+            public string ConverterLabel { get; set; }
 
             public ITypeSymbol NonUnionArgumentType { get; set; }
 

@@ -196,21 +196,22 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                 string label;
 
-                if (string.IsNullOrWhiteSpace(member.Label))
+                if (string.IsNullOrWhiteSpace(member.BindingFieldLabel))
                 {
                     label = ConstName(member);
                 }
                 else
                 {
-                    label = $"\"{member.Label}\"";
+                    label = $"\"{member.BindingFieldLabel}\"";
                 }
 
                 p.PrintLine($"/// <summary>The binding field for <see cref=\"{member.Member.Name}\"/></summary>");
                 p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
                 p.PrintLine("[global::UnityEngine.SerializeField]");
                 p.Print("#endif").PrintEndLine();
+                p.PrintLine($"[global::ZBase.Foundation.Mvvm.ViewBinding.FieldLabel({label})]");
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.BindingField {BindingFieldName(member)} =  new global::ZBase.Foundation.Mvvm.ViewBinding.BindingField() {{ Label = {label} }};");
+                p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.BindingField {BindingFieldName(member)} =  new global::ZBase.Foundation.Mvvm.ViewBinding.BindingField();");
                 p.PrintEndLine();
             }
 
@@ -239,21 +240,22 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                 string label;
 
-                if (string.IsNullOrWhiteSpace(member.Label))
+                if (string.IsNullOrWhiteSpace(member.ConverterLabel))
                 {
                     label = ConstName(member);
                 }
                 else
                 {
-                    label = $"\"{member.Label}\"";
+                    label = $"\"{member.ConverterLabel}\"";
                 }
 
                 p.PrintLine($"/// <summary>The converter for the parameter of <see cref=\"{member.Member.Name}\"/></summary>");
                 p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
                 p.PrintLine("[global::UnityEngine.SerializeReference]");
                 p.Print("#endif").PrintEndLine();
+                p.PrintLine($"[global::ZBase.Foundation.Mvvm.ViewBinding.FieldLabel({label})]");
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.Converter {ConverterName(member)} = new global::ZBase.Foundation.Mvvm.ViewBinding.Converter() {{ Label = {label} }};");
+                p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.Converter {ConverterName(member)} = new global::ZBase.Foundation.Mvvm.ViewBinding.Converter();");
                 p.PrintEndLine();
             }
 
