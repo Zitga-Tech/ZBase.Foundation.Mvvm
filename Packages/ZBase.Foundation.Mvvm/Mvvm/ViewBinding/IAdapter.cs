@@ -1,6 +1,6 @@
 ﻿using ZBase.Foundation.Mvvm.Unions;
 
-namespace ZBase.Foundation.Mvvm.Conversion
+namespace ZBase.Foundation.Mvvm.ViewBinding
 {
     public interface IAdapter
     {

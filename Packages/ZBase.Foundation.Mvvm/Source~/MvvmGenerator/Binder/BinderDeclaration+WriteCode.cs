@@ -8,6 +8,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.BinderGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
         private const string OBSOLETE_METHOD = "[global::System.Obsolete(\"This method is not intended to be use directly by user code.\")]";
+
         public string WriteCodeWithoutMember()
         {
             var scopePrinter = new SyntaxNodeScopePrinter(Printer.DefaultLarge, Syntax.Parent);
@@ -177,6 +178,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         {
             foreach (var member in MemberRefs)
             {
+                if (member.SkipBindingField)
+                {
+                    continue;
+                }
+
                 string readonlyKeyword;
 
                 if (ReferenceUnityEngine)
@@ -204,7 +210,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 p.PrintLine("[global::UnityEngine.SerializeField]");
                 p.Print("#endif").PrintEndLine();
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.BindingField {FieldName(member)} =  new global::ZBase.Foundation.Mvvm.ViewBinding.BindingField() {{ Label = {label} }};");
+                p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.BindingField {BindingFieldName(member)} =  new global::ZBase.Foundation.Mvvm.ViewBinding.BindingField() {{ Label = {label} }};");
                 p.PrintEndLine();
             }
 
@@ -215,6 +221,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         {
             foreach (var member in MemberRefs)
             {
+                if (member.SkipConverter)
+                {
+                    continue;
+                }
+
                 string readonlyKeyword;
 
                 if (ReferenceUnityEngine)
@@ -242,7 +253,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 p.PrintLine("[global::UnityEngine.SerializeReference]");
                 p.Print("#endif").PrintEndLine();
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.Conversion.Converter {ConverterName(member)} = new global::ZBase.Foundation.Mvvm.Conversion.Converter() {{ Label = {label} }};");
+                p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.Converter {ConverterName(member)} = new global::ZBase.Foundation.Mvvm.ViewBinding.Converter() {{ Label = {label} }};");
                 p.PrintEndLine();
             }
 
@@ -257,7 +268,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             {
                 p.PrintLine($"/// <summary>");
                 p.PrintLine($"/// The listener that binds <see cref=\"{member.Member.Name}\"/>");
-                p.PrintLine($"/// to the property chosen by {FieldName(member)}.");
+                p.PrintLine($"/// to the property chosen by {BindingFieldName(member)}.");
                 p.PrintLine($"/// </summary>");
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine($"private readonly global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener<{className}> {ListenerName(member)};");
@@ -340,7 +351,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                 foreach (var member in MemberRefs)
                 {
-                    p.PrintLine($"inpc.PropertyChanged(this.{FieldName(member)}.PropertyName, this.{ListenerName(member)});");
+                    p.PrintLine($"inpc.PropertyChanged(this.{BindingFieldName(member)}.PropertyName, this.{ListenerName(member)});");
                 }
             }
             p.CloseScope();
@@ -402,7 +413,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                         p.PrintLine($"case {ConstName(member)}:");
                         p.OpenScope();
                         {
-                            p.PrintLine($"this.{FieldName(member)}.PropertyName = propertyName;");
+                            p.PrintLine($"this.{BindingFieldName(member)}.PropertyName = propertyName;");
                             p.PrintLine("return true;");
                         }
                         p.CloseScope();
@@ -495,14 +506,14 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         private string ConstName(MemberRef member)
             => $"BindingField_{member.Member.Name}";
 
-        private string FieldName(MemberRef member)
-            => $"_field{member.Member.Name}";
+        private string BindingFieldName(MemberRef member)
+            => $"_bindingFieldFor{member.Member.Name}";
 
         private string ConverterName(MemberRef member)
-            => $"_converter{member.Member.Name}";
+            => $"_converterFor{member.Member.Name}";
 
         private string ListenerName(MemberRef member)
-            => $"_listener{member.Member.Name}";
+            => $"_listenerFor{member.Member.Name}";
 
         private string MethodName(MemberRef member)
         {

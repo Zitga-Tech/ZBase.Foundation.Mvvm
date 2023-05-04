@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using ZBase.Foundation.Mvvm.Unions;
 
-namespace ZBase.Foundation.Mvvm.Conversion
+namespace ZBase.Foundation.Mvvm.ViewBinding
 {
     [Serializable]
     public class Converter

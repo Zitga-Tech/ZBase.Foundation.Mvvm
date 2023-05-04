@@ -12,6 +12,8 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
     {
         public const string IBINDER_INTERFACE = "global::ZBase.Foundation.Mvvm.ViewBinding.IBinder";
         public const string BINDING_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ViewBinding.BindingAttribute";
+        public const string BINDING_FIELD = "global::ZBase.Foundation.Mvvm.ViewBinding.BindingField";
+        public const string CONVERTER = "global::ZBase.Foundation.Mvvm.ViewBinding.Converter";
         public const string UNION_TYPE = "global::ZBase.Foundation.Mvvm.Unions.Union";
         public const string MONO_BEHAVIOUR_TYPE = "global::UnityEngine.MonoBehaviour";
 
@@ -30,6 +32,9 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         public BinderDeclaration(ClassDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
         {
             using var memberRefs = ImmutableArrayBuilder<MemberRef>.Rent();
+
+            var bindingFields = new HashSet<string>();
+            var converters = new HashSet<string>();
 
             Syntax = candidate;
             Symbol = semanticModel.GetDeclaredSymbol(candidate, token);
@@ -56,56 +61,71 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
             foreach (var member in members)
             {
-                if (member is not IMethodSymbol method
-                    || method.Parameters.Length != 1
-                )
+                if (member is IMethodSymbol method)
                 {
-                    continue;
-                }
-
-                var parameter = method.Parameters[0];
-
-                if (parameter.RefKind is not (RefKind.None or RefKind.In))
-                {
-                    continue;
-                }
-
-                var attribute = method.GetAttribute(BINDING_ATTRIBUTE);
-                
-                if (attribute == null)
-                {
-                    continue;
-                }
-
-                var label = string.Empty;
-
-                foreach (var kv in attribute.NamedArguments)
-                {
-                    if (kv.Key == "Label" && kv.Value.Value is string lbl)
+                    if (method.Parameters.Length == 1)
                     {
-                        label = lbl;
+                        var parameter = method.Parameters[0];
+
+                        if (parameter.RefKind is not (RefKind.None or RefKind.In))
+                        {
+                            continue;
+                        }
+
+                        var attribute = method.GetAttribute(BINDING_ATTRIBUTE);
+
+                        if (attribute == null)
+                        {
+                            continue;
+                        }
+
+                        var label = string.Empty;
+
+                        foreach (var kv in attribute.NamedArguments)
+                        {
+                            if (kv.Key == "Label" && kv.Value.Value is string lbl)
+                            {
+                                label = lbl;
+                            }
+                        }
+
+                        var argumentType = parameter.Type;
+                        var isNotUnion = argumentType.ToFullName() != UNION_TYPE;
+
+                        memberRefs.Add(new MemberRef {
+                            Member = method,
+                            Label = label,
+                            NonUnionArgumentType = isNotUnion ? argumentType : null,
+                        });
+
+                        if (isNotUnion == false)
+                        {
+                            continue;
+                        }
+
+                        var typeName = argumentType.ToFullName();
+
+                        if (filtered.ContainsKey(typeName) == false)
+                        {
+                            filtered[typeName] = argumentType;
+                        }
                     }
-                }
 
-                var argumentType = parameter.Type;
-                var isNotUnion = argumentType.ToFullName() != UNION_TYPE;
-
-                memberRefs.Add(new MemberRef {
-                    Member = method,
-                    Label = label,
-                    NonUnionArgumentType = isNotUnion ? argumentType : null,
-                });
-
-                if (isNotUnion == false)
-                {
                     continue;
                 }
 
-                var typeName = argumentType.ToFullName();
-                
-                if (filtered.ContainsKey(typeName) == false)
+                if (member is IFieldSymbol field)
                 {
-                    filtered[typeName] = argumentType;
+                    var typeName = field.Type.ToFullName();
+                    
+                    if (typeName == BINDING_FIELD)
+                    {
+                        bindingFields.Add(field.Name);
+                    }
+                    else if (typeName == CONVERTER)
+                    {
+                        converters.Add(field.Name);
+                    }
                 }
             }
 
@@ -114,6 +134,14 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
             MemberRefs = memberRefs.ToImmutable();
             NonUnionTypes = nonUnionTypes.ToImmutable();
+
+            foreach (var memberRef in MemberRefs)
+            {
+                var bindingFieldName = BindingFieldName(memberRef);
+                var converterName = ConverterName(memberRef);
+                memberRef.SkipBindingField = bindingFields.Contains(bindingFieldName);
+                memberRef.SkipConverter = converters.Contains(converterName);
+            }
         }
 
         public class MemberRef
@@ -123,6 +151,10 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             public string Label { get; set; }
 
             public ITypeSymbol NonUnionArgumentType { get; set; }
+
+            public bool SkipBindingField { get; set; }
+
+            public bool SkipConverter { get; set; }
         }
     }
 }
