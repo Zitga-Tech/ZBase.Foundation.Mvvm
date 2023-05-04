@@ -39,12 +39,12 @@ namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
 
                     p.PrintLine("/// <inheritdoc/>");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public {keyword}void StartBinding()");
+                    p.PrintLine($"public {keyword}void StartListening()");
                     p.OpenScope();
                     {
                         if (IsBaseBinder)
                         {
-                            p.PrintLine("base.StartBinding();");
+                            p.PrintLine("base.StartListening();");
                         }
                     }
                     p.CloseScope();
@@ -53,12 +53,12 @@ namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
 
                     p.PrintLine("/// <inheritdoc/>");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public {keyword}void StopBinding()");
+                    p.PrintLine($"public {keyword}void StopListening()");
                     p.OpenScope();
                     {
                         if (IsBaseBinder)
                         {
-                            p.PrintLine("base.StopBinding();");
+                            p.PrintLine("base.StopListening();");
                         }
                     }
                     p.CloseScope();
@@ -126,9 +126,10 @@ namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
                 WriteBindingFields(ref p);
                 WriteConverters(ref p);
                 WriteListeners(ref p);
+                WriteFlags(ref p);
                 WriteConstructor(ref p);
-                WriteStartBindingMethod(ref p);
-                WriteStopBindingMethod(ref p);
+                WriteStartListeningMethod(ref p);
+                WriteStopListeningMethod(ref p);
                 WriteSetPropertyNameMethod(ref p);
 
                 if (NonUnionTypes.Length > 0)
@@ -266,6 +267,19 @@ namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
             p.PrintEndLine();
         }
 
+        private void WriteFlags(ref Printer p)
+        {
+            foreach (var member in MemberRefs)
+            {
+                p.PrintLine($"/// <summary>A flag indicates whether <see cref=\"{member.Member.Name}\"/> is listening.</summary>");
+                p.PrintLine(GENERATED_CODE);
+                p.PrintLine($"private bool {FlagName(member)};");
+                p.PrintEndLine();
+            }
+
+            p.PrintEndLine();
+        }
+
         private void WriteConstructor(ref Printer p)
         {
             var className = Syntax.Identifier.Text;
@@ -305,18 +319,18 @@ namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
             p.PrintEndLine();
         }
 
-        private void WriteStartBindingMethod(ref Printer p)
+        private void WriteStartListeningMethod(ref Printer p)
         {
             var keyword = IsBaseBinder ? "override " : Symbol.IsSealed ? "" : "virtual ";
 
             p.PrintLine("/// <inheritdoc/>");
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-            p.PrintLine($"public {keyword}void StartBinding()");
+            p.PrintLine($"public {keyword}void StartListening()");
             p.OpenScope();
             {
                 if (IsBaseBinder)
                 {
-                    p.PrintLine("base.StartBinding();");
+                    p.PrintLine("base.StartListening();");
                     p.PrintEndLine();
                 }
 
@@ -325,7 +339,15 @@ namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
 
                 foreach (var member in MemberRefs)
                 {
-                    p.PrintLine($"inpc.PropertyChanged(this.{FieldName(member)}.PropertyName, this.{ListenerName(member)});");
+                    var flagName = FlagName(member);
+
+                    p.PrintLine($"if (this.{flagName} == false)");
+                    p.OpenScope();
+                    {
+                        p.PrintLine($"inpc.PropertyChanged(this.{FieldName(member)}.PropertyName, this.{ListenerName(member)});");
+                        p.PrintLine($"this.{flagName} = true;");
+                    }
+                    p.CloseScope();
                 }
             }
             p.CloseScope();
@@ -333,24 +355,32 @@ namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
             p.PrintEndLine();
         }
 
-        private void WriteStopBindingMethod(ref Printer p)
+        private void WriteStopListeningMethod(ref Printer p)
         {
             var keyword = IsBaseBinder ? "override " : Symbol.IsSealed ? "" : "virtual ";
 
             p.PrintLine("/// <inheritdoc/>");
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-            p.PrintLine($"public {keyword}void StopBinding()");
+            p.PrintLine($"public {keyword}void StopListening()");
             p.OpenScope();
             {
                 if (IsBaseBinder)
                 {
-                    p.PrintLine("base.StopBinding();");
+                    p.PrintLine("base.StopListening();");
                     p.PrintEndLine();
                 }
 
                 foreach (var member in MemberRefs)
                 {
-                    p.PrintLine($"this.{ListenerName(member)}.Detach();");
+                    var flagName = FlagName(member);
+
+                    p.PrintLine($"if (this.{flagName})");
+                    p.OpenScope();
+                    {
+                        p.PrintLine($"this.{ListenerName(member)}.Detach();");
+                        p.PrintLine($"this.{flagName} = false;");
+                    }
+                    p.CloseScope();
                 }
             }
             p.CloseScope();
@@ -482,6 +512,9 @@ namespace ZBase.Foundation.Mvvm.BindingFieldSourceGen
 
         private string ListenerName(MemberRef member)
             => $"_listener{member.Member.Name}";
+
+        private string FlagName(MemberRef member)
+            => $"_is{member.Member.Name}Listening";
 
         private string MethodName(MemberRef member)
         {

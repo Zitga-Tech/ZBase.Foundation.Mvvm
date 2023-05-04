@@ -21,13 +21,13 @@
         bool SetPropertyName(string bindingField, string propertyName);
 
         /// <summary>
-        /// Start receiving events from the <see cref="DataContext"/>.
+        /// Start listening to events from the <see cref="DataContext"/>.
         /// </summary>
-        void StartBinding();
+        void StartListening();
 
         /// <summary>
-        /// Stop receiving any event from the <see cref="DataContext"/>.
+        /// Stop listening to events from the <see cref="DataContext"/>.
         /// </summary>
-        void StopBinding();
+        void StopListening();
     }
 }

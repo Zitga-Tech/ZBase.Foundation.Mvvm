@@ -13,19 +13,34 @@ namespace MvvmTest
 
             binder.DataContext = model;
             binder.SetPropertyName(Binder.BindingField_OnUpdate, Model.PropertyName_IntField);
-            binder.StartBinding();
+            binder.StartListening();
 
             while (true)
             {
                 var key = Console.ReadKey();
 
-                if (key.Key == ConsoleKey.Spacebar)
+                switch (key.Key)
                 {
-                    model.IntField += 1;
-                }
-                else
-                {
-                    break;
+                    case ConsoleKey.Spacebar:
+                    {
+                        model.IntField += 1;
+                        break;
+                    }
+
+                    case ConsoleKey.Enter:
+                    {
+                        binder.StartListening();
+                        break;
+                    }
+
+                    case ConsoleKey.Backspace:
+                    {
+                        binder.StopListening();
+                        break;
+                    }
+
+                    default:
+                        return;
                 }
             }
         }
