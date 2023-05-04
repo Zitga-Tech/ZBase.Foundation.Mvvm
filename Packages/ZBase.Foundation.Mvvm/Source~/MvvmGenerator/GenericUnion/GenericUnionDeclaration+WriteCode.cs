@@ -19,6 +19,7 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
         public const string UNION_TYPE_KIND = "global::ZBase.Foundation.Mvvm.Unions.UnionTypeKind";
         public const string DOES_NOT_RETURN = "[global::System.Diagnostics.CodeAnalysis.DoesNotReturn]";
         public const string RUNTIME_INITIALIZE_ON_LOAD_METHOD = "[global::UnityEngine.RuntimeInitializeOnLoadMethod(global::UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]";
+        public const string GENERATED_GENERIC_UNIONS = "[global::ZBase.Foundation.Mvvm.Unions.GeneratedGenericUnions]";
 
         public const string GENERATOR_NAME = nameof(GenericUnionDeclaration);
 
@@ -188,7 +189,7 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
                 p.PrintLine("/// to <see cref=\"ZBase.Foundation.Mvvm.Unions.UnionConverter\"/>.");
                 p.PrintLine("/// </remarks>");
                 p.Print("#endif").PrintEndLine();
-                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
+                p.PrintLine(GENERATED_GENERIC_UNIONS).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
                 p.PrintLine("public static partial class GenericUnions");
                 p.OpenScope();
                 {
