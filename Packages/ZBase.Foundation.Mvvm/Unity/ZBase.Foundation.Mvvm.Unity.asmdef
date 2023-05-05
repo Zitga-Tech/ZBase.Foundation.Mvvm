@@ -1,0 +1,23 @@
+{
+    "name": "ZBase.Foundation.Mvvm.Unity",
+    "rootNamespace": "",
+    "references": [
+        "ZBase.Foundation.Mvvm",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "",
+            "define": "UNITY_TEXT_MESH_PRO"
+        }
+    ],
+    "noEngineReferences": false
+}

@@ -2,23 +2,19 @@ using TMPro;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
-namespace MvvmTests
+namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     [RequireComponent(typeof(TMP_Text))]
-    public partial class TMP_TextBinder : MonoBehaviour, IBinder
+    public partial class TMP_TextBinder : MonoBinder
     {
         private TMP_Text _text;
 
-        public IObservableContext Context { get; private set; }
-
-        private void Awake()
+        protected override void OnAwake()
         {
-            Context = GetComponentInParent<IObservableContext>(true);
-
             _text = GetComponent<TMP_Text>();
         }
 
-        [Binding("Text Field", "Text Converter")]
+        [Binding("Text")]
         private void UpdateText(string value)
         {
             _text.text = value;

@@ -1,0 +1,19 @@
+{
+    "name": "ZBase.Foundation.Mvvm.Editor",
+    "rootNamespace": "ZBase.Foundation.Mvvm.Editor",
+    "references": [
+        "ZBase.Foundation.Mvvm",
+        "ZBase.Foundation.Mvvm.Unity"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
