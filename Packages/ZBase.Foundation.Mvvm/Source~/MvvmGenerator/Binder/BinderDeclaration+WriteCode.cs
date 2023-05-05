@@ -259,7 +259,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                 p.PrintLine($"/// <summary>The converter for the parameter of <see cref=\"{member.Member.Name}\"/></summary>");
                 p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
-                p.PrintLine("[global::UnityEngine.SerializeReference]");
+                p.PrintLine("[global::UnityEngine.SerializeField]");
                 p.Print("#endif").PrintEndLine();
 
                 foreach (var attribute in member.ForwardedFieldAttributes)
