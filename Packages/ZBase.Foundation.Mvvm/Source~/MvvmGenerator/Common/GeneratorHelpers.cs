@@ -12,12 +12,13 @@ namespace ZBase.Foundation.Mvvm
     {
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.InternalUnionGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
+        private const string DISABLE_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.SkipGeneratorForAssemblyAttribute";
 
         public const string FIELD_PREFIX_UNDERSCORE = "_";
         public const string FIELD_PREFIX_M_UNDERSCORE = "m_";
 
         public static bool IsValidCompilation(this Compilation compilation)
-            => string.Equals(compilation?.AssemblyName, "ZBase.Foundation.Mvvm") == false;
+            => compilation.Assembly.HasAttribute(DISABLE_ATTRIBUTE) == false;
 
         public static bool IsClassSyntaxMatch(SyntaxNode syntaxNode , CancellationToken token)
         {
