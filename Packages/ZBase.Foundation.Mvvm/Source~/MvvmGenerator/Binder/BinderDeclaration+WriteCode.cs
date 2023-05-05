@@ -8,6 +8,8 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.BinderGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
         private const string OBSOLETE_METHOD = "[global::System.Obsolete(\"This method is not intended to be use directly by user code.\")]";
+        private const string GENERATED_BINDING_FIELD = "[global::ZBase.Foundation.Mvvm.ViewBinding.GeneratedBindingField]";
+        private const string GENERATED_CONVERTER = "[global::ZBase.Foundation.Mvvm.ViewBinding.GeneratedConverter]";
 
         public string WriteCodeWithoutMember()
         {
@@ -216,7 +218,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 }
 
                 p.PrintLine($"[global::ZBase.Foundation.Mvvm.ViewBinding.FieldLabel({label})]");
-                p.PrintLine(GENERATED_CODE);
+                p.PrintLine(GENERATED_CODE).PrintLine(GENERATED_BINDING_FIELD);
                 p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.BindingField {BindingFieldName(member)} =  new global::ZBase.Foundation.Mvvm.ViewBinding.BindingField();");
                 p.PrintEndLine();
             }
@@ -266,7 +268,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 }
 
                 p.PrintLine($"[global::ZBase.Foundation.Mvvm.ViewBinding.FieldLabel({label})]");
-                p.PrintLine(GENERATED_CODE);
+                p.PrintLine(GENERATED_CODE).PrintLine(GENERATED_CONVERTER);
                 p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.Converter {ConverterName(member)} = new global::ZBase.Foundation.Mvvm.ViewBinding.Converter();");
                 p.PrintEndLine();
             }

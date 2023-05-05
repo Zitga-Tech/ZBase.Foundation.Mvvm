@@ -10,7 +10,9 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
         private const string AGGRESSIVE_INLINING = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]";
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.ObservablePropertyGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
-        private const string OBSERVABLE_PROPERTY = "[global::ZBase.Foundation.Mvvm.ComponentModel.GeneratedObservableProperty]";
+        private const string GENERATED_OBSERVABLE_PROPERTY = "[global::ZBase.Foundation.Mvvm.ComponentModel.GeneratedObservableProperty]";
+        private const string GENERATED_PROPERTY_CHANGING_HANDLER = "[global::ZBase.Foundation.Mvvm.ComponentModel.GeneratedPropertyChangingEventHandler]";
+        private const string GENERATED_PROPERTY_CHANGED_HANDLER = "[global::ZBase.Foundation.Mvvm.ComponentModel.GeneratedPropertyChangedEventHandler]";
 
         public string WriteCodeWithoutMember()
         {
@@ -180,11 +182,11 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
         {
             foreach (var member in MemberRefs)
             {
-                p.PrintLine(GENERATED_CODE);
+                p.PrintLine(GENERATED_CODE).PrintLine(GENERATED_PROPERTY_CHANGING_HANDLER);
                 p.PrintLine($"private event global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangingEventHandler {OnChangingEventName(member)};");
                 p.PrintEndLine();
 
-                p.PrintLine(GENERATED_CODE);
+                p.PrintLine(GENERATED_CODE).PrintLine(GENERATED_PROPERTY_CHANGED_HANDLER);
                 p.PrintLine($"private event global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangedEventHandler {OnChangedEventName(member)};");
                 p.PrintEndLine();
             }
@@ -201,7 +203,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
             foreach (var property in properties.Values)
             {
-                p.PrintLine(GENERATED_CODE);
+                p.PrintLine(GENERATED_CODE).PrintLine(GENERATED_PROPERTY_CHANGED_HANDLER);
                 p.PrintLine($"private event global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangedEventHandler {OnChangedEventName(property)};");
                 p.PrintEndLine();
             }
@@ -225,7 +227,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                     p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
                 }
 
-                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(OBSERVABLE_PROPERTY);
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(GENERATED_OBSERVABLE_PROPERTY);
                 p.PrintLine($"public {typeName} {propertyName}");
                 p.OpenScope();
                 {

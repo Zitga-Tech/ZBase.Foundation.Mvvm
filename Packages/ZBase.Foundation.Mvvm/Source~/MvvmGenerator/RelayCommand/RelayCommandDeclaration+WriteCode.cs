@@ -7,7 +7,7 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
     {
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.RelayCommandGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
-        private const string RELAY_COMMAND = "[global::ZBase.Foundation.Mvvm.Input.GeneratedRelayCommand]";
+        private const string GENERATED_RELAY_COMMAND = "[global::ZBase.Foundation.Mvvm.Input.GeneratedRelayCommand]";
 
         public string WriteCode()
         {
@@ -100,7 +100,7 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
                     p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
                 }
 
-                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(RELAY_COMMAND);
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(GENERATED_RELAY_COMMAND);
                 p.PrintLine($"public {interfaceName} {propertyName}");
                 p.OpenScope();
                 {
