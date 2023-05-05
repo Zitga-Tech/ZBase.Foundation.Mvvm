@@ -209,6 +209,12 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
                 p.PrintLine("[global::UnityEngine.SerializeField]");
                 p.Print("#endif").PrintEndLine();
+
+                foreach (var attribute in member.ForwardedFieldAttributes)
+                {
+                    p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
+                }
+
                 p.PrintLine($"[global::ZBase.Foundation.Mvvm.ViewBinding.FieldLabel({label})]");
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.BindingField {BindingFieldName(member)} =  new global::ZBase.Foundation.Mvvm.ViewBinding.BindingField();");
@@ -253,6 +259,12 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
                 p.PrintLine("[global::UnityEngine.SerializeReference]");
                 p.Print("#endif").PrintEndLine();
+
+                foreach (var attribute in member.ForwardedFieldAttributes)
+                {
+                    p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
+                }
+
                 p.PrintLine($"[global::ZBase.Foundation.Mvvm.ViewBinding.FieldLabel({label})]");
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.Converter {ConverterName(member)} = new global::ZBase.Foundation.Mvvm.ViewBinding.Converter();");

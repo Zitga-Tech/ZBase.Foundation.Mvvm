@@ -67,5 +67,21 @@ namespace ZBase.Foundation.Mvvm
         isEnabledByDefault: true,
         description: "All attributes targeting the generated field or property for a method annotated with [RelayCommand] must correctly be resolved to valid types.",
         helpLinkUri: "https://aka.ms/mvvmtoolkit/errors/mvvmtk0036");
+
+        /// <summary>
+        /// Gets a <see cref="DiagnosticDescriptor"/> indicating when a method with <c>[Binding]</c> is using an invalid attribute targeting the field.
+        /// <para>
+        /// Format: <c>"The method {0} annotated with [Binding] is using attribute "{1}" which was not recognized as a valid type (are you missing a using directive?)"</c>.
+        /// </para>
+        /// </summary>
+        public static readonly DiagnosticDescriptor InvalidFieldTargetedAttributeOnBindingMethod = new DiagnosticDescriptor(
+        id: "MVVMTK0037",
+        title: "Invalid field targeted attribute type",
+        messageFormat: "The method {0} annotated with [Binding] is using attribute \"{1}\" which was not recognized as a valid type (are you missing a using directive?)",
+        category: "BinderGenerator",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "All attributes targeting the generated field for a method annotated with [Binding] must correctly be resolved to valid types.",
+        helpLinkUri: "https://aka.ms/mvvmtoolkit/errors/mvvmtk0036");
     }
 }

@@ -32,6 +32,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         public BinderDeclaration(ClassDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
         {
             using var memberRefs = ImmutableArrayBuilder<MemberRef>.Rent();
+            using var diagnosticBuilder = ImmutableArrayBuilder<DiagnosticInfo>.Rent();
 
             var bindingFields = new HashSet<string>();
             var converters = new HashSet<string>();
@@ -156,6 +157,17 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 var converterName = ConverterName(memberRef);
                 memberRef.SkipBindingField = bindingFields.Contains(bindingFieldName);
                 memberRef.SkipConverter = converters.Contains(converterName);
+
+                memberRef.Member.GatherForwardedAttributes(
+                      semanticModel
+                    , token
+                    , diagnosticBuilder
+                    , out var fieldAttributes
+                    , out _
+                    , DiagnosticDescriptors.InvalidFieldTargetedAttributeOnBindingMethod
+                );
+
+                memberRef.ForwardedFieldAttributes = fieldAttributes;
             }
         }
 
@@ -172,6 +184,8 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             public bool SkipBindingField { get; set; }
 
             public bool SkipConverter { get; set; }
+
+            public ImmutableArray<AttributeInfo> ForwardedFieldAttributes { get; set; }
         }
     }
 }

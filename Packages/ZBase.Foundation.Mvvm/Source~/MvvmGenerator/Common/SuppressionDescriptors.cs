@@ -28,5 +28,14 @@ namespace ZBase.Foundation.Mvvm
             , suppressedDiagnosticId: "CS0657"
             , justification: "Methods using [RelayCommand] can use [field:] and [property:] attribute lists to forward attributes to the generated fields and properties"
         );
+
+        /// <summary>
+        /// Gets a <see cref="SuppressionDescriptor"/> for a method using [Binding] with an attribute list targeting a field or property.
+        /// </summary>
+        public static readonly SuppressionDescriptor FieldAttributeListForBindingMethod = new(
+              id: "MVVMTKSPR0003"
+            , suppressedDiagnosticId: "CS0657"
+            , justification: "Methods using [Binding] can use [field:] attribute lists to forward attributes to the generated fields"
+        );
     }
 }
