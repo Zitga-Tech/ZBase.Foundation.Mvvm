@@ -7,7 +7,7 @@
     /// <seealso cref="BindingAttribute"/>
     public interface IBinder
     {
-        IDataContext DataContext { get; }
+        IObservableContext Context { get; }
 
         /// <summary>
         /// Sets the property name to a binding field.
@@ -21,12 +21,12 @@
         public bool SetPropertyName(string bindingField, string propertyName) => false;
 
         /// <summary>
-        /// Start listening to events from the <see cref="DataContext"/>.
+        /// Start listening to events from the <see cref="Context"/>.
         /// </summary>
         public void StartListening() { }
 
         /// <summary>
-        /// Stop listening to events from the <see cref="DataContext"/>.
+        /// Stop listening to events from the <see cref="Context"/>.
         /// </summary>
         public void StopListening() { }
     }

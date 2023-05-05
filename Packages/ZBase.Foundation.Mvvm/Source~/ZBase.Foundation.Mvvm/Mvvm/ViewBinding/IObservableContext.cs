@@ -2,8 +2,8 @@
 
 namespace ZBase.Foundation.Mvvm.ViewBinding
 {
-    public interface IDataContext
+    public interface IObservableContext
     {
-        IObservableObject ViewModel { get; }
+        IObservableObject Target { get; }
     }
 }

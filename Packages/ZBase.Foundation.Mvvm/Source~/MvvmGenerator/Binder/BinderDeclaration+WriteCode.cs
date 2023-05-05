@@ -282,7 +282,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteFlags(ref Printer p)
         {
-            p.PrintLine($"/// <summary>A flag indicates whether this binder is listening to events from <see cref=\"DataContext\"/>.</summary>");
+            p.PrintLine($"/// <summary>A flag indicates whether this binder is listening to events from <see cref=\"Context\"/>.</summary>");
             p.PrintLine(GENERATED_CODE);
             p.PrintLine($"private bool _isListening;");
             p.PrintEndLine();
@@ -342,7 +342,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     p.PrintEndLine();
                 }
 
-                p.PrintLine("if (this.DataContext.ViewModel is not global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged inpc) return;");
+                p.PrintLine("if (this.Context.Target is not global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged inpc) return;");
                 p.PrintEndLine();
 
                 p.PrintLine($"if (this._isListening) return;");

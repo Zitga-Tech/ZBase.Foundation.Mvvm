@@ -8,14 +8,14 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace MvvmTests
 {
-    public class MvvmTest : MonoBehaviour, IDataContext
+    public class MvvmTest : MonoBehaviour, IObservableContext
     {
         private readonly TextModel _textModel = new TextModel();
 
         [SerializeField]
         private TMP_TextBinder _textBinder;
 
-        public IObservableObject ViewModel => _textModel;
+        public IObservableObject Target => _textModel;
 
         private void Awake()
         {

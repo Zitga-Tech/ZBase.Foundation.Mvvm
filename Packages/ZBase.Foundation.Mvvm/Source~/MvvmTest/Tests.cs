@@ -11,7 +11,7 @@ namespace MvvmTest
             var model = new Model();
             var binder = new Binder();
 
-            binder.DataContext = model;
+            binder.Context = model;
             binder.SetPropertyName(Binder.BindingField_OnUpdate, Model.PropertyName_IntField);
             binder.StartListening();
 
@@ -46,19 +46,19 @@ namespace MvvmTest
         }
     }
 
-    public partial class Model : IObservableObject, IDataContext
+    public partial class Model : IObservableObject, IObservableContext
     {
         [ObservableProperty]
         private int _intField;
 
         public TypeCode Type { get; }
 
-        public IObservableObject ViewModel => this;
+        public IObservableObject Target => this;
     }
 
     public partial class Binder : IBinder
     {
-        public IDataContext DataContext { get; set; }
+        public IObservableContext Context { get; set; }
 
         [Binding]
         private void OnUpdate(int value)

@@ -9,11 +9,11 @@ namespace MvvmTests
     {
         private TMP_Text _text;
 
-        public IDataContext DataContext { get; private set; }
+        public IObservableContext Context { get; private set; }
 
         private void Awake()
         {
-            DataContext = GetComponentInParent<IDataContext>(true);
+            Context = GetComponentInParent<IObservableContext>(true);
 
             _text = GetComponent<TMP_Text>();
         }
