@@ -7,14 +7,14 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     public sealed class MonoBindingContext : MonoBehaviour, IBindingContext
     {
-        [SerializeField]
+        [SerializeField, HideInInspector]
         internal ContextTargetKind _targetKind;
 
-        [SerializeField]
+        [SerializeField, HideInInspector]
         [SerializeReference]
         internal IObservableObject _targetSystemObject;
 
-        [SerializeField]
+        [SerializeField, HideInInspector]
         internal UnityEngine.Object _targetUnityObject;
 
         public IObservableObject Target { get; private set; }

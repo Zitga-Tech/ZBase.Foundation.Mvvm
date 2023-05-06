@@ -1,5 +1,8 @@
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ComponentModel;
+using ZBase.Foundation.Mvvm.Unity.ViewBinding;
+using ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders;
+using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace Mvvm.Samples
 {
@@ -9,6 +12,10 @@ namespace Mvvm.Samples
         private float _time;
 
         private bool _updating;
+
+        private void Awake()
+        {
+        }
 
         private void Update()
         {

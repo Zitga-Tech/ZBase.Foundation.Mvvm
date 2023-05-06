@@ -21,6 +21,8 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 return;
             }
 
+            EditorGUILayout.Space();
+
             var contextProp = this.serializedObject.FindProperty(nameof(MonoBinder._context));
 
             DrawContextField(this.serializedObject, contextProp, binder);
@@ -323,6 +325,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             GUIContent adapterLabel;
             string adapterFullName;
             Type adapterType;
+            AdapterUsingScriptableAdapter scriptableAdapter;
 
             if (adapterProp.managedReferenceValue is IAdapter adapter)
             {
@@ -336,12 +339,14 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 );
 
                 adapterFullName = adapterType.FullName;
+                scriptableAdapter = adapterProp.managedReferenceValue as AdapterUsingScriptableAdapter;
             }
             else
             {
                 adapterType = null;
                 adapterLabel = new GUIContent("< undefined >");
                 adapterFullName = "";
+                scriptableAdapter = null;
             }
 
             var attrib = fieldInfo.GetCustomAttribute<LabelAttribute>();
@@ -354,6 +359,17 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             if (GUILayout.Button(adapterLabel))
             {
                 DrawAdapterMenu(serializedBinder, binder, adapterProp, adapterTypes, adapterTypesIsEmpty, adapterType, adapterFullName);
+            }
+
+            if (scriptableAdapter != null)
+            {
+                EditorGUI.BeginChangeCheck();
+
+                var scriptableAdapterProp = adapterProp.FindPropertyRelative("_scriptableAdapter");
+                EditorGUILayout.PropertyField(scriptableAdapterProp, GUIContent.none, false);
+
+                serializedBinder.ApplyModifiedProperties();
+                EditorGUI.EndChangeCheck();
             }
 
             EditorGUILayout.EndHorizontal();
