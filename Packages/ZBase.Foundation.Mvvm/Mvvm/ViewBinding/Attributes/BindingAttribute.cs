@@ -5,7 +5,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
     public sealed class BindingAttribute : Attribute
     {
-        public string BindingFieldLabel { get; }
+        public string BindingLabel { get; }
 
         public string ConverterLabel { get; }
 
@@ -13,13 +13,13 @@ namespace ZBase.Foundation.Mvvm.ViewBinding
 
         public BindingAttribute(string label)
         {
-            BindingFieldLabel = label;
+            BindingLabel = label;
             ConverterLabel = label;
         }
 
-        public BindingAttribute(string bindingFieldLabel, string converterLabel)
+        public BindingAttribute(string bindingLabel, string converterLabel)
         {
-            BindingFieldLabel = bindingFieldLabel;
+            BindingLabel = bindingLabel;
             ConverterLabel = converterLabel;
         }
     }

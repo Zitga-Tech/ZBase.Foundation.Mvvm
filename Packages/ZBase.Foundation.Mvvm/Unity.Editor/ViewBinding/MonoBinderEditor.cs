@@ -37,7 +37,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             var target = GetContextTarget(targetKindProp, systemObjectProp, unityObjectProp);
             DrawContextTarget(target);
-            DrawBindingFields(this.serializedObject, contextProp, binder, target);
+            DrawBindingProperties(this.serializedObject, contextProp, binder, target);
             DrawConverters(this.serializedObject, contextProp, binder);
         }
 
@@ -129,7 +129,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             );
         }
 
-        private static void DrawBindingFields(
+        private static void DrawBindingProperties(
               SerializedObject serializedBinder
             , SerializedProperty contextProp
             , MonoBinder binder
@@ -142,14 +142,14 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
 
             var type = binder.GetType();
-            var fieldInfos = TypeCache.GetFieldsWithAttribute<GeneratedBindingFieldAttribute>()
+            var fieldInfos = TypeCache.GetFieldsWithAttribute<GeneratedBindingPropertyAttribute>()
                 .Where(x => x.DeclaringType == type);
 
-            EditorGUILayout.LabelField("Binding Fields", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Binding Properties", EditorStyles.boldLabel);
             EditorGUILayout.BeginVertical(GUI.skin.box);
 
             EditorGUILayout.HelpBox(
-                $"Select property on {target.GetType().Name} to bind to each binding field."
+                $"Select a target property on {target.GetType().Name} to bind."
                 , MessageType.None
             );
 
@@ -157,13 +157,13 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             foreach (var fieldInfo in fieldInfos)
             {
-                DrawBindingField(serializedBinder, binder, target, fieldInfo);
+                DrawBindingProperty(serializedBinder, binder, target, fieldInfo);
             }
 
             EditorGUILayout.EndVertical();
         }
 
-        private static void DrawBindingField(
+        private static void DrawBindingProperty(
               SerializedObject serializedBinder
             , MonoBinder binder
             , IObservableObject target
@@ -171,12 +171,12 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         )
         {
             var binderProp = serializedBinder.FindProperty(fieldInfo.Name);
-            var propertyNameProp = binderProp.FindPropertyRelative("<PropertyName>k__BackingField");
+            var propertyNameProp = binderProp.FindPropertyRelative("<TargetPropertyName>k__BackingField");
             var propertyName = string.IsNullOrWhiteSpace(propertyNameProp.stringValue)
                 ? "< undefined >"
                 : propertyNameProp.stringValue;
 
-            var attrib = fieldInfo.GetCustomAttribute<FieldLabelAttribute>();
+            var attrib = fieldInfo.GetCustomAttribute<LabelAttribute>();
             var label = attrib != null ? attrib.Value : ObjectNames.NicifyVariableName(fieldInfo.Name);
 
             EditorGUILayout.BeginHorizontal();
@@ -185,13 +185,13 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             if (GUILayout.Button(propertyName))
             {
-                DrawBindingFieldMenu(serializedBinder, binder, propertyNameProp, target, propertyName);
+                DrawBindingPropertyMenu(serializedBinder, binder, propertyNameProp, target, propertyName);
             }
 
             EditorGUILayout.EndHorizontal();
         }
 
-        private static void DrawBindingFieldMenu(
+        private static void DrawBindingPropertyMenu(
               SerializedObject serializedBinder
             , MonoBinder binder
             , SerializedProperty propertyNameProp
@@ -209,7 +209,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 menu.AddItem(
                       new GUIContent($"{attribute.PropertyName} : {attribute.PropertyType.Name}")
                     , propertyName == attribute.PropertyName
-                    , x => SetBindingFieldPropertyName(serializedBinder, binder, propertyNameProp, (string)x)
+                    , x => SetBindingPropertyName(serializedBinder, binder, propertyNameProp, (string)x)
                     , attribute.PropertyName
                 );
 
@@ -224,7 +224,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             menu.ShowAsContext();
         }
 
-        private static void SetBindingFieldPropertyName(
+        private static void SetBindingPropertyName(
               SerializedObject serializedBinder
             , MonoBinder binder
             , SerializedProperty propertyNameProp
@@ -259,7 +259,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             EditorGUILayout.BeginVertical(GUI.skin.box);
 
             EditorGUILayout.HelpBox(
-                $"Select an IAdapter to convert the data transferred to and from each binding field."
+                $"Select an IAdapter to convert the data transferred from the source property."
                 , MessageType.None
             );
 
@@ -294,7 +294,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 adapterName = "< undefined >";
             }
 
-            var attrib = fieldInfo.GetCustomAttribute<FieldLabelAttribute>();
+            var attrib = fieldInfo.GetCustomAttribute<LabelAttribute>();
             var label = attrib != null ? attrib.Value : ObjectNames.NicifyVariableName(fieldInfo.Name);
 
             EditorGUILayout.BeginHorizontal();

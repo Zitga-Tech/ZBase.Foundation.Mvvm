@@ -24,7 +24,7 @@ namespace ZBase.Foundation.Mvvm.Tests
             {
                 var type = binder.GetType();
 
-                var fields = TypeCache.GetFieldsWithAttribute<GeneratedBindingFieldAttribute>()
+                var fields = TypeCache.GetFieldsWithAttribute<GeneratedBindingPropertyAttribute>()
                     .Where(x => x.DeclaringType == type);
 
                 var count = fields.Count();
@@ -45,7 +45,7 @@ namespace ZBase.Foundation.Mvvm.Tests
                 var type = binder.GetType();
 
                 var fields = type.GetFields()
-                    .Where(x => x.GetCustomAttribute<GeneratedBindingFieldAttribute>() != null);
+                    .Where(x => x.GetCustomAttribute<GeneratedBindingPropertyAttribute>() != null);
 
                 var count = fields.Count();
             }

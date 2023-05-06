@@ -10,15 +10,15 @@
         IBindingContext Context { get; }
 
         /// <summary>
-        /// Sets the property name to a binding field.
+        /// Sets target property name to a binding property.
         /// </summary>
-        /// <param name="bindingField">The binding field whose <see cref="BindingField.PropertyName"/> will be set.</param>
-        /// <param name="propertyName">
+        /// <param name="bindingPropertyName">The binding property whose <see cref="BindingProperty.TargetPropertyName"/> will be set.</param>
+        /// <param name="targetPropertyName">
         /// The property whose container class is an <see cref="ZBase.Foundation.Mvvm.ComponentModel.IObservableObject"/>.
         /// <br/>
-        /// See <see cref="ZBase.Foundation.Mvvm.ViewBinding.BindingField.PropertyName"/>
+        /// See <see cref="ZBase.Foundation.Mvvm.ViewBinding.BindingProperty.TargetPropertyName"/>
         /// </param>
-        public bool SetPropertyName(string bindingField, string propertyName) => false;
+        public bool SetTargetPropertyName(string bindingPropertyName, string targetPropertyName) => false;
 
         /// <summary>
         /// Start listening to events from the <see cref="Context"/>.

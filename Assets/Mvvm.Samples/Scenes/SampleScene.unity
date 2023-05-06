@@ -731,7 +731,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _context: {fileID: 606846926}
   _bindingFieldForUpdateText:
-    <PropertyName>k__BackingField: Text
+    <TargetPropertyName>k__BackingField: Text
   _converterForUpdateText:
     <Adapter>k__BackingField:
       rid: -2

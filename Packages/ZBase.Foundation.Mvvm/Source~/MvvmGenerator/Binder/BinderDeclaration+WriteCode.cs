@@ -8,7 +8,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.BinderGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
         private const string OBSOLETE_METHOD = "[global::System.Obsolete(\"This method is not intended to be use directly by user code.\")]";
-        private const string GENERATED_BINDING_FIELD = "[global::ZBase.Foundation.Mvvm.ViewBinding.GeneratedBindingField]";
+        private const string GENERATED_BINDING_PROPERTY = "[global::ZBase.Foundation.Mvvm.ViewBinding.GeneratedBindingProperty]";
         private const string GENERATED_CONVERTER = "[global::ZBase.Foundation.Mvvm.ViewBinding.GeneratedConverter]";
 
         public string WriteCodeWithoutMember()
@@ -70,12 +70,12 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                     p.PrintLine("/// <inheritdoc/>");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public {keyword}bool SetPropertyName(string bindingField, string propertyName)");
+                    p.PrintLine($"public {keyword}bool SetTargetPropertyName(string bindingPropertyName, string targetPropertyName)");
                     p.OpenScope();
                     {
                         if (IsBaseBinder)
                         {
-                            p.PrintLine("return base.SetPropertyName(bindingField, propertyName);");
+                            p.PrintLine("return base.SetTargetPropertyName(bindingPropertyName, targetPropertyName);");
                         }
                         else
                         {
@@ -126,14 +126,14 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 }
 
                 WriteConstantFields(ref p);
-                WriteBindingFields(ref p);
+                WriteBindingProperties(ref p);
                 WriteConverters(ref p);
                 WriteListeners(ref p);
                 WriteFlags(ref p);
                 WriteConstructor(ref p);
                 WriteStartListeningMethod(ref p);
                 WriteStopListeningMethod(ref p);
-                WriteSetPropertyNameMethod(ref p);
+                WriteSetTargetPropertyNameMethod(ref p);
 
                 if (NonUnionTypes.Length > 0)
                 {
@@ -176,11 +176,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             p.PrintEndLine();
         }
 
-        private void WriteBindingFields(ref Printer p)
+        private void WriteBindingProperties(ref Printer p)
         {
             foreach (var member in MemberRefs)
             {
-                if (member.SkipBindingField)
+                if (member.SkipBindingProperty)
                 {
                     continue;
                 }
@@ -198,16 +198,16 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                 string label;
 
-                if (string.IsNullOrWhiteSpace(member.BindingFieldLabel))
+                if (string.IsNullOrWhiteSpace(member.BindingPropertyLabel))
                 {
                     label = ConstName(member);
                 }
                 else
                 {
-                    label = $"\"{member.BindingFieldLabel}\"";
+                    label = $"\"{member.BindingPropertyLabel}\"";
                 }
 
-                p.PrintLine($"/// <summary>The binding field for <see cref=\"{member.Member.Name}\"/></summary>");
+                p.PrintLine($"/// <summary>The binding property for <see cref=\"{member.Member.Name}\"/></summary>");
                 p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
                 p.PrintLine("[global::UnityEngine.SerializeField]");
                 p.Print("#endif").PrintEndLine();
@@ -217,9 +217,9 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
                 }
 
-                p.PrintLine($"[global::ZBase.Foundation.Mvvm.ViewBinding.FieldLabel({label})]");
-                p.PrintLine(GENERATED_CODE).PrintLine(GENERATED_BINDING_FIELD);
-                p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.BindingField {BindingFieldName(member)} =  new global::ZBase.Foundation.Mvvm.ViewBinding.BindingField();");
+                p.PrintLine($"[global::ZBase.Foundation.Mvvm.ViewBinding.Label({label})]");
+                p.PrintLine(GENERATED_CODE).PrintLine(GENERATED_BINDING_PROPERTY);
+                p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.BindingProperty {BindingPropertyName(member)} =  new global::ZBase.Foundation.Mvvm.ViewBinding.BindingProperty();");
                 p.PrintEndLine();
             }
 
@@ -267,7 +267,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
                 }
 
-                p.PrintLine($"[global::ZBase.Foundation.Mvvm.ViewBinding.FieldLabel({label})]");
+                p.PrintLine($"[global::ZBase.Foundation.Mvvm.ViewBinding.Label({label})]");
                 p.PrintLine(GENERATED_CODE).PrintLine(GENERATED_CONVERTER);
                 p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.Converter {ConverterName(member)} = new global::ZBase.Foundation.Mvvm.ViewBinding.Converter();");
                 p.PrintEndLine();
@@ -284,7 +284,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             {
                 p.PrintLine($"/// <summary>");
                 p.PrintLine($"/// The listener that binds <see cref=\"{member.Member.Name}\"/>");
-                p.PrintLine($"/// to the property chosen by {BindingFieldName(member)}.");
+                p.PrintLine($"/// to the property chosen by {BindingPropertyName(member)}.");
                 p.PrintLine($"/// </summary>");
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine($"private readonly global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener<{className}> {ListenerName(member)};");
@@ -367,7 +367,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                 foreach (var member in MemberRefs)
                 {
-                    p.PrintLine($"inpc.PropertyChanged(this.{BindingFieldName(member)}.PropertyName, this.{ListenerName(member)});");
+                    p.PrintLine($"inpc.PropertyChanged(this.{BindingPropertyName(member)}.TargetPropertyName, this.{ListenerName(member)});");
                 }
             }
             p.CloseScope();
@@ -406,22 +406,22 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             p.PrintEndLine();
         }
 
-        private void WriteSetPropertyNameMethod(ref Printer p)
+        private void WriteSetTargetPropertyNameMethod(ref Printer p)
         {
             var keyword = IsBaseBinder ? "override " : Symbol.IsSealed ? "" : "virtual ";
 
             p.PrintLine("/// <inheritdoc/>");
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-            p.PrintLine($"public {keyword}bool SetPropertyName(string bindingField, string propertyName)");
+            p.PrintLine($"public {keyword}bool SetTargetPropertyName(string bindingPropertyName, string targetPropertyName)");
             p.OpenScope();
             {
                 if (IsBaseBinder)
                 {
-                    p.PrintLine("if (base.SetPropertyName(bindingField, propertyName)) return true;");
+                    p.PrintLine("if (base.SetTargetPropertyName(bindingPropertyName, targetPropertyName)) return true;");
                     p.PrintEndLine();
                 }
 
-                p.PrintLine("switch (bindingField)");
+                p.PrintLine("switch (bindingPropertyName)");
                 p.OpenScope();
                 {
                     foreach (var member in MemberRefs)
@@ -429,7 +429,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                         p.PrintLine($"case {ConstName(member)}:");
                         p.OpenScope();
                         {
-                            p.PrintLine($"this.{BindingFieldName(member)}.PropertyName = propertyName;");
+                            p.PrintLine($"this.{BindingPropertyName(member)}.TargetPropertyName = targetPropertyName;");
                             p.PrintLine("return true;");
                         }
                         p.CloseScope();
@@ -520,9 +520,9 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         }
 
         private string ConstName(MemberRef member)
-            => $"BindingField_{member.Member.Name}";
+            => $"BindingProperty_{member.Member.Name}";
 
-        private string BindingFieldName(MemberRef member)
+        private string BindingPropertyName(MemberRef member)
             => $"_bindingFieldFor{member.Member.Name}";
 
         private string ConverterName(MemberRef member)

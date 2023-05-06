@@ -12,7 +12,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
     {
         public const string IBINDER_INTERFACE = "global::ZBase.Foundation.Mvvm.ViewBinding.IBinder";
         public const string BINDING_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ViewBinding.BindingAttribute";
-        public const string BINDING_FIELD = "global::ZBase.Foundation.Mvvm.ViewBinding.BindingField";
+        public const string BINDING_PROPERTY = "global::ZBase.Foundation.Mvvm.ViewBinding.BindingProperty";
         public const string CONVERTER = "global::ZBase.Foundation.Mvvm.ViewBinding.Converter";
         public const string UNION_TYPE = "global::ZBase.Foundation.Mvvm.Unions.Union";
         public const string MONO_BEHAVIOUR_TYPE = "global::UnityEngine.MonoBehaviour";
@@ -34,8 +34,8 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             using var memberRefs = ImmutableArrayBuilder<MemberRef>.Rent();
             using var diagnosticBuilder = ImmutableArrayBuilder<DiagnosticInfo>.Rent();
 
-            var bindingFields = new HashSet<string>();
-            var converters = new HashSet<string>();
+            var bindingPropNames = new HashSet<string>();
+            var converterNames = new HashSet<string>();
 
             Syntax = candidate;
             Symbol = semanticModel.GetDeclaredSymbol(candidate, token);
@@ -80,7 +80,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                             continue;
                         }
 
-                        var bindingFieldLabel = "";
+                        var bindingPropLabel = "";
                         var converterLabel = "";
                         var args = attribute.ConstructorArguments;
 
@@ -91,17 +91,17 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                             if (arg.Value is string label)
                             {
                                 if (i == 0)
-                                    bindingFieldLabel = label;
+                                    bindingPropLabel = label;
                                 else if (i == 1)
                                     converterLabel = label;
                             }
                         }
 
-                        if (string.IsNullOrEmpty(bindingFieldLabel) == false
+                        if (string.IsNullOrEmpty(bindingPropLabel) == false
                             && string.IsNullOrEmpty(converterLabel)
                         )
                         {
-                            converterLabel = bindingFieldLabel;
+                            converterLabel = bindingPropLabel;
                         }
 
                         var argumentType = parameter.Type;
@@ -109,7 +109,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                         memberRefs.Add(new MemberRef {
                             Member = method,
-                            BindingFieldLabel = bindingFieldLabel,
+                            BindingPropertyLabel = bindingPropLabel,
                             ConverterLabel = converterLabel,
                             NonUnionArgumentType = isNotUnion ? argumentType : null,
                         });
@@ -134,13 +134,13 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 {
                     var typeName = field.Type.ToFullName();
                     
-                    if (typeName == BINDING_FIELD)
+                    if (typeName == BINDING_PROPERTY)
                     {
-                        bindingFields.Add(field.Name);
+                        bindingPropNames.Add(field.Name);
                     }
                     else if (typeName == CONVERTER)
                     {
-                        converters.Add(field.Name);
+                        converterNames.Add(field.Name);
                     }
                 }
             }
@@ -153,10 +153,10 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
             foreach (var memberRef in MemberRefs)
             {
-                var bindingFieldName = BindingFieldName(memberRef);
+                var bindingPropName = BindingPropertyName(memberRef);
                 var converterName = ConverterName(memberRef);
-                memberRef.SkipBindingField = bindingFields.Contains(bindingFieldName);
-                memberRef.SkipConverter = converters.Contains(converterName);
+                memberRef.SkipBindingProperty = bindingPropNames.Contains(bindingPropName);
+                memberRef.SkipConverter = converterNames.Contains(converterName);
 
                 memberRef.Member.GatherForwardedAttributes(
                       semanticModel
@@ -175,13 +175,13 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         {
             public IMethodSymbol Member { get; set; }
 
-            public string BindingFieldLabel { get; set; }
+            public string BindingPropertyLabel { get; set; }
 
             public string ConverterLabel { get; set; }
 
             public ITypeSymbol NonUnionArgumentType { get; set; }
 
-            public bool SkipBindingField { get; set; }
+            public bool SkipBindingProperty { get; set; }
 
             public bool SkipConverter { get; set; }
 
