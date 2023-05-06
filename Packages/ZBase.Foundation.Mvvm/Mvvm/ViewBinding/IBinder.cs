@@ -7,7 +7,7 @@
     /// <seealso cref="BindingAttribute"/>
     public interface IBinder
     {
-        IObservableContext Context { get; }
+        IBindingContext Context { get; }
 
         /// <summary>
         /// Sets the property name to a binding field.

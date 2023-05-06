@@ -2,7 +2,7 @@
 
 namespace ZBase.Foundation.Mvvm.ViewBinding
 {
-    public interface IObservableContext
+    public interface IBindingContext
     {
         IObservableObject Target { get; }
     }

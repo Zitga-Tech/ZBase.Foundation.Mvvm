@@ -54,7 +54,7 @@ namespace ZBase.Foundation.Mvvm.Tests
 
     public partial class CustomBinder : IBinder
     {
-        public IObservableContext Context { get; set; }
+        public IBindingContext Context { get; set; }
 
         [Binding]
         private void OnUpdate(int _) { }

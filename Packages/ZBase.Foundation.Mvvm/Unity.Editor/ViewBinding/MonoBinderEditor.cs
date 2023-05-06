@@ -25,7 +25,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             DrawContextField(this.serializedObject, contextProp, binder);
             DrawFindNearestButton(this.serializedObject, contextProp, binder);
 
-            if (contextProp.objectReferenceValue is not IObservableContext)
+            if (contextProp.objectReferenceValue is not IBindingContext)
             {
                 return;
             }
@@ -68,7 +68,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             , MonoBinder binder
         )
         {
-            if (serializedProperty.objectReferenceValue is IObservableContext)
+            if (serializedProperty.objectReferenceValue is IBindingContext)
             {
                 return;
             }
@@ -76,7 +76,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             if (serializedProperty.objectReferenceValue)
             {
                 EditorGUILayout.HelpBox(
-                    $"The component {serializedProperty.objectReferenceValue.GetType()} does not implement {typeof(IObservableContext)}."
+                    $"The component {serializedProperty.objectReferenceValue.GetType()} does not implement {typeof(IBindingContext)}."
                     , MessageType.Error
                 );
             }
@@ -136,7 +136,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             , IObservableObject target
         )
         {
-            if (contextProp.objectReferenceValue is not IObservableContext)
+            if (contextProp.objectReferenceValue is not IBindingContext)
             {
                 return;
             }
@@ -246,7 +246,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             , MonoBinder binder
         )
         {
-            if (contextProp.objectReferenceValue is not IObservableContext)
+            if (contextProp.objectReferenceValue is not IBindingContext)
             {
                 return;
             }
@@ -377,7 +377,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 return input;
             }
 
-            var components = input.gameObject.GetComponents<IObservableContext>();
+            var components = input.gameObject.GetComponents<IBindingContext>();
 
             if (components == null || components.Length < 1)
                 return input;
@@ -388,7 +388,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         private Component FindNearestContext(GameObject go)
         {
             var parent = go.transform;
-            var components = new List<IObservableContext>();
+            var components = new List<IBindingContext>();
 
             while (parent)
             {

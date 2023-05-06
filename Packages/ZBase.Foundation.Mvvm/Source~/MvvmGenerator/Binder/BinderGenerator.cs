@@ -110,9 +110,9 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         }
 
         private static readonly DiagnosticDescriptor s_errorDescriptor
-            = new("SG_BINDING_FIELD_01"
-                , "Binding Field Generator Error"
-                , "This error indicates a bug in the Binding Field source generators. Error message: '{0}'."
+            = new("SG_BINDER_01"
+                , "Binder Generator Error"
+                , "This error indicates a bug in the Binder source generators. Error message: '{0}'."
                 , "ZBase.Foundation.Mvvm.BindingAttribute"
                 , DiagnosticSeverity.Error
                 , isEnabledByDefault: true

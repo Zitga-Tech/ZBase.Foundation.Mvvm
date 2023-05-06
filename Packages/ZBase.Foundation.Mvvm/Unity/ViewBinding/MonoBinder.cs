@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [SerializeField]
         internal Component _context;
 
-        public IObservableContext Context { get; private set; }
+        public IBindingContext Context { get; private set; }
 
         protected void Awake()
         {
@@ -30,7 +30,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             StopListening();
         }
 
-        private IObservableContext GetContext()
+        private IBindingContext GetContext()
         {
             if (_context == false)
             {
@@ -39,10 +39,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 );
             }
 
-            if (_context is not IObservableContext context)
+            if (_context is not IBindingContext context)
             {
                 throw new InvalidCastException(
-                    $"Reference on the `Context` field does not implement {typeof(IObservableContext)}."
+                    $"Reference on the `Context` field does not implement {typeof(IBindingContext)}."
                 );
             }
 

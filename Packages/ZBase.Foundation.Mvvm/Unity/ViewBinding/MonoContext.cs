@@ -5,7 +5,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
-    public sealed class MonoContext : MonoBehaviour, IObservableContext
+    public sealed class MonoContext : MonoBehaviour, IBindingContext
     {
         [SerializeField]
         internal ContextTargetKind _targetKind;

@@ -46,7 +46,7 @@ namespace MvvmTest
         }
     }
 
-    public partial class Model : IObservableObject, IObservableContext
+    public partial class Model : IObservableObject, IBindingContext
     {
         [ObservableProperty]
         private int _intField;
@@ -58,7 +58,7 @@ namespace MvvmTest
 
     public partial class Binder : IBinder
     {
-        public IObservableContext Context { get; set; }
+        public IBindingContext Context { get; set; }
 
         [Binding]
         private void OnUpdate(int value)
