@@ -24,7 +24,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TrySetValue(in Union union, ref T dest)
+        public bool TrySetValueTo(in Union union, ref T dest)
         {
             return false;
         }

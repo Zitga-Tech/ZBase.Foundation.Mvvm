@@ -1,7 +1,6 @@
 #if UNITY_TEXT_MESH_PRO
 
 using System;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;

@@ -18,7 +18,7 @@
             return false;
         }
 
-        public bool TrySetValue(in Union union, ref T dest)
+        public bool TrySetValueTo(in Union union, ref T dest)
         {
             return false;
         }

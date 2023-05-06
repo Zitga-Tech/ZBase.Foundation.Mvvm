@@ -12,7 +12,9 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
     {
         public const string INTERFACE = "global::ZBase.Foundation.Mvvm.Unions.IUnion<";
 
-        public ImmutableArray<StructRef> StructRefs { get; }
+        public ImmutableArray<StructRef> ValueTypeRefs { get; }
+
+        public ImmutableArray<StructRef> RefTypeRefs { get; }
 
         public ImmutableArray<StructRef> Redundants { get; }
 
@@ -23,7 +25,8 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
         )
         {
             using var redundants = ImmutableArrayBuilder<StructRef>.Rent();
-            var filtered = new Dictionary<string, StructRef>();
+            var valueTypeFiltered = new Dictionary<string, StructRef>();
+            var refTypeFiltered = new Dictionary<string, StructRef>();
 
             foreach (var candidate in candidates)
             {
@@ -33,24 +36,45 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
 
                 var typeName = candidate.TypeArgument.ToFullName();
 
-                if (typeName.ToUnionType().IsNativeUnionType() == false
-                    && filtered.ContainsKey(typeName) == false
-                )
+                if (typeName.ToUnionType().IsNativeUnionType())
                 {
-                    filtered[typeName] = candidate;
+                    redundants.Add(candidate);
+                    continue;
+                }
+
+                if (candidate.TypeArgument.IsValueType)
+                {
+                    if (valueTypeFiltered.ContainsKey(typeName) == false)
+                    {
+                        valueTypeFiltered[typeName] = candidate;
+                    }
+                    else
+                    {
+                        redundants.Add(candidate);
+                    }
                 }
                 else
                 {
-                    redundants.Add(candidate);
+                    if (refTypeFiltered.ContainsKey(typeName) == false)
+                    {
+                        refTypeFiltered[typeName] = candidate;
+                    }
+                    else
+                    {
+                        redundants.Add(candidate);
+                    }
                 }
             }
 
-            using var structRefs = ImmutableArrayBuilder<StructRef>.Rent();
-            structRefs.AddRange(filtered.Values);
+            using var valueTypeRefs = ImmutableArrayBuilder<StructRef>.Rent();
+            using var refTypeRefs = ImmutableArrayBuilder<StructRef>.Rent();
+            
+            valueTypeRefs.AddRange(valueTypeFiltered.Values);
+            refTypeRefs.AddRange(refTypeFiltered.Values);
 
-            StructRefs = structRefs.ToImmutable();
+            ValueTypeRefs = valueTypeRefs.ToImmutable();
+            RefTypeRefs = refTypeRefs.ToImmutable();
             Redundants = redundants.ToImmutable();
-
         }
     }
 

@@ -28,7 +28,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
             return false;
         }
 
-        public bool TrySetValue(in Union union, ref T dest)
+        public bool TrySetValueTo(in Union union, ref T dest)
         {
             if (union.TryGetValue(out object candidate) && candidate is T value)
             {

@@ -120,7 +120,13 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
 
             var declaration = new GenericUnionDeclaration(candidates, compilation, context.CancellationToken);
 
-            declaration.GenerateUnionTypes(
+            declaration.GenerateUnionForValueTypes(
+                  context
+                , compilation
+                , outputSourceGenFiles
+            );
+
+            declaration.GenerateUnionForRefTypes(
                   context
                 , compilation
                 , outputSourceGenFiles

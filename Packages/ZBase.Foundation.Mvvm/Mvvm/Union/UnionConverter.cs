@@ -77,8 +77,8 @@ namespace ZBase.Foundation.Mvvm.Unions
             => GetConverter<T>().TryGetValue(union, out result);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TrySetValue<T>(in Union union, ref T dest)
-            => GetConverter<T>().TrySetValue(union, ref dest);
+        public static bool TrySetValueTo<T>(in Union union, ref T dest)
+            => GetConverter<T>().TrySetValueTo(union, ref dest);
 
         [DoesNotReturn]
         private static void ThrowUndefinedException<T>()

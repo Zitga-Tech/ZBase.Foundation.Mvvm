@@ -132,7 +132,13 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
 
             var declaration = new InternalUnionDeclaration(candidates);
 
-            declaration.GenerateUnionTypes(
+            declaration.GenerateUnionForValueTypes(
+                  context
+                , compilation
+                , outputSourceGenFiles
+            );
+
+            declaration.GenerateUnionForRefTypes(
                   context
                 , compilation
                 , outputSourceGenFiles

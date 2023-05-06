@@ -1,6 +1,7 @@
 ﻿using System;
 using ZBase.Foundation.Mvvm.ComponentModel;
 using ZBase.Foundation.Mvvm.Input;
+using ZBase.Foundation.Mvvm.Unions;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace MvvmTest
@@ -47,6 +48,8 @@ namespace MvvmTest
         }
     }
 
+    public class A { }
+
     public partial class Model : IObservableObject, IBindingContext
     {
         [ObservableProperty]
@@ -72,5 +75,10 @@ namespace MvvmTest
         {
             Console.WriteLine(value);
         }
+    }
+
+    public partial struct UnionForA : IUnion<A>
+    {
+
     }
 }

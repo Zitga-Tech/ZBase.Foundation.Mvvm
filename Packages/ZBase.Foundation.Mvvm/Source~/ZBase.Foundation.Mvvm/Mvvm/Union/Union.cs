@@ -287,7 +287,7 @@ namespace ZBase.Foundation.Mvvm.Unions
             return false;
         }
 
-        public bool TrySetValue(ref bool dest)
+        public bool TrySetValueTo(ref bool dest)
         {
             if (TypeKind == UnionTypeKind.Bool)
             {
@@ -297,7 +297,7 @@ namespace ZBase.Foundation.Mvvm.Unions
             return false;
         }
 
-        public bool TrySetValue(ref byte dest)
+        public bool TrySetValueTo(ref byte dest)
         {
             if (TypeKind == UnionTypeKind.Byte)
             {
@@ -307,7 +307,7 @@ namespace ZBase.Foundation.Mvvm.Unions
             return false;
         }
 
-        public bool TrySetValue(ref sbyte dest)
+        public bool TrySetValueTo(ref sbyte dest)
         {
             if (TypeKind == UnionTypeKind.SByte)
             {
@@ -317,7 +317,7 @@ namespace ZBase.Foundation.Mvvm.Unions
             return false;
         }
 
-        public bool TrySetValue(ref char dest)
+        public bool TrySetValueTo(ref char dest)
         {
             switch (TypeKind)
             {
@@ -329,7 +329,7 @@ namespace ZBase.Foundation.Mvvm.Unions
             return false;
         }
 
-        public bool TrySetValue(ref double dest)
+        public bool TrySetValueTo(ref double dest)
         {
             switch (TypeKind)
             {
@@ -349,7 +349,7 @@ namespace ZBase.Foundation.Mvvm.Unions
             return false;
         }
 
-        public bool TrySetValue(ref float dest)
+        public bool TrySetValueTo(ref float dest)
         {
             switch (TypeKind)
             {
@@ -368,7 +368,7 @@ namespace ZBase.Foundation.Mvvm.Unions
             return false;
         }
 
-        public bool TrySetValue(ref int dest)
+        public bool TrySetValueTo(ref int dest)
         {
             switch (TypeKind)
             {
@@ -383,7 +383,7 @@ namespace ZBase.Foundation.Mvvm.Unions
             return false;
         }
 
-        public bool TrySetValue(ref uint dest)
+        public bool TrySetValueTo(ref uint dest)
         {
             switch (TypeKind)
             {
@@ -396,7 +396,7 @@ namespace ZBase.Foundation.Mvvm.Unions
             return false;
         }
 
-        public bool TrySetValue(ref long dest)
+        public bool TrySetValueTo(ref long dest)
         {
             switch (TypeKind)
             {
@@ -413,7 +413,7 @@ namespace ZBase.Foundation.Mvvm.Unions
             return false;
         }
 
-        public bool TrySetValue(ref ulong dest)
+        public bool TrySetValueTo(ref ulong dest)
         {
             switch (TypeKind)
             {
@@ -427,7 +427,7 @@ namespace ZBase.Foundation.Mvvm.Unions
             return false;
         }
 
-        public bool TrySetValue(ref short dest)
+        public bool TrySetValueTo(ref short dest)
         {
             switch (TypeKind)
             {
@@ -439,7 +439,7 @@ namespace ZBase.Foundation.Mvvm.Unions
             return false;
         }
 
-        public bool TrySetValue(ref ushort dest)
+        public bool TrySetValueTo(ref ushort dest)
         {
             switch (TypeKind)
             {
@@ -451,7 +451,7 @@ namespace ZBase.Foundation.Mvvm.Unions
             return false;
         }
 
-        public bool TrySetValue(ref string dest)
+        public bool TrySetValueTo(ref string dest)
         {
             if (TypeKind == UnionTypeKind.String && GCHandle.Target is string value)
             {
@@ -462,7 +462,7 @@ namespace ZBase.Foundation.Mvvm.Unions
             return false;
         }
 
-        public bool TrySetValue(ref object dest)
+        public bool TrySetValueTo(ref object dest)
         {
             if (TypeKind == UnionTypeKind.Object && GCHandle.Target is object value)
             {

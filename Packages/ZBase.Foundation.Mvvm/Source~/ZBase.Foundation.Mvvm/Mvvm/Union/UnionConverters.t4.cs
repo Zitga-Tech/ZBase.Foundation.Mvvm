@@ -27,7 +27,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
 
         public bool TryGetValue(in Union union, out bool result) => union.TryGetValue(out result);
 
-        public bool TrySetValue(in Union union, ref bool dest) => union.TrySetValue(ref dest);
+        public bool TrySetValueTo(in Union union, ref bool dest) => union.TrySetValueTo(ref dest);
     }
 
     internal sealed class UnionConverterByte : IUnionConverter<byte>
@@ -42,7 +42,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
 
         public bool TryGetValue(in Union union, out byte result) => union.TryGetValue(out result);
 
-        public bool TrySetValue(in Union union, ref byte dest) => union.TrySetValue(ref dest);
+        public bool TrySetValueTo(in Union union, ref byte dest) => union.TrySetValueTo(ref dest);
     }
 
     internal sealed class UnionConverterSByte : IUnionConverter<sbyte>
@@ -57,7 +57,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
 
         public bool TryGetValue(in Union union, out sbyte result) => union.TryGetValue(out result);
 
-        public bool TrySetValue(in Union union, ref sbyte dest) => union.TrySetValue(ref dest);
+        public bool TrySetValueTo(in Union union, ref sbyte dest) => union.TrySetValueTo(ref dest);
     }
 
     internal sealed class UnionConverterChar : IUnionConverter<char>
@@ -72,7 +72,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
 
         public bool TryGetValue(in Union union, out char result) => union.TryGetValue(out result);
 
-        public bool TrySetValue(in Union union, ref char dest) => union.TrySetValue(ref dest);
+        public bool TrySetValueTo(in Union union, ref char dest) => union.TrySetValueTo(ref dest);
     }
 
     internal sealed class UnionConverterDouble : IUnionConverter<double>
@@ -87,7 +87,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
 
         public bool TryGetValue(in Union union, out double result) => union.TryGetValue(out result);
 
-        public bool TrySetValue(in Union union, ref double dest) => union.TrySetValue(ref dest);
+        public bool TrySetValueTo(in Union union, ref double dest) => union.TrySetValueTo(ref dest);
     }
 
     internal sealed class UnionConverterFloat : IUnionConverter<float>
@@ -102,7 +102,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
 
         public bool TryGetValue(in Union union, out float result) => union.TryGetValue(out result);
 
-        public bool TrySetValue(in Union union, ref float dest) => union.TrySetValue(ref dest);
+        public bool TrySetValueTo(in Union union, ref float dest) => union.TrySetValueTo(ref dest);
     }
 
     internal sealed class UnionConverterInt : IUnionConverter<int>
@@ -117,7 +117,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
 
         public bool TryGetValue(in Union union, out int result) => union.TryGetValue(out result);
 
-        public bool TrySetValue(in Union union, ref int dest) => union.TrySetValue(ref dest);
+        public bool TrySetValueTo(in Union union, ref int dest) => union.TrySetValueTo(ref dest);
     }
 
     internal sealed class UnionConverterUInt : IUnionConverter<uint>
@@ -132,7 +132,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
 
         public bool TryGetValue(in Union union, out uint result) => union.TryGetValue(out result);
 
-        public bool TrySetValue(in Union union, ref uint dest) => union.TrySetValue(ref dest);
+        public bool TrySetValueTo(in Union union, ref uint dest) => union.TrySetValueTo(ref dest);
     }
 
     internal sealed class UnionConverterLong : IUnionConverter<long>
@@ -147,7 +147,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
 
         public bool TryGetValue(in Union union, out long result) => union.TryGetValue(out result);
 
-        public bool TrySetValue(in Union union, ref long dest) => union.TrySetValue(ref dest);
+        public bool TrySetValueTo(in Union union, ref long dest) => union.TrySetValueTo(ref dest);
     }
 
     internal sealed class UnionConverterULong : IUnionConverter<ulong>
@@ -162,7 +162,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
 
         public bool TryGetValue(in Union union, out ulong result) => union.TryGetValue(out result);
 
-        public bool TrySetValue(in Union union, ref ulong dest) => union.TrySetValue(ref dest);
+        public bool TrySetValueTo(in Union union, ref ulong dest) => union.TrySetValueTo(ref dest);
     }
 
     internal sealed class UnionConverterShort : IUnionConverter<short>
@@ -177,7 +177,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
 
         public bool TryGetValue(in Union union, out short result) => union.TryGetValue(out result);
 
-        public bool TrySetValue(in Union union, ref short dest) => union.TrySetValue(ref dest);
+        public bool TrySetValueTo(in Union union, ref short dest) => union.TrySetValueTo(ref dest);
     }
 
     internal sealed class UnionConverterUShort : IUnionConverter<ushort>
@@ -192,7 +192,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
 
         public bool TryGetValue(in Union union, out ushort result) => union.TryGetValue(out result);
 
-        public bool TrySetValue(in Union union, ref ushort dest) => union.TrySetValue(ref dest);
+        public bool TrySetValueTo(in Union union, ref ushort dest) => union.TrySetValueTo(ref dest);
     }
 
     internal sealed class UnionConverterString : IUnionConverter<string>
@@ -207,7 +207,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
 
         public bool TryGetValue(in Union union, out string result) => union.TryGetValue(out result);
 
-        public bool TrySetValue(in Union union, ref string dest) => union.TrySetValue(ref dest);
+        public bool TrySetValueTo(in Union union, ref string dest) => union.TrySetValueTo(ref dest);
     }
 
     internal sealed class UnionConverterObject : IUnionConverter<object>
@@ -222,7 +222,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
 
         public bool TryGetValue(in Union union, out object result) => union.TryGetValue(out result);
 
-        public bool TrySetValue(in Union union, ref object dest) => union.TrySetValue(ref dest);
+        public bool TrySetValueTo(in Union union, ref object dest) => union.TrySetValueTo(ref dest);
     }
 
 
