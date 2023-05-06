@@ -35,6 +35,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
     for (var i = 0; i < unionTypeNames.Length; i++) {
         var typeName = unionTypeNames[i];
 #>
+    [Label("<#= typeName #> => String")]
     public sealed class <#= typeName #>ToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)

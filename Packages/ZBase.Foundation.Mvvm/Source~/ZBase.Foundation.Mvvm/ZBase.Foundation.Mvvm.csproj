@@ -11,6 +11,34 @@
         <PackageReference Include="Unity3D" Version="2.1.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Mvvm\Union\UnionConverters.t4.tt">
+        <Generator>TextTemplatingFileGenerator</Generator>
+        <LastGenOutput>UnionConverters.t4.cs</LastGenOutput>
+      </None>
+      <None Update="Mvvm\ViewBinding\Adapters\AnyToStringAdapters.t4.tt">
+        <Generator>TextTemplatingFileGenerator</Generator>
+        <LastGenOutput>AnyToStringAdapters.t4.cs</LastGenOutput>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Mvvm\Union\UnionConverters.t4.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>UnionConverters.t4.tt</DependentUpon>
+      </Compile>
+      <Compile Update="Mvvm\ViewBinding\Adapters\AnyToStringAdapters.t4.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>AnyToStringAdapters.t4.tt</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
     <Target Name="CopySourceFiles" AfterTargets="Build">
         <ItemGroup>
             <DataFiles Include="$(ProjectDir)/Mvvm/**/*.*" />

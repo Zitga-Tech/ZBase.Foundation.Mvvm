@@ -2,6 +2,7 @@
 
 namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 {
+    [Label("Object => String")]
     public sealed class ObjectToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)

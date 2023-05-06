@@ -217,7 +217,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
                 }
 
-                p.PrintLine($"[global::ZBase.Foundation.Mvvm.ViewBinding.Label({label})]");
+                p.PrintLine($"[global::ZBase.Foundation.Mvvm.Label({label})]");
                 p.PrintLine(GENERATED_CODE).PrintLine(GENERATED_BINDING_PROPERTY);
                 p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.BindingProperty {BindingPropertyName(member)} =  new global::ZBase.Foundation.Mvvm.ViewBinding.BindingProperty();");
                 p.PrintEndLine();
@@ -267,7 +267,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
                 }
 
-                p.PrintLine($"[global::ZBase.Foundation.Mvvm.ViewBinding.Label({label})]");
+                p.PrintLine($"[global::ZBase.Foundation.Mvvm.Label({label})]");
                 p.PrintLine(GENERATED_CODE).PrintLine(GENERATED_CONVERTER);
                 p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.Converter {ConverterName(member)} = new global::ZBase.Foundation.Mvvm.ViewBinding.Converter();");
                 p.PrintEndLine();

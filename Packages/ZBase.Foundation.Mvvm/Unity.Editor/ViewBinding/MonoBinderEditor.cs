@@ -203,7 +203,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 {
                     propertyLabel = new GUIContent(
                           $"{propAttrib.PropertyName} : {propAttrib.PropertyType.GetName()}"
-                        , $"class {targetType.Name} in namespace {targetType.Namespace}"
+                        , $"class {targetType.Name}\nin {targetType.Namespace}"
                     );
                     propertyName = propAttrib.PropertyName;
                 }
@@ -326,7 +326,14 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             if (adapterProp.managedReferenceValue is IAdapter adapter)
             {
                 adapterType = adapter.GetType();
-                adapterLabel = new GUIContent(adapterType.Name, $"namespace {adapterType.Namespace}");
+                var keyword = adapterType.IsValueType ? "struct" : "class";
+                var labelAttrib = adapterType.GetCustomAttribute<LabelAttribute>();
+                
+                adapterLabel = new GUIContent(
+                      labelAttrib?.Value ?? adapterType.Name
+                    , $"{keyword} {adapterType.Name}\nin {adapterType.Namespace}"
+                );
+
                 adapterFullName = adapterType.FullName;
             }
             else
@@ -374,8 +381,16 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             foreach (var type in adapterTypes)
             {
+                var labelAttrib = type.GetCustomAttribute<LabelAttribute>();
+                var labelText = labelAttrib?.Value ?? type.Name;
+                var keyword = type.IsValueType ? "struct" : "class";
+                var label = new GUIContent(
+                      $"{type.Namespace}/{labelText}"
+                    , $"{keyword} {type.Name}\nin {type.Namespace}"
+                );
+
                 menu.AddItem(
-                      new GUIContent($"{type.Namespace}/{type.Name}")
+                      label
                     , type.FullName == adapterFullName
                     , x => SetAdapter(serializedBinder, binder, adapterProp, adapterType, (Type)x)
                     , type
