@@ -6,7 +6,7 @@ namespace Mvvm.Samples
     public partial class ViewModel : MonoBehaviour, IObservableObject
     {
         [ObservableProperty]
-        private string _text;
+        private float _time;
 
         private bool _updating;
 
@@ -19,7 +19,7 @@ namespace Mvvm.Samples
 
             if (_updating)
             {
-                Text = Time.time.ToString();
+                Time = UnityEngine.Time.time;
             }
         }
     }

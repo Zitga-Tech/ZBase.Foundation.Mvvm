@@ -751,15 +751,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _context: {fileID: 606846926}
   _bindingFieldForUpdateText:
-    <TargetPropertyName>k__BackingField: Text
+    <TargetPropertyName>k__BackingField: Time
   _converterForUpdateText:
     <Adapter>k__BackingField:
-      rid: 4789600339994345474
+      rid: 4789600339994345475
   references:
     version: 2
     RefIds:
-    - rid: 4789600339994345474
-      type: {class: IntToStringAdapter, ns: ZBase.Foundation.Mvvm.ViewBinding.Adapters, asm: ZBase.Foundation.Mvvm}
+    - rid: 4789600339994345475
+      type: {class: FloatToStringAdapter, ns: ZBase.Foundation.Mvvm.ViewBinding.Adapters, asm: ZBase.Foundation.Mvvm}
 --- !u!1 &1865242959
 GameObject:
   m_ObjectHideFlags: 0
