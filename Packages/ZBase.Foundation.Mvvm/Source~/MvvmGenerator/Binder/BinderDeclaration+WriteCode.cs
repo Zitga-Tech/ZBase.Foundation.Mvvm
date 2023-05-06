@@ -151,7 +151,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         {
             const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ViewBinding.BindingMethodInfo({0}.{1}, typeof(global::ZBase.Foundation.Mvvm.Unions.Union))]";
 
-            var className = Syntax.Identifier.Text;
+            var className = Symbol.ToFullName();
 
             foreach (var member in MemberRefs)
             {
@@ -519,19 +519,19 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             p.PrintEndLine();
         }
 
-        private string ConstName(MemberRef member)
+        private static string ConstName(MemberRef member)
             => $"BindingProperty_{member.Member.Name}";
 
-        private string BindingPropertyName(MemberRef member)
+        private static string BindingPropertyName(MemberRef member)
             => $"_bindingFieldFor{member.Member.Name}";
 
-        private string ConverterName(MemberRef member)
+        private static string ConverterName(MemberRef member)
             => $"_converterFor{member.Member.Name}";
 
-        private string ListenerName(MemberRef member)
+        private static string ListenerName(MemberRef member)
             => $"_listenerFor{member.Member.Name}";
 
-        private string MethodName(MemberRef member)
+        private static string MethodName(MemberRef member)
         {
             var name = member.Member.Name;
 

@@ -219,6 +219,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 var argsName = OnChangedArgsName(member);
                 var converterForField = GeneratorHelpers.ToTitleCase(member.Member.Type.ToValidIdentifier().AsSpan());
                 var willNotifyPropertyChanged = NotifyPropertyChangedForMap.TryGetValue(fieldName, out var property);
+                var constName = ConstName(member);
 
                 p.PrintLine($"/// <inheritdoc cref=\"{fieldName}\"/>");
 
@@ -252,7 +253,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                             p.PrintLine($"{OnChangingMethodName(member)}(oldValue, value);");
                             p.PrintEndLine();
 
-                            p.PrintLine($"var {argsName} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventArgs(this, nameof(this.{propertyName}), this._unionConverters.{converterForField}.ToUnion(value));");
+                            p.PrintLine($"var {argsName} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventArgs(this, {constName}, this._unionConverters.{converterForField}.ToUnion(value));");
                             p.PrintLine($"this.{OnChangingEventName(member)}?.Invoke({argsName});");
                             p.PrintEndLine();
 
@@ -273,7 +274,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                                 p.PrintLine($"{OnChangedMethodName(property)}(oldPropertyValue, this.{property.Name});");
                                 p.PrintEndLine();
 
-                                p.PrintLine($"var {otherArgsName} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventArgs(this, nameof(this.{property.Name}), this._unionConverters.{converterForProperty}.ToUnion(this.{property.Name}));");
+                                p.PrintLine($"var {otherArgsName} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventArgs(this, {ConstName(property)}, this._unionConverters.{converterForProperty}.ToUnion(this.{property.Name}));");
                                 p.PrintLine($"this.{OnChangedEventName(property)}?.Invoke({otherArgsName});");
                             }
 
@@ -392,10 +393,10 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 {
                     foreach (var member in MemberRefs)
                     {
-                        var propertyName = member.PropertyName;
                         var eventName = OnChangingEventName(member);
+                        var constName = ConstName(member);
 
-                        p.PrintLine($"case nameof(this.{propertyName}):");
+                        p.PrintLine($"case {constName}:");
                         p.OpenScope();
                         {
                             p.PrintLine($"this.{eventName} += listener.OnEvent;");
@@ -441,10 +442,10 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 {
                     foreach (var member in MemberRefs)
                     {
-                        var propertyName = member.PropertyName;
                         var eventName = OnChangedEventName(member);
+                        var constName = ConstName(member);
 
-                        p.PrintLine($"case nameof(this.{propertyName}):");
+                        p.PrintLine($"case {constName}:");
                         p.OpenScope();
                         {
                             p.PrintLine($"this.{eventName} += listener.OnEvent;");
@@ -467,10 +468,10 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
                     foreach (var property in properties.Values)
                     {
-                        var propertyName = property.Name;
+                        var constName = ConstName(property);
                         var eventName = OnChangedEventName(property);
 
-                        p.PrintLine($"case nameof(this.{propertyName}):");
+                        p.PrintLine($"case {constName}:");
                         p.OpenScope();
                         {
                             p.PrintLine($"this.{eventName} += listener.OnEvent;");
@@ -494,7 +495,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
         {
             const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ComponentModel.NotifyPropertyChangingInfo({0}.{1}, typeof({2}))]";
 
-            var className = Syntax.Identifier.Text;
+            var className = Symbol.ToFullName();
 
             foreach (var member in MemberRefs)
             {
@@ -509,7 +510,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
         {
             const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ComponentModel.NotifyPropertyChangedInfo({0}.{1}, typeof({2}))]";
 
-            var className = Syntax.Identifier.Text;
+            var className = Symbol.ToFullName();
             var additionalProperties = new Dictionary<string, IPropertySymbol>();
 
             foreach (var member in MemberRefs)
@@ -594,34 +595,34 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             p.PrintEndLine();
         }
 
-        private string ConstName(MemberRef member)
+        private static string ConstName(MemberRef member)
             => $"PropertyName_{member.PropertyName}";
 
-        private string ConstName(IPropertySymbol member)
+        private static string ConstName(IPropertySymbol member)
             => $"PropertyName_{member.Name}";
 
-        private string OnChangingEventName(MemberRef member)
+        private static string OnChangingEventName(MemberRef member)
             => $"_onChanging{member.PropertyName}";
 
-        private string OnChangedEventName(MemberRef member)
+        private static string OnChangedEventName(MemberRef member)
             => $"_onChanged{member.PropertyName}";
 
-        private string OnChangedEventName(ISymbol member)
+        private static string OnChangedEventName(ISymbol member)
             => $"_onChanged{member.Name}";
 
-        private string OnChangedArgsName(ISymbol member)
+        private static string OnChangedArgsName(ISymbol member)
             => $"args{member.Name}";
 
-        private string OnChangedArgsName(MemberRef member)
+        private static string OnChangedArgsName(MemberRef member)
             => $"args{member.PropertyName}";
 
-        private string OnChangingMethodName(MemberRef member)
+        private static string OnChangingMethodName(MemberRef member)
             => $"On{member.PropertyName}Changing";
 
-        private string OnChangedMethodName(MemberRef member)
+        private static string OnChangedMethodName(MemberRef member)
             => $"On{member.PropertyName}Changed";
 
-        private string OnChangedMethodName(IPropertySymbol member)
+        private static string OnChangedMethodName(IPropertySymbol member)
             => $"On{member.Name}Changed";
     }
 }

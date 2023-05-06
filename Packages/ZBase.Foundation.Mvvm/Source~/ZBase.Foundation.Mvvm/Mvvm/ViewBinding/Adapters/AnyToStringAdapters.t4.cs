@@ -12,11 +12,13 @@
 ///                                                 ///
 ///*************************************************///
 
+using System;
 using ZBase.Foundation.Mvvm.Unions;
 
 namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 {
 
+    [Serializable]
     [Label("Bool => String", "Default")]
     public sealed class BoolToStringAdapter : IAdapter
     {
@@ -31,6 +33,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
+    [Serializable]
     [Label("Byte => String", "Default")]
     public sealed class ByteToStringAdapter : IAdapter
     {
@@ -45,6 +48,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
+    [Serializable]
     [Label("SByte => String", "Default")]
     public sealed class SByteToStringAdapter : IAdapter
     {
@@ -59,6 +63,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
+    [Serializable]
     [Label("Char => String", "Default")]
     public sealed class CharToStringAdapter : IAdapter
     {
@@ -73,6 +78,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
+    [Serializable]
     [Label("Double => String", "Default")]
     public sealed class DoubleToStringAdapter : IAdapter
     {
@@ -87,6 +93,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
+    [Serializable]
     [Label("Float => String", "Default")]
     public sealed class FloatToStringAdapter : IAdapter
     {
@@ -101,6 +108,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
+    [Serializable]
     [Label("Int => String", "Default")]
     public sealed class IntToStringAdapter : IAdapter
     {
@@ -115,6 +123,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
+    [Serializable]
     [Label("UInt => String", "Default")]
     public sealed class UIntToStringAdapter : IAdapter
     {
@@ -129,6 +138,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
+    [Serializable]
     [Label("Long => String", "Default")]
     public sealed class LongToStringAdapter : IAdapter
     {
@@ -143,6 +153,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
+    [Serializable]
     [Label("ULong => String", "Default")]
     public sealed class ULongToStringAdapter : IAdapter
     {
@@ -157,6 +168,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
+    [Serializable]
     [Label("Short => String", "Default")]
     public sealed class ShortToStringAdapter : IAdapter
     {
@@ -171,6 +183,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
+    [Serializable]
     [Label("UShort => String", "Default")]
     public sealed class UShortToStringAdapter : IAdapter
     {

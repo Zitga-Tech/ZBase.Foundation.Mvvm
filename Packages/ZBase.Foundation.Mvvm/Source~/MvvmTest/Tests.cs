@@ -1,5 +1,6 @@
 ﻿using System;
 using ZBase.Foundation.Mvvm.ComponentModel;
+using ZBase.Foundation.Mvvm.Input;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace MvvmTest
@@ -54,6 +55,12 @@ namespace MvvmTest
         public TypeCode Type { get; }
 
         public IObservableObject Target => this;
+
+        [RelayCommand]
+        private void UpdateInt(int value)
+        {
+
+        }
     }
 
     public partial class Binder : IBinder

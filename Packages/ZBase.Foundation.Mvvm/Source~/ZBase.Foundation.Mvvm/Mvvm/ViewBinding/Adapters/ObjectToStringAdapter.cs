@@ -1,7 +1,9 @@
-﻿using ZBase.Foundation.Mvvm.Unions;
+﻿using System;
+using ZBase.Foundation.Mvvm.Unions;
 
 namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 {
+    [Serializable]
     [Label("Object => String", "Default")]
     public sealed class ObjectToStringAdapter : IAdapter
     {

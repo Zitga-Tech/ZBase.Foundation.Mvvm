@@ -27,6 +27,7 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
 
             p.OpenScope();
             {
+                WriteConstantFields(ref p);
                 WriteFields(ref p);
                 WriteProperties(ref p);
             }
@@ -38,33 +39,50 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
 
         private void WriteRelayCommandInfoAttributes(ref Printer p)
         {
-            var className = Syntax.Identifier.Text;
+            var className = Symbol.ToFullName();
 
             foreach (var member in MemberRefs)
             {
-                var commandName = CommandPropertyName(member.Member);
+                var constName = ConstName(member);
 
                 if (member.Member.Parameters.Length > 0)
                 {
                     var param = member.Member.Parameters[0];
                     var paramType = param.Type.ToFullName();
 
-                    p.PrintLine($"[global::ZBase.Foundation.Mvvm.Input.RelayCommandInfo(nameof({className}.{commandName}), typeof({paramType}))]");
+                    p.PrintLine($"[global::ZBase.Foundation.Mvvm.Input.RelayCommandInfo({className}.{constName}, typeof({paramType}))]");
                 }
                 else
                 {
-                    p.PrintLine($"[global::ZBase.Foundation.Mvvm.Input.RelayCommandInfo(nameof({className}.{commandName}))]");
+                    p.PrintLine($"[global::ZBase.Foundation.Mvvm.Input.RelayCommandInfo({className}.{constName})]");
                 }
             }
+        }
+
+        private void WriteConstantFields(ref Printer p)
+        {
+            var className = Syntax.Identifier.Text;
+
+            foreach (var member in MemberRefs)
+            {
+                var name = CommandPropertyName(member);
+
+                p.PrintLine($"/// <summary>The name of <see cref=\"{name}\"/></summary>");
+                p.PrintLine(GENERATED_CODE);
+                p.PrintLine($"public const string {ConstName(member)} = nameof({className}.{name});");
+                p.PrintEndLine();
+            }
+
+            p.PrintEndLine();
         }
 
         private void WriteFields(ref Printer p)
         {
             foreach (var member in MemberRefs)
             {
-                var propertyName = CommandPropertyName(member.Member);
-                var fieldName = CommandFieldName(member.Member);
-                var typeName = CommandTypeName(member.Member);
+                var propertyName = CommandPropertyName(member);
+                var fieldName = CommandFieldName(member);
+                var typeName = CommandTypeName(member);
 
                 p.PrintLine($"/// <summary>The backing field for <see cref=\"{propertyName}\"/>.</summary>");
 
@@ -86,11 +104,11 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
             foreach (var member in MemberRefs)
             {
                 var method = member.Member;
-                var propertyName = CommandPropertyName(method);
-                var fieldName = CommandFieldName(method);
-                var typeName = CommandTypeName(method);
-                var interfaceName = CommandInterfaceName(method);
-                var interfaceNameComment = CommandInterfaceNameComment(method);
+                var propertyName = CommandPropertyName(member);
+                var fieldName = CommandFieldName(member);
+                var typeName = CommandTypeName(member);
+                var interfaceName = CommandInterfaceName(member);
+                var interfaceNameComment = CommandInterfaceNameComment(member);
                 var canExecuteArg = CanExecuteMethodArg(member.CanExecuteMethod);
 
                 p.PrintLine($"/// <summary>Gets an <see cref=\"{interfaceNameComment}\"/> instance wrapping <see cref=\"{method.Name}\"/>.</summary>");
@@ -124,40 +142,49 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
             p.PrintEndLine();
         }
 
-        private string CommandFieldName(IMethodSymbol method)
-            => $"_command{method.Name}";
+        private static string ConstName(MemberRef member)
+            => $"CommandName_{CommandPropertyName(member)}";
 
-        private string CommandPropertyName(IMethodSymbol method)
-            => $"{method.Name}Command";
+        private static string CommandFieldName(MemberRef method)
+            => $"_command{method.Member.Name}";
 
-        private string CommandTypeName(IMethodSymbol method)
+        private static string CommandPropertyName(MemberRef method)
+            => $"{method.Member.Name}Command";
+
+        private static string CommandTypeName(MemberRef method)
         {
-            if (method.Parameters.Length < 1)
+            if (method.Member.Parameters.Length < 1)
+            {
                 return "global::ZBase.Foundation.Mvvm.Input.RelayCommand";
+            }
 
-            var param = method.Parameters[0];
+            var param = method.Member.Parameters[0];
             return $"global::ZBase.Foundation.Mvvm.Input.RelayCommand<{param.Type.ToFullName()}>";
         }
 
-        private string CommandInterfaceName(IMethodSymbol method)
+        private static string CommandInterfaceName(MemberRef method)
         {
-            if (method.Parameters.Length < 1)
+            if (method.Member.Parameters.Length < 1)
+            {
                 return "global::ZBase.Foundation.Mvvm.Input.IRelayCommand";
+            }
 
-            var param = method.Parameters[0];
+            var param = method.Member.Parameters[0];
             return $"global::ZBase.Foundation.Mvvm.Input.IRelayCommand<{param.Type.ToFullName()}>";
         }
 
-        private string CommandInterfaceNameComment(IMethodSymbol method)
+        private static string CommandInterfaceNameComment(MemberRef method)
         {
-            if (method.Parameters.Length < 1)
+            if (method.Member.Parameters.Length < 1)
+            {
                 return "global::ZBase.Foundation.Mvvm.Input.IRelayCommand";
+            }
 
-            var param = method.Parameters[0];
+            var param = method.Member.Parameters[0];
             return $"global::ZBase.Foundation.Mvvm.Input.IRelayCommand{{{param.Type.ToFullName()}}}";
         }
 
-        private string CanExecuteMethodArg(IMethodSymbol method)
+        private static string CanExecuteMethodArg(IMethodSymbol method)
         {
             if (method == null)
                 return string.Empty;
