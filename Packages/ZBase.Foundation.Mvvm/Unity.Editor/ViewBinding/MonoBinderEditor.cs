@@ -141,9 +141,12 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 return;
             }
 
-            var type = binder.GetType();
+            var binderType = binder.GetType();
             var fieldInfos = TypeCache.GetFieldsWithAttribute<GeneratedBindingPropertyAttribute>()
-                .Where(x => x.DeclaringType == type);
+                .Where(x => x.DeclaringType == binderType);
+
+            var targetType = target.GetType();
+            var targetAttributes = targetType.GetCustomAttributes<NotifyPropertyChangedInfoAttribute>();
 
             EditorGUILayout.LabelField("Binding Properties", EditorStyles.boldLabel);
             EditorGUILayout.BeginVertical(GUI.skin.box);
@@ -157,7 +160,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             foreach (var fieldInfo in fieldInfos)
             {
-                DrawBindingProperty(serializedBinder, binder, target, fieldInfo);
+                DrawBindingProperty(serializedBinder, binder, targetType, targetAttributes, fieldInfo);
             }
 
             EditorGUILayout.EndVertical();
@@ -166,15 +169,45 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         private static void DrawBindingProperty(
               SerializedObject serializedBinder
             , MonoBinder binder
-            , IObservableObject target
+            , Type targetType
+            , IEnumerable<NotifyPropertyChangedInfoAttribute> targetAttributes
             , FieldInfo fieldInfo
         )
         {
             var binderProp = serializedBinder.FindProperty(fieldInfo.Name);
             var propertyNameProp = binderProp.FindPropertyRelative("<TargetPropertyName>k__BackingField");
-            var propertyName = string.IsNullOrWhiteSpace(propertyNameProp.stringValue)
-                ? "< undefined >"
-                : propertyNameProp.stringValue;
+
+            string propertyName;
+            GUIContent propertyLabel;
+
+            if (string.IsNullOrWhiteSpace(propertyNameProp.stringValue))
+            {
+                propertyLabel = new GUIContent("< undefined >");
+                propertyName = "";
+            }
+            else
+            {
+                var candidate = propertyNameProp.stringValue;
+                var propAttrib = targetAttributes.FirstOrDefault(x => x.PropertyName == candidate);
+
+                if (propAttrib == null)
+                {
+                    propertyLabel = new GUIContent(
+                          $"< invalid > {candidate}"
+                        , $"{targetType.FullName} does not contain a property named {candidate}"
+                    );
+
+                    propertyName = "";
+                }
+                else
+                {
+                    propertyLabel = new GUIContent(
+                          $"{propAttrib.PropertyName} : {propAttrib.PropertyType.GetName()}"
+                        , $"class {targetType.Name} in namespace {targetType.Namespace}"
+                    );
+                    propertyName = propAttrib.PropertyName;
+                }
+            }
 
             var attrib = fieldInfo.GetCustomAttribute<LabelAttribute>();
             var label = attrib != null ? attrib.Value : ObjectNames.NicifyVariableName(fieldInfo.Name);
@@ -183,9 +216,9 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             EditorGUILayout.PrefixLabel(label);
 
-            if (GUILayout.Button(propertyName))
+            if (GUILayout.Button(propertyLabel))
             {
-                DrawBindingPropertyMenu(serializedBinder, binder, propertyNameProp, target, propertyName);
+                DrawBindingPropertyMenu(serializedBinder, binder, propertyNameProp, targetType, targetAttributes, propertyName);
             }
 
             EditorGUILayout.EndHorizontal();
@@ -195,19 +228,18 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
               SerializedObject serializedBinder
             , MonoBinder binder
             , SerializedProperty propertyNameProp
-            , IObservableObject target
+            , Type targetType
+            , IEnumerable<NotifyPropertyChangedInfoAttribute> targetAttributes
             , string propertyName
         )
         {
-            var type = target.GetType();
-            var isEmpty = true;
-            var attributes = type.GetCustomAttributes<NotifyPropertyChangedInfoAttribute>();
             var menu = new GenericMenu();
+            var isEmpty = true;
 
-            foreach (var attribute in attributes)
+            foreach (var attribute in targetAttributes)
             {
                 menu.AddItem(
-                      new GUIContent($"{attribute.PropertyName} : {attribute.PropertyType.Name}")
+                      new GUIContent($"{attribute.PropertyName} : {attribute.PropertyType.GetName()}")
                     , propertyName == attribute.PropertyName
                     , x => SetBindingPropertyName(serializedBinder, binder, propertyNameProp, (string)x)
                     , attribute.PropertyName
@@ -218,7 +250,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             if (isEmpty)
             {
-                menu.AddDisabledItem(new GUIContent($"{type.FullName} contains no [ObservableProperty]"));
+                menu.AddDisabledItem(new GUIContent($"{targetType.FullName} contains no [ObservableProperty]"));
             }
 
             menu.ShowAsContext();
@@ -251,9 +283,14 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 return;
             }
 
-            var type = binder.GetType();
+            var binderType = binder.GetType();
             var fieldInfos = TypeCache.GetFieldsWithAttribute<GeneratedConverterAttribute>()
-                .Where(x => x.DeclaringType == type);
+                .Where(x => x.DeclaringType == binderType);
+
+            var adapterTypes = TypeCache.GetTypesDerivedFrom<IAdapter>()
+                .Where(x => x.IsSubclassOf(typeof(UnityEngine.Object)) == false);
+
+            var adapterTypesIsEmpty = adapterTypes.Count() == 0;
 
             EditorGUILayout.LabelField("Converters", EditorStyles.boldLabel);
             EditorGUILayout.BeginVertical(GUI.skin.box);
@@ -265,7 +302,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             foreach (var fieldInfo in fieldInfos)
             {
-                DrawConverter(serializedBinder, binder, fieldInfo);
+                DrawConverter(serializedBinder, binder, fieldInfo, adapterTypes, adapterTypesIsEmpty);
             }
 
             EditorGUILayout.EndVertical();
@@ -275,23 +312,28 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
               SerializedObject serializedBinder
             , MonoBinder binder
             , FieldInfo fieldInfo
+            , IEnumerable<Type> adapterTypes
+            , bool adapterTypesIsEmpty
         )
         {
             var converterProp = serializedBinder.FindProperty(fieldInfo.Name);
             var adapterProp = converterProp.FindPropertyRelative("<Adapter>k__BackingField");
 
-            string adapterName;
+            GUIContent adapterLabel;
+            string adapterFullName;
             Type adapterType;
 
             if (adapterProp.managedReferenceValue is IAdapter adapter)
             {
                 adapterType = adapter.GetType();
-                adapterName = adapterType.FullName;
+                adapterLabel = new GUIContent(adapterType.Name, $"namespace {adapterType.Namespace}");
+                adapterFullName = adapterType.FullName;
             }
             else
             {
                 adapterType = null;
-                adapterName = "< undefined >";
+                adapterLabel = new GUIContent("< undefined >");
+                adapterFullName = "";
             }
 
             var attrib = fieldInfo.GetCustomAttribute<LabelAttribute>();
@@ -301,9 +343,9 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             EditorGUILayout.PrefixLabel(label);
 
-            if (GUILayout.Button(adapterName))
+            if (GUILayout.Button(adapterLabel))
             {
-                DrawAdapterMenu(serializedBinder, binder, adapterProp, adapterType, adapterName);
+                DrawAdapterMenu(serializedBinder, binder, adapterProp, adapterTypes, adapterTypesIsEmpty, adapterType, adapterFullName);
             }
 
             EditorGUILayout.EndHorizontal();
@@ -313,34 +355,51 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
               SerializedObject serializedBinder
             , MonoBinder binder
             , SerializedProperty adapterProp
+            , IEnumerable<Type> adapterTypes
+            , bool adapterTypesIsEmpty
             , Type adapterType
-            , string adapterName
+            , string adapterFullName
         )
         {
-            var types = TypeCache.GetTypesDerivedFrom<IAdapter>()
-                .Where(x => x.IsSubclassOf(typeof(UnityEngine.Object)) == false);
-
             var menu = new GenericMenu();
-            var isEmpty = true;
 
-            foreach (var type in types)
+            if (adapterTypesIsEmpty == false)
+            {
+                menu.AddItem(
+                      new GUIContent("None")
+                    , string.IsNullOrWhiteSpace(adapterFullName)
+                    , () => RemoveAdapter(serializedBinder, binder, adapterProp)
+                );
+            }
+
+            foreach (var type in adapterTypes)
             {
                 menu.AddItem(
                       new GUIContent($"{type.Namespace}/{type.Name}")
-                    , type.FullName == adapterName
+                    , type.FullName == adapterFullName
                     , x => SetAdapter(serializedBinder, binder, adapterProp, adapterType, (Type)x)
                     , type
                 );
-
-                isEmpty = false;
             }
 
-            if (isEmpty)
+            if (adapterTypesIsEmpty)
             {
                 menu.AddDisabledItem(new GUIContent($"No type implements {typeof(IAdapter)}"));
             }
 
             menu.ShowAsContext();
+        }
+
+        private static void RemoveAdapter(
+              SerializedObject serializedBinder
+            , MonoBinder binder
+            , SerializedProperty adapterProp
+        )
+        {
+            Undo.RecordObject(binder, $"Remove {adapterProp.propertyPath}");
+            adapterProp.managedReferenceValue = null;
+            serializedBinder.ApplyModifiedProperties();
+            serializedBinder.Update();
         }
 
         private static void SetAdapter(
@@ -358,7 +417,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             try
             {
-                var instance = Activator.CreateInstance(newType) as IObservableObject;
+                var instance = Activator.CreateInstance(newType) as IAdapter;
                 Undo.RecordObject(binder, $"Set {adapterProp.propertyPath}");
                 adapterProp.managedReferenceValue = instance;
                 serializedBinder.ApplyModifiedProperties();

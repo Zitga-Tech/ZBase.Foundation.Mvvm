@@ -591,8 +591,8 @@ GameObject:
   - component: {fileID: 1774268205}
   - component: {fileID: 1774268207}
   - component: {fileID: 1774268206}
-  - component: {fileID: 1774268208}
   - component: {fileID: 1774268209}
+  - component: {fileID: 1774268210}
   m_Layer: 5
   m_Name: Time_Text
   m_TagString: Untagged
@@ -717,29 +717,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1774268204}
   m_CullTransparentMesh: 1
---- !u!114 &1774268208
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1774268204}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a4a74a37d8ee5b4d823740495bca1a4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _context: {fileID: 606846926}
-  _bindingFieldForUpdateText:
-    <TargetPropertyName>k__BackingField: Text
-  _converterForUpdateText:
-    <Adapter>k__BackingField:
-      rid: -2
-  references:
-    version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
 --- !u!114 &1774268209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -760,6 +737,29 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: 1
   m_LayoutPriority: 1
+--- !u!114 &1774268210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1774268204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 171388d3ee8bde446bbb138e15adc5c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _context: {fileID: 606846926}
+  _bindingFieldForUpdateText:
+    <TargetPropertyName>k__BackingField: Text
+  _converterForUpdateText:
+    <Adapter>k__BackingField:
+      rid: -2
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!1 &1865242959
 GameObject:
   m_ObjectHideFlags: 0

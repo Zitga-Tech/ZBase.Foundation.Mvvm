@@ -4,6 +4,6 @@ namespace ZBase.Foundation.Mvvm.ViewBinding
 {
     public interface IAdapter
     {
-        Union Convert(in Union value);
+        Union Convert(in Union union);
     }
 }
