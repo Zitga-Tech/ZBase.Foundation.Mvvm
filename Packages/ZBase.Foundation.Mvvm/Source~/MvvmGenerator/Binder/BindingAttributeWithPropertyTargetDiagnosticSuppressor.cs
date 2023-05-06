@@ -33,7 +33,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
     public sealed class BindingAttributeWithPropertyTargetDiagnosticSuppressor : DiagnosticSuppressor
     {
         /// <inheritdoc/>
-        public override ImmutableArray<SuppressionDescriptor> SupportedSuppressions => ImmutableArray.Create(PropertyAttributeListForObservablePropertyField);
+        public override ImmutableArray<SuppressionDescriptor> SupportedSuppressions => ImmutableArray.Create(FieldAttributeListForBindingMethod);
 
         /// <inheritdoc/>
         public override void ReportSuppressions(SuppressionAnalysisContext context)
@@ -42,7 +42,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             {
                 var syntaxNode = diagnostic.Location.SourceTree?.GetRoot(context.CancellationToken).FindNode(diagnostic.Location.SourceSpan);
 
-                // Check that the target is effectively [field:] or [property:] over a method declaration, which is the case we're looking for
+                // Check that the target is effectively [field:] over a method declaration, which is the case we're looking for
                 if (syntaxNode is AttributeTargetSpecifierSyntax attributeTarget
                     && attributeTarget.Parent.Parent is MethodDeclarationSyntax methodDeclaration
                     && attributeTarget.Identifier.IsKind(SyntaxKind.FieldKeyword)
@@ -53,7 +53,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     // Get the method symbol from the first variable declaration
                     var declaredSymbol = semanticModel.GetDeclaredSymbol(methodDeclaration, context.CancellationToken);
 
-                    // Check if the method is using [RelayCommand], in which case we should suppress the warning
+                    // Check if the method is using [Binding], in which case we should suppress the warning
                     if (declaredSymbol is IMethodSymbol methodSymbol
                         && semanticModel.Compilation.GetTypeByMetadataName("ZBase.Foundation.Mvvm.ViewBinding.BindingAttribute") is INamedTypeSymbol bindingSymbol
                         && methodSymbol.HasAttributeWithType(bindingSymbol)
