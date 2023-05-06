@@ -288,7 +288,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 .Where(x => x.DeclaringType == binderType);
 
             var adapterTypes = TypeCache.GetTypesDerivedFrom<IAdapter>()
-                .Where(x => x.IsSubclassOf(typeof(UnityEngine.Object)) == false);
+                .Where(x => x.IsAbstract == false && x.IsSubclassOf(typeof(UnityEngine.Object)) == false);
 
             var adapterTypesIsEmpty = adapterTypes.Count() == 0;
 
