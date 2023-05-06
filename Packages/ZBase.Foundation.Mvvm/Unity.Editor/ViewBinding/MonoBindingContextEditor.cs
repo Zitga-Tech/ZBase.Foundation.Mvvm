@@ -6,24 +6,24 @@ using ZBase.Foundation.Mvvm.ComponentModel;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
-    [UnityEditor.CustomEditor(typeof(MonoContext))]
-    public sealed class MonoContextEditor : UnityEditor.Editor
+    [UnityEditor.CustomEditor(typeof(MonoBindingContext))]
+    public sealed class MonoBindingContextEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
-            if (this.target is not MonoContext context)
+            if (this.target is not MonoBindingContext context)
             {
                 base.OnInspectorGUI();
                 return;
             }
 
-            var targetKindProp = this.serializedObject.FindProperty(nameof(MonoContext._targetKind));
-            var systemObjectProp = this.serializedObject.FindProperty(nameof(MonoContext._targetSystemObject));
-            var unityObjectProp = this.serializedObject.FindProperty(nameof(MonoContext._targetUnityObject));
+            var targetKindProp = this.serializedObject.FindProperty(nameof(MonoBindingContext._targetKind));
+            var systemObjectProp = this.serializedObject.FindProperty(nameof(MonoBindingContext._targetSystemObject));
+            var unityObjectProp = this.serializedObject.FindProperty(nameof(MonoBindingContext._targetUnityObject));
 
             EditorGUI.BeginChangeCheck();
 
-            var targetKind = (MonoContext.ContextTargetKind)EditorGUILayout.EnumPopup(
+            var targetKind = (MonoBindingContext.ContextTargetKind)EditorGUILayout.EnumPopup(
                 "Target Kind", context._targetKind
             );
 
@@ -34,13 +34,13 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
                 switch (targetKind)
                 {
-                    case MonoContext.ContextTargetKind.SystemObject:
+                    case MonoBindingContext.ContextTargetKind.SystemObject:
                     {
                         unityObjectProp.objectReferenceValue = null;
                         break;
                     }
 
-                    case MonoContext.ContextTargetKind.UnityObject:
+                    case MonoBindingContext.ContextTargetKind.UnityObject:
                     {
                         systemObjectProp.managedReferenceValue = null;
                         break;
@@ -53,13 +53,13 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             switch (context._targetKind)
             {
-                case MonoContext.ContextTargetKind.SystemObject:
+                case MonoBindingContext.ContextTargetKind.SystemObject:
                 {
                     DrawTargetSystemObject(context, this.serializedObject, systemObjectProp);
                     break;
                 }
 
-                case MonoContext.ContextTargetKind.UnityObject:
+                case MonoBindingContext.ContextTargetKind.UnityObject:
                 {
                     DrawTargetUnityObject(this.serializedObject, unityObjectProp, context);
                     break;
@@ -68,7 +68,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         }
 
         private static void DrawTargetSystemObject(
-              MonoContext context
+              MonoBindingContext context
             , SerializedObject obj
             , SerializedProperty prop
         )
@@ -124,7 +124,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         private static void SetTargetSystemObject(
               SerializedObject serializedObject
             , SerializedProperty serializedProperty
-            , MonoContext context
+            , MonoBindingContext context
             , Type currentType
             , Type newType
         )
@@ -151,7 +151,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         private static void DrawTargetUnityObject(
               SerializedObject serializedObject
             , SerializedProperty serializedProperty
-            , MonoContext context
+            , MonoBindingContext context
         )
         {
             var target = EditorGUILayout.ObjectField(

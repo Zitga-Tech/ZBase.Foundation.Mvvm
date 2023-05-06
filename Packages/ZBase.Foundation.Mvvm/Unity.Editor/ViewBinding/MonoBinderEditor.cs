@@ -31,9 +31,9 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
 
             var serializedContext = new SerializedObject(contextProp.objectReferenceValue);
-            var targetKindProp = serializedContext.FindProperty(nameof(MonoContext._targetKind));
-            var systemObjectProp = serializedContext.FindProperty(nameof(MonoContext._targetSystemObject));
-            var unityObjectProp = serializedContext.FindProperty(nameof(MonoContext._targetUnityObject));
+            var targetKindProp = serializedContext.FindProperty(nameof(MonoBindingContext._targetKind));
+            var systemObjectProp = serializedContext.FindProperty(nameof(MonoBindingContext._targetSystemObject));
+            var unityObjectProp = serializedContext.FindProperty(nameof(MonoBindingContext._targetUnityObject));
 
             var target = GetContextTarget(targetKindProp, systemObjectProp, unityObjectProp);
             DrawContextTarget(target);
@@ -102,11 +102,11 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             , SerializedProperty unityObjectProp
         )
         {
-            var targetKind = (MonoContext.ContextTargetKind)targetKindProp.enumValueIndex;
+            var targetKind = (MonoBindingContext.ContextTargetKind)targetKindProp.enumValueIndex;
 
             return targetKind switch {
-                MonoContext.ContextTargetKind.SystemObject => systemObjectProp.managedReferenceValue as IObservableObject,
-                MonoContext.ContextTargetKind.UnityObject => unityObjectProp.objectReferenceValue as IObservableObject,
+                MonoBindingContext.ContextTargetKind.SystemObject => systemObjectProp.managedReferenceValue as IObservableObject,
+                MonoBindingContext.ContextTargetKind.UnityObject => unityObjectProp.objectReferenceValue as IObservableObject,
                 _ => null,
             };
         }
