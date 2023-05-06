@@ -2,8 +2,9 @@ using TMPro;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
-namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
+namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
+    [AddComponentMenu("MVVM/Binders/TMP Text Binder")]
     [RequireComponent(typeof(TMP_Text))]
     public partial class TMP_TextBinder : MonoBinder
     {
