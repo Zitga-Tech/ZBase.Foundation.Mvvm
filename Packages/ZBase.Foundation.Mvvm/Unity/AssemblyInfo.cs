@@ -1,1 +1,1 @@
-[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ZBase.Foundation.Mvvm.Editor")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ZBase.Foundation.Mvvm.Unity.Editor")]

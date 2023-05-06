@@ -1,6 +1,6 @@
 {
-    "name": "ZBase.Foundation.Mvvm.Editor",
-    "rootNamespace": "ZBase.Foundation.Mvvm.Editor",
+    "name": "ZBase.Foundation.Mvvm.Unity.Editor",
+    "rootNamespace": "ZBase.Foundation.Mvvm.Unity.Editor",
     "references": [
         "ZBase.Foundation.Mvvm",
         "ZBase.Foundation.Mvvm.Unity"
