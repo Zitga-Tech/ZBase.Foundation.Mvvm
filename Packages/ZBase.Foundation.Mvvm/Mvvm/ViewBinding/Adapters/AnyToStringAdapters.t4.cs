@@ -17,7 +17,7 @@ using ZBase.Foundation.Mvvm.Unions;
 namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 {
 
-    [Label("Bool => String")]
+    [Label("Bool => String", "Default")]
     public sealed class BoolToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -31,7 +31,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
-    [Label("Byte => String")]
+    [Label("Byte => String", "Default")]
     public sealed class ByteToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -45,7 +45,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
-    [Label("SByte => String")]
+    [Label("SByte => String", "Default")]
     public sealed class SByteToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -59,7 +59,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
-    [Label("Char => String")]
+    [Label("Char => String", "Default")]
     public sealed class CharToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -73,7 +73,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
-    [Label("Double => String")]
+    [Label("Double => String", "Default")]
     public sealed class DoubleToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -87,7 +87,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
-    [Label("Float => String")]
+    [Label("Float => String", "Default")]
     public sealed class FloatToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -101,7 +101,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
-    [Label("Int => String")]
+    [Label("Int => String", "Default")]
     public sealed class IntToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -115,7 +115,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
-    [Label("UInt => String")]
+    [Label("UInt => String", "Default")]
     public sealed class UIntToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -129,7 +129,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
-    [Label("Long => String")]
+    [Label("Long => String", "Default")]
     public sealed class LongToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -143,7 +143,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
-    [Label("ULong => String")]
+    [Label("ULong => String", "Default")]
     public sealed class ULongToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -157,7 +157,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
-    [Label("Short => String")]
+    [Label("Short => String", "Default")]
     public sealed class ShortToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -171,7 +171,7 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
         }
     }
 
-    [Label("UShort => String")]
+    [Label("UShort => String", "Default")]
     public sealed class UShortToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)

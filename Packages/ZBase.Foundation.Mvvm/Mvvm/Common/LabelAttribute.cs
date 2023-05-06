@@ -8,11 +8,20 @@ namespace ZBase.Foundation.Mvvm
     [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = false)]
     public sealed class LabelAttribute : Attribute
     {
-        public string Value { get; }
+        public string Label { get; }
 
-        public LabelAttribute(string value)
+        public string Directory { get; }
+
+        public LabelAttribute(string label)
         {
-            this.Value = value;
+            this.Label = label;
+            this.Directory = "";
+        }
+
+        public LabelAttribute(string label, string directory)
+        {
+            this.Label = label;
+            this.Directory = directory;
         }
     }
 }

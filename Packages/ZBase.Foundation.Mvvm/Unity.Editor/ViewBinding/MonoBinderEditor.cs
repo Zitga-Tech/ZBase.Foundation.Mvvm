@@ -14,9 +14,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
     {
         public override void OnInspectorGUI()
         {
+            base.OnInspectorGUI();
+
             if (this.target is not MonoBinder binder)
             {
-                base.OnInspectorGUI();
                 return;
             }
 
@@ -210,7 +211,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
 
             var attrib = fieldInfo.GetCustomAttribute<LabelAttribute>();
-            var label = attrib != null ? attrib.Value : ObjectNames.NicifyVariableName(fieldInfo.Name);
+            var label = attrib != null ? attrib.Label : ObjectNames.NicifyVariableName(fieldInfo.Name);
 
             EditorGUILayout.BeginHorizontal();
 
@@ -330,7 +331,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 var labelAttrib = adapterType.GetCustomAttribute<LabelAttribute>();
                 
                 adapterLabel = new GUIContent(
-                      labelAttrib?.Value ?? adapterType.Name
+                      labelAttrib?.Label ?? adapterType.Name
                     , $"{keyword} {adapterType.Name}\nin {adapterType.Namespace}"
                 );
 
@@ -344,7 +345,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
 
             var attrib = fieldInfo.GetCustomAttribute<LabelAttribute>();
-            var label = attrib != null ? attrib.Value : ObjectNames.NicifyVariableName(fieldInfo.Name);
+            var label = attrib != null ? attrib.Label : ObjectNames.NicifyVariableName(fieldInfo.Name);
 
             EditorGUILayout.BeginHorizontal();
 
@@ -382,10 +383,11 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             foreach (var type in adapterTypes)
             {
                 var labelAttrib = type.GetCustomAttribute<LabelAttribute>();
-                var labelText = labelAttrib?.Value ?? type.Name;
+                var labelText = labelAttrib?.Label ?? type.Name;
                 var keyword = type.IsValueType ? "struct" : "class";
+                var directory = labelAttrib?.Directory ?? type.Namespace;
                 var label = new GUIContent(
-                      $"{type.Namespace}/{labelText}"
+                      $"{directory}/{labelText}"
                     , $"{keyword} {type.Name}\nin {type.Namespace}"
                 );
 

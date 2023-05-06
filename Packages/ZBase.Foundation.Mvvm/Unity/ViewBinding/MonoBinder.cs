@@ -6,7 +6,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     public abstract partial class MonoBinder : MonoBehaviour, IBinder
     {
-        [SerializeField]
+        [SerializeField, HideInInspector]
         internal Component _context;
 
         public IBindingContext Context { get; private set; }
