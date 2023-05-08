@@ -10,6 +10,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
               SourceProductionContext context
             , Compilation compilation
             , bool outputSourceGenFiles
+            , DiagnosticDescriptor errorDescriptor
         )
         {
             foreach (var typeRef in RefTypeRefs)
@@ -46,7 +47,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
                 catch (Exception e)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
-                          s_errorDescriptor
+                          errorDescriptor
                         , typeRef.Syntax.GetLocation()
                         , e.ToUnityPrintableString()
                     ));
@@ -258,6 +259,24 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
                         p.PrintEndLine();
 
                         p.PrintLine("return false;");
+                    }
+                    p.CloseScope();
+                    p.PrintEndLine();
+
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine($"public string ToString(in {UNION_TYPE} union)");
+                    p.OpenScope();
+                    {
+                        p.PrintLine($"if (union.TypeId == {unionName}.TypeId)");
+                        p.OpenScope();
+                        {
+                            p.PrintLine($"var temp = new {internalUnionName}(union);");
+                            p.PrintLine("return temp.Value.ToString();");
+                        }
+                        p.CloseScope();
+                        p.PrintEndLine();
+
+                        p.PrintLine("return union.TypeId.AsType()?.ToString() ?? string.Empty;");
                     }
                     p.CloseScope();
                     p.PrintEndLine();

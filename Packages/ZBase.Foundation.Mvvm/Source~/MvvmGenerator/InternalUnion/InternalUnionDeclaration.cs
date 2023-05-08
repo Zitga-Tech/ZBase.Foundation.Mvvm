@@ -8,26 +8,32 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
 {
     public partial class InternalUnionDeclaration
     {
-        public const string COMPONENT_MODEL_NAMESPACE = "ZBase.Foundation.Mvvm.ComponentModel";
-        public const string OBSERVABLE_PROPERTY = "ObservableProperty";
-        public const string OBSERVABLE_PROPERTY_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ComponentModel.ObservablePropertyAttribute";
-        public const string RELAY_COMMAND_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.Input.RelayCommandAttribute";
-
         public ImmutableArray<TypeRef> ValueTypeRefs { get; }
 
         public ImmutableArray<TypeRef> RefTypeRefs { get; }
 
-        public InternalUnionDeclaration(ImmutableArray<TypeRef> candidates)
+        public InternalUnionDeclaration(
+              ImmutableArray<TypeRef> candidates
+            , ImmutableArray<ITypeSymbol> candidatesToIgnore
+        )
         {
             var valueTypeFiltered = new Dictionary<string, TypeRef>();
             var refTypeFiltered = new Dictionary<string, TypeRef>();
+            var ignoredTypes = new HashSet<string>();
+
+            foreach (var candidate in candidatesToIgnore)
+            {
+                ignoredTypes.Add(candidate.ToFullName());
+            }
 
             foreach (var candidate in candidates)
             {
                 var symbol = candidate.Symbol;
                 var typeName = symbol.ToFullName();
 
-                if (typeName.ToUnionType().IsNativeUnionType())
+                if (typeName.ToUnionType().IsNativeUnionType()
+                    || ignoredTypes.Contains(typeName)
+                )
                 {
                     continue;
                 }

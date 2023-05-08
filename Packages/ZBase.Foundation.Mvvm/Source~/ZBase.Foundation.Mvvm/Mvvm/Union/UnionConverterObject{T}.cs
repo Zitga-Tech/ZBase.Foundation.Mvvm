@@ -38,5 +38,15 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
 
             return false;
         }
+
+        public string ToString(in Union union)
+        {
+            if (union.TryGetValue(out object candidate) && candidate is T value)
+            {
+                return value.ToString();
+            }
+
+            return union.TypeId.AsType()?.ToString() ?? string.Empty;
+        }
     }
 }

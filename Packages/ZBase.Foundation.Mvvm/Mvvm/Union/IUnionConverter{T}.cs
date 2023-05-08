@@ -2,25 +2,14 @@
 {
     public interface IUnionConverter<T>
     {
-        public Union ToUnion(T value)
-        {
-            return default;
-        }
+        Union ToUnion(T value);
 
-        public Union<T> ToUnionT(T value)
-        {
-            return default;
-        }
+        Union<T> ToUnionT(T value);
 
-        public bool TryGetValue(in Union union, out T result)
-        {
-            result = default;
-            return false;
-        }
+        bool TryGetValue(in Union union, out T result);
 
-        public bool TrySetValueTo(in Union union, ref T dest)
-        {
-            return false;
-        }
+        bool TrySetValueTo(in Union union, ref T dest);
+
+        string ToString(in Union union);
     }
 }

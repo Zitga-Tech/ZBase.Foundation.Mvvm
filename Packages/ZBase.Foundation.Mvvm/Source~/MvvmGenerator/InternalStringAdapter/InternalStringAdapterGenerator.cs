@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Immutable;
@@ -6,13 +7,14 @@ using System.Linq;
 using System.Threading;
 using ZBase.Foundation.SourceGen;
 
-namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
+namespace ZBase.Foundation.Mvvm.InternalStringAdapterSourceGen
 {
     [Generator]
-    public class InternalUnionGenerator : IIncrementalGenerator
+    public class InternalStringAdapterGenerator : IIncrementalGenerator
     {
         private const string IOBSERVABLE_OBJECT = "global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject";
-        private const string IUNION_T = "global::ZBase.Foundation.Mvvm.Unions.IUnion<";
+        private const string IADAPTER = "global::ZBase.Foundation.Mvvm.ViewBinding.IAdapter";
+        private const string ADAPTER_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ViewBinding.AdapterAttribute";
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
@@ -24,9 +26,9 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
             ).Where(static t => t is { });
 
             var candidateToIgnoreProvider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: static (node, token) => GeneratorHelpers.IsStructSyntaxMatch(node, token),
-                transform: static (syntaxContext, token) => GetTypeInGenericUnionDeclaration(syntaxContext, token)
-            ).Where(static t => t is { });
+                predicate: static (node, token) => IsAdapterTypeSyntaxMatch(node, token),
+                transform: static (syntaxContext, token) => GetTypeInAdapterDeclaration(syntaxContext, token)
+            ).Where(static t => t is not null);
 
             var combined = candidateProvider.Collect()
                 .Combine(candidateToIgnoreProvider.Collect())
@@ -48,7 +50,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
         public static bool IsSyntaxMatch(SyntaxNode syntaxNode, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            
+
             if (syntaxNode is FieldDeclarationSyntax field)
             {
                 if (field.HasAttributeCandidate("ZBase.Foundation.Mvvm.ComponentModel", "ObservableProperty"))
@@ -124,7 +126,18 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
             return null;
         }
 
-        public static ITypeSymbol GetTypeInGenericUnionDeclaration(
+        public static bool IsAdapterTypeSyntaxMatch(SyntaxNode syntaxNode, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            return syntaxNode is TypeDeclarationSyntax typeDeclareSyntax
+                && typeDeclareSyntax.Kind() is (SyntaxKind.ClassDeclaration or SyntaxKind.StructDeclaration)
+                && typeDeclareSyntax.BaseList != null
+                && typeDeclareSyntax.BaseList.Types.Count > 0
+                && typeDeclareSyntax.AttributeLists.Count > 0;
+        }
+
+        public static INamedTypeSymbol GetTypeInAdapterDeclaration(
               GeneratorSyntaxContext context
             , CancellationToken token
         )
@@ -132,33 +145,34 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
             token.ThrowIfCancellationRequested();
 
             if (context.SemanticModel.Compilation.IsValidCompilation() == false
-                || context.Node is not StructDeclarationSyntax structSyntax
-                || structSyntax.BaseList == null
-                || structSyntax.BaseList.Types.Count < 1
+                || context.Node is not TypeDeclarationSyntax typeDeclareSyntax
+                || typeDeclareSyntax.Kind() is not (SyntaxKind.ClassDeclaration or SyntaxKind.StructDeclaration)
+                || typeDeclareSyntax.BaseList == null
+                || typeDeclareSyntax.BaseList.Types.Count < 1
+                || typeDeclareSyntax.AttributeLists.Count < 1
             )
             {
                 return null;
             }
 
             var semanticModel = context.SemanticModel;
+            var declaredSymbol = semanticModel.GetDeclaredSymbol(typeDeclareSyntax, token);
 
-            foreach (var baseType in structSyntax.BaseList.Types)
+            foreach (var baseType in typeDeclareSyntax.BaseList.Types)
             {
-                var typeInfo = semanticModel.GetTypeInfo(baseType.Type, token);
+                var baseTypeInfo = semanticModel.GetTypeInfo(baseType.Type, token);
 
-                if (typeInfo.Type is INamedTypeSymbol interfaceSymbol)
+                if (baseTypeInfo.Type is INamedTypeSymbol interfaceSymbol
+                    && interfaceSymbol.ToFullName() == IADAPTER
+                    && TryGetMatchTypeFromAttribute(declaredSymbol, out var type)
+                )
                 {
-                    if (interfaceSymbol.IsGenericType
-                       && interfaceSymbol.TypeParameters.Length == 1
-                       && interfaceSymbol.ToFullName().StartsWith(IUNION_T)
-                    )
-                    {
-                        return interfaceSymbol.TypeArguments[0];
-                    }
+                    return type;
                 }
 
-                if (TryGetMatchTypeArgument(typeInfo.Type.Interfaces, out var type)
-                    || TryGetMatchTypeArgument(typeInfo.Type.AllInterfaces, out type)
+                if ((ImplementsInterface(baseTypeInfo.Type.Interfaces)
+                    || ImplementsInterface(baseTypeInfo.Type.AllInterfaces))
+                    && TryGetMatchTypeFromAttribute(declaredSymbol, out type)
                 )
                 {
                     return type;
@@ -167,25 +181,45 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
 
             return null;
 
-            static bool TryGetMatchTypeArgument(
-                  ImmutableArray<INamedTypeSymbol> interfaces
-                , out ITypeSymbol result
-            )
+            static bool ImplementsInterface(ImmutableArray<INamedTypeSymbol> interfaces)
             {
                 foreach (var interfaceSymbol in interfaces)
                 {
-                    if (interfaceSymbol.IsGenericType
-                        && interfaceSymbol.TypeParameters.Length == 1
-                        && interfaceSymbol.ToFullName().StartsWith(IUNION_T)
-                    )
+                    if (interfaceSymbol.ToFullName() == IADAPTER)
                     {
-                        result = interfaceSymbol.TypeArguments[0];
                         return true;
                     }
                 }
 
-                result = default;
                 return false;
+            }
+
+            static bool TryGetMatchTypeFromAttribute(
+                  INamedTypeSymbol declaredSymbol
+                , out INamedTypeSymbol fromType
+            )
+            {
+                if (declaredSymbol == null)
+                {
+                    fromType = default;
+                    return false;
+                }
+
+                var attribute = declaredSymbol.GetAttribute(ADAPTER_ATTRIBUTE);
+
+                if (attribute == null
+                    || attribute.ConstructorArguments.Length != 2
+                    || attribute.ConstructorArguments[1].Value is not INamedTypeSymbol toArg
+                    || toArg.ToFullName() != "string"
+                    || attribute.ConstructorArguments[0].Value is not INamedTypeSymbol fromArg
+                )
+                {
+                    fromType = default;
+                    return false;
+                }
+
+                fromType = fromArg;
+                return fromType != null;
             }
         }
 
@@ -193,7 +227,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
               SourceProductionContext context
             , Compilation compilation
             , ImmutableArray<TypeRef> candidates
-            , ImmutableArray<ITypeSymbol> candidatesToIgnore
+            , ImmutableArray<INamedTypeSymbol> candidatesToIgnore
             , string projectPath
             , bool outputSourceGenFiles
         )
@@ -209,23 +243,9 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
             {
                 SourceGenHelpers.ProjectPath = projectPath;
 
-                var declaration = new InternalUnionDeclaration(candidates, candidatesToIgnore);
-
-                declaration.GenerateUnionForValueTypes(
-                      context
-                    , compilation
-                    , outputSourceGenFiles
-                    , s_errorDescriptor
-                );
-
-                declaration.GenerateUnionForRefTypes(
-                      context
-                    , compilation
-                    , outputSourceGenFiles
-                    , s_errorDescriptor
-                );
-
-                declaration.GenerateStaticClass(
+                var declaration = new InternalStringAdapterDeclaration(candidates, candidatesToIgnore);
+                
+                declaration.GenerateAdapters(
                       context
                     , compilation
                     , outputSourceGenFiles
@@ -243,10 +263,10 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
         }
 
         private static readonly DiagnosticDescriptor s_errorDescriptor
-            = new("SG_INTERNAL_UNIONS_01"
-                , "Internal Union Generator Error"
-                , "This error indicates a bug in the Internal Union source generators. Error message: '{0}'."
-                , "ZBase.Foundation.Mvvm.IObservableObject"
+            = new("SG_INTERNAL_STRING_ADAPTER_01"
+                , "Internal String Adapter Generator Error"
+                , "This error indicates a bug in the Internal String Adapter source generators. Error message: '{0}'."
+                , "ZBase.Foundation.Mvvm.ViewBinding.IAdapter"
                 , DiagnosticSeverity.Error
                 , isEnabledByDefault: true
                 , description: ""

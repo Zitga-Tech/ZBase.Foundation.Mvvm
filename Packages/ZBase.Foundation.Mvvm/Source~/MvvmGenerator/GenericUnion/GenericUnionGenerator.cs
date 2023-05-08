@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -10,7 +11,7 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
     [Generator]
     public class GenericUnionGenerator : IIncrementalGenerator
     {
-        public const string INTERFACE = "global::ZBase.Foundation.Mvvm.Unions.IUnion<";
+        public const string IUNION_T = "global::ZBase.Foundation.Mvvm.Unions.IUnion<";
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
@@ -59,8 +60,8 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
                 {
                     if (interfaceSymbol.IsGenericType
                        && interfaceSymbol.TypeParameters.Length == 1
-                       && interfaceSymbol.ToFullName().StartsWith(INTERFACE)
-                   )
+                       && interfaceSymbol.ToFullName().StartsWith(IUNION_T)
+                    )
                     {
                         return new StructRef {
                             Syntax = structSyntax,
@@ -69,34 +70,37 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
                     }
                 }
 
-                if (TryGetMatchTypeArgument(typeInfo.Type.Interfaces, out var typeArgument)
-                    || TryGetMatchTypeArgument(typeInfo.Type.AllInterfaces, out typeArgument)
+                if (TryGetMatchTypeArgument(typeInfo.Type.Interfaces, out var type)
+                    || TryGetMatchTypeArgument(typeInfo.Type.AllInterfaces, out type)
                 )
                 {
                     return new StructRef {
                         Syntax = structSyntax,
-                        TypeArgument = typeArgument,
+                        TypeArgument = type,
                     };
                 }
             }
 
             return null;
 
-            static bool TryGetMatchTypeArgument(ImmutableArray<INamedTypeSymbol> interfaces, out ITypeSymbol typeArgument)
+            static bool TryGetMatchTypeArgument(
+                  ImmutableArray<INamedTypeSymbol> interfaces
+                , out ITypeSymbol result
+            )
             {
                 foreach (var interfaceSymbol in interfaces)
                 {
                     if (interfaceSymbol.IsGenericType
                         && interfaceSymbol.TypeParameters.Length == 1
-                        && interfaceSymbol.ToFullName().StartsWith(INTERFACE)
+                        && interfaceSymbol.ToFullName().StartsWith(IUNION_T)
                     )
                     {
-                        typeArgument = interfaceSymbol.TypeArguments[0];
+                        result = interfaceSymbol.TypeArguments[0];
                         return true;
                     }
                 }
 
-                typeArgument = default;
+                result = default;
                 return false;
             }
         }
@@ -116,33 +120,58 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
 
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            SourceGenHelpers.ProjectPath = projectPath;
+            try
+            {
+                SourceGenHelpers.ProjectPath = projectPath;
 
-            var declaration = new GenericUnionDeclaration(candidates, compilation, context.CancellationToken);
+                var declaration = new GenericUnionDeclaration(candidates, compilation, context.CancellationToken);
 
-            declaration.GenerateUnionForValueTypes(
-                  context
-                , compilation
-                , outputSourceGenFiles
-            );
+                declaration.GenerateUnionForValueTypes(
+                      context
+                    , compilation
+                    , outputSourceGenFiles
+                    , s_errorDescriptor
+                );
 
-            declaration.GenerateUnionForRefTypes(
-                  context
-                , compilation
-                , outputSourceGenFiles
-            );
+                declaration.GenerateUnionForRefTypes(
+                      context
+                    , compilation
+                    , outputSourceGenFiles
+                    , s_errorDescriptor
+                );
 
-            declaration.GenerateStaticClass(
-                  context
-                , compilation
-                , outputSourceGenFiles
-            );
+                declaration.GenerateStaticClass(
+                      context
+                    , compilation
+                    , outputSourceGenFiles
+                    , s_errorDescriptor
+                );
 
-            declaration.GenerateRedundantTypes(
-                  context
-                , compilation
-                , outputSourceGenFiles
-            );
+                declaration.GenerateRedundantTypes(
+                      context
+                    , compilation
+                    , outputSourceGenFiles
+                    , s_errorDescriptor
+                );
+            }
+            catch (Exception e)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                      s_errorDescriptor
+                    , null
+                    , e.ToUnityPrintableString()
+                ));
+            }
         }
+
+        private static readonly DiagnosticDescriptor s_errorDescriptor
+            = new("SG_GENERIC_UNIONS_01"
+                , "Generic Union Generator Error"
+                , "This error indicates a bug in the Generic Union source generators. Error message: '{0}'."
+                , "ZBase.Foundation.Mvvm.Unions.IUnion<T>"
+                , DiagnosticSeverity.Error
+                , isEnabledByDefault: true
+                , description: ""
+            );
     }
 }

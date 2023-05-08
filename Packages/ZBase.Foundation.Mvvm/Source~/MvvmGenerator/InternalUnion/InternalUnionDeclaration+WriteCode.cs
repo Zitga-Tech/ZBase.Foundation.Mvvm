@@ -27,6 +27,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
               SourceProductionContext context
             , Compilation compilation
             , bool outputSourceGenFiles
+            , DiagnosticDescriptor errorDescriptor
         )
         {
             var syntax = CompilationUnit().NormalizeWhitespace(eol: "\n");
@@ -65,7 +66,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
             catch (Exception e)
             {
                 context.ReportDiagnostic(Diagnostic.Create(
-                      s_errorDescriptor
+                      errorDescriptor
                     , syntax.GetLocation()
                     , e.ToUnityPrintableString()
                 ));
@@ -175,15 +176,5 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
                 p.Print("#endif").PrintEndLine();
             }
         }
-
-        private static readonly DiagnosticDescriptor s_errorDescriptor
-            = new("SG_INTERNAL_UNIONS_01"
-                , "Internal Union Generator Error"
-                , "This error indicates a bug in the Internal Union source generators. Error message: '{0}'."
-                , "ZBase.Foundation.Mvvm.IObservableObject"
-                , DiagnosticSeverity.Error
-                , isEnabledByDefault: true
-                , description: ""
-            );
     }
 }

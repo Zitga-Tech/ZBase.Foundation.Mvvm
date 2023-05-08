@@ -503,10 +503,10 @@ namespace ZBase.Foundation.Mvvm.Unions
                     if (GCHandle.Target is object value)
                         return value.ToString();
 
-                    return TypeId.AsType().ToString();
+                    return TypeId.AsType()?.ToString() ?? string.Empty;
                 }
 
-                case UnionTypeKind.ValueType: return TypeId.AsType().ToString();
+                case UnionTypeKind.ValueType: return TypeId.AsType()?.ToString() ?? string.Empty;
             }
 
             if (TypeId != UnionTypeId.Undefined)

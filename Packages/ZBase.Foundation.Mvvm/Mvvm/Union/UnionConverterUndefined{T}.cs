@@ -28,5 +28,11 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         {
             return false;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(in Union union)
+        {
+            return union.ToString();
+        }
     }
 }

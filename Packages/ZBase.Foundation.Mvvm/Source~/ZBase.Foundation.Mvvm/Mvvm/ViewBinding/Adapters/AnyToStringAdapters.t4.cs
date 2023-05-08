@@ -1,4 +1,4 @@
-
+﻿
 
 
 
@@ -19,7 +19,8 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 {
 
     [Serializable]
-    [Label("Bool => String", "Default")]
+    [Label("Bool ⇒ String", "Default")]
+    [Adapter(typeof(bool), typeof(string))]
     public sealed class BoolToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -34,7 +35,8 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
     }
 
     [Serializable]
-    [Label("Byte => String", "Default")]
+    [Label("Byte ⇒ String", "Default")]
+    [Adapter(typeof(byte), typeof(string))]
     public sealed class ByteToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -49,7 +51,8 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
     }
 
     [Serializable]
-    [Label("SByte => String", "Default")]
+    [Label("SByte ⇒ String", "Default")]
+    [Adapter(typeof(sbyte), typeof(string))]
     public sealed class SByteToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -64,7 +67,8 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
     }
 
     [Serializable]
-    [Label("Char => String", "Default")]
+    [Label("Char ⇒ String", "Default")]
+    [Adapter(typeof(char), typeof(string))]
     public sealed class CharToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -79,7 +83,8 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
     }
 
     [Serializable]
-    [Label("Double => String", "Default")]
+    [Label("Double ⇒ String", "Default")]
+    [Adapter(typeof(double), typeof(string))]
     public sealed class DoubleToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -94,7 +99,8 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
     }
 
     [Serializable]
-    [Label("Float => String", "Default")]
+    [Label("Float ⇒ String", "Default")]
+    [Adapter(typeof(float), typeof(string))]
     public sealed class FloatToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -109,7 +115,8 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
     }
 
     [Serializable]
-    [Label("Int => String", "Default")]
+    [Label("Int ⇒ String", "Default")]
+    [Adapter(typeof(int), typeof(string))]
     public sealed class IntToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -124,7 +131,8 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
     }
 
     [Serializable]
-    [Label("UInt => String", "Default")]
+    [Label("UInt ⇒ String", "Default")]
+    [Adapter(typeof(uint), typeof(string))]
     public sealed class UIntToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -139,7 +147,8 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
     }
 
     [Serializable]
-    [Label("Long => String", "Default")]
+    [Label("Long ⇒ String", "Default")]
+    [Adapter(typeof(long), typeof(string))]
     public sealed class LongToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -154,7 +163,8 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
     }
 
     [Serializable]
-    [Label("ULong => String", "Default")]
+    [Label("ULong ⇒ String", "Default")]
+    [Adapter(typeof(ulong), typeof(string))]
     public sealed class ULongToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -169,7 +179,8 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
     }
 
     [Serializable]
-    [Label("Short => String", "Default")]
+    [Label("Short ⇒ String", "Default")]
+    [Adapter(typeof(short), typeof(string))]
     public sealed class ShortToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
@@ -184,7 +195,8 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
     }
 
     [Serializable]
-    [Label("UShort => String", "Default")]
+    [Label("UShort ⇒ String", "Default")]
+    [Adapter(typeof(ushort), typeof(string))]
     public sealed class UShortToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)

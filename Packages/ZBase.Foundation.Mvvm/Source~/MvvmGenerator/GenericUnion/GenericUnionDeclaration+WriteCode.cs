@@ -27,6 +27,7 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
               SourceProductionContext context
             , Compilation compilation
             , bool outputSourceGenFiles
+            , DiagnosticDescriptor errorDescriptor
         )
         {
             var syntax = CompilationUnit().NormalizeWhitespace(eol: "\n");
@@ -65,7 +66,7 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
             catch (Exception e)
             {
                 context.ReportDiagnostic(Diagnostic.Create(
-                      s_errorDescriptor
+                      errorDescriptor
                     , syntax.GetLocation()
                     , e.ToUnityPrintableString()
                 ));
@@ -76,6 +77,7 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
               SourceProductionContext context
             , Compilation compilation
             , bool outputSourceGenFiles
+            , DiagnosticDescriptor errorDescriptor
         )
         {
             foreach (var structRef in Redundants)
@@ -112,7 +114,7 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
                 catch (Exception e)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
-                          s_errorDescriptor
+                          errorDescriptor
                         , structRef.Syntax.GetLocation()
                         , e.ToUnityPrintableString()
                     ));
@@ -238,15 +240,5 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
             p = p.DecreasedIndent();
             return p.Result;
         }
-
-        private static readonly DiagnosticDescriptor s_errorDescriptor
-            = new("SG_GENERIC_UNIONS_01"
-                , "Generic Union Generator Error"
-                , "This error indicates a bug in the Generic Union source generators. Error message: '{0}'."
-                , "ZBase.Foundation.Mvvm.Unions.IUnion<T>"
-                , DiagnosticSeverity.Error
-                , isEnabledByDefault: true
-                , description: ""
-            );
     }
 }

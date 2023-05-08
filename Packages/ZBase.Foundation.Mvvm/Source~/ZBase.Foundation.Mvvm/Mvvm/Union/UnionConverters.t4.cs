@@ -12,6 +12,8 @@
 ///                                                 ///
 ///*************************************************///
 
+using System.Runtime.CompilerServices;
+
 namespace ZBase.Foundation.Mvvm.Unions.Converters
 {
 
@@ -20,14 +22,21 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         public static readonly UnionConverterBool Default = new UnionConverterBool();
 
         private UnionConverterBool() { }
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union ToUnion(bool value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<bool> ToUnionT(bool value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out bool result) => union.TryGetValue(out result);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TrySetValueTo(in Union union, ref bool dest) => union.TrySetValueTo(ref dest);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(in Union union) => union.Bool.ToString();
     }
 
     internal sealed class UnionConverterByte : IUnionConverter<byte>
@@ -35,14 +44,21 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         public static readonly UnionConverterByte Default = new UnionConverterByte();
 
         private UnionConverterByte() { }
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union ToUnion(byte value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<byte> ToUnionT(byte value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out byte result) => union.TryGetValue(out result);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TrySetValueTo(in Union union, ref byte dest) => union.TrySetValueTo(ref dest);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(in Union union) => union.Byte.ToString();
     }
 
     internal sealed class UnionConverterSByte : IUnionConverter<sbyte>
@@ -50,14 +66,21 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         public static readonly UnionConverterSByte Default = new UnionConverterSByte();
 
         private UnionConverterSByte() { }
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union ToUnion(sbyte value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<sbyte> ToUnionT(sbyte value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out sbyte result) => union.TryGetValue(out result);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TrySetValueTo(in Union union, ref sbyte dest) => union.TrySetValueTo(ref dest);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(in Union union) => union.SByte.ToString();
     }
 
     internal sealed class UnionConverterChar : IUnionConverter<char>
@@ -65,14 +88,21 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         public static readonly UnionConverterChar Default = new UnionConverterChar();
 
         private UnionConverterChar() { }
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union ToUnion(char value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<char> ToUnionT(char value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out char result) => union.TryGetValue(out result);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TrySetValueTo(in Union union, ref char dest) => union.TrySetValueTo(ref dest);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(in Union union) => union.Char.ToString();
     }
 
     internal sealed class UnionConverterDouble : IUnionConverter<double>
@@ -80,14 +110,21 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         public static readonly UnionConverterDouble Default = new UnionConverterDouble();
 
         private UnionConverterDouble() { }
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union ToUnion(double value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<double> ToUnionT(double value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out double result) => union.TryGetValue(out result);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TrySetValueTo(in Union union, ref double dest) => union.TrySetValueTo(ref dest);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(in Union union) => union.Double.ToString();
     }
 
     internal sealed class UnionConverterFloat : IUnionConverter<float>
@@ -95,14 +132,21 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         public static readonly UnionConverterFloat Default = new UnionConverterFloat();
 
         private UnionConverterFloat() { }
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union ToUnion(float value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<float> ToUnionT(float value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out float result) => union.TryGetValue(out result);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TrySetValueTo(in Union union, ref float dest) => union.TrySetValueTo(ref dest);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(in Union union) => union.Float.ToString();
     }
 
     internal sealed class UnionConverterInt : IUnionConverter<int>
@@ -110,14 +154,21 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         public static readonly UnionConverterInt Default = new UnionConverterInt();
 
         private UnionConverterInt() { }
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union ToUnion(int value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<int> ToUnionT(int value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out int result) => union.TryGetValue(out result);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TrySetValueTo(in Union union, ref int dest) => union.TrySetValueTo(ref dest);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(in Union union) => union.Int.ToString();
     }
 
     internal sealed class UnionConverterUInt : IUnionConverter<uint>
@@ -125,14 +176,21 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         public static readonly UnionConverterUInt Default = new UnionConverterUInt();
 
         private UnionConverterUInt() { }
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union ToUnion(uint value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<uint> ToUnionT(uint value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out uint result) => union.TryGetValue(out result);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TrySetValueTo(in Union union, ref uint dest) => union.TrySetValueTo(ref dest);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(in Union union) => union.UInt.ToString();
     }
 
     internal sealed class UnionConverterLong : IUnionConverter<long>
@@ -140,14 +198,21 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         public static readonly UnionConverterLong Default = new UnionConverterLong();
 
         private UnionConverterLong() { }
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union ToUnion(long value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<long> ToUnionT(long value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out long result) => union.TryGetValue(out result);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TrySetValueTo(in Union union, ref long dest) => union.TrySetValueTo(ref dest);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(in Union union) => union.Long.ToString();
     }
 
     internal sealed class UnionConverterULong : IUnionConverter<ulong>
@@ -155,14 +220,21 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         public static readonly UnionConverterULong Default = new UnionConverterULong();
 
         private UnionConverterULong() { }
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union ToUnion(ulong value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<ulong> ToUnionT(ulong value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out ulong result) => union.TryGetValue(out result);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TrySetValueTo(in Union union, ref ulong dest) => union.TrySetValueTo(ref dest);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(in Union union) => union.ULong.ToString();
     }
 
     internal sealed class UnionConverterShort : IUnionConverter<short>
@@ -170,14 +242,21 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         public static readonly UnionConverterShort Default = new UnionConverterShort();
 
         private UnionConverterShort() { }
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union ToUnion(short value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<short> ToUnionT(short value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out short result) => union.TryGetValue(out result);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TrySetValueTo(in Union union, ref short dest) => union.TrySetValueTo(ref dest);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(in Union union) => union.Short.ToString();
     }
 
     internal sealed class UnionConverterUShort : IUnionConverter<ushort>
@@ -185,44 +264,21 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         public static readonly UnionConverterUShort Default = new UnionConverterUShort();
 
         private UnionConverterUShort() { }
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union ToUnion(ushort value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<ushort> ToUnionT(ushort value) => new Union(value);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out ushort result) => union.TryGetValue(out result);
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TrySetValueTo(in Union union, ref ushort dest) => union.TrySetValueTo(ref dest);
-    }
-
-    internal sealed class UnionConverterString : IUnionConverter<string>
-    {
-        public static readonly UnionConverterString Default = new UnionConverterString();
-
-        private UnionConverterString() { }
-
-        public Union ToUnion(string value) => new Union(value);
-
-        public Union<string> ToUnionT(string value) => new Union(value);
-
-        public bool TryGetValue(in Union union, out string result) => union.TryGetValue(out result);
-
-        public bool TrySetValueTo(in Union union, ref string dest) => union.TrySetValueTo(ref dest);
-    }
-
-    internal sealed class UnionConverterObject : IUnionConverter<object>
-    {
-        public static readonly UnionConverterObject Default = new UnionConverterObject();
-
-        private UnionConverterObject() { }
-
-        public Union ToUnion(object value) => new Union(value);
-
-        public Union<object> ToUnionT(object value) => new Union(value);
-
-        public bool TryGetValue(in Union union, out object result) => union.TryGetValue(out result);
-
-        public bool TrySetValueTo(in Union union, ref object dest) => union.TrySetValueTo(ref dest);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(in Union union) => union.UShort.ToString();
     }
 
 

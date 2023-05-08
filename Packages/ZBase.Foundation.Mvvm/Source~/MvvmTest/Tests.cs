@@ -81,4 +81,13 @@ namespace MvvmTest
     {
 
     }
+
+    [Adapter(typeof(TypeCode), typeof(string))]
+    public class TypeCodeToStringAdapter : IAdapter
+    {
+        public Union Convert(in Union union)
+        {
+            return Union<TypeCode>.GetConverter().ToString(union);
+        }
+    }
 }

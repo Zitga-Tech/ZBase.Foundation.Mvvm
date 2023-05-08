@@ -10,8 +10,6 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
 {
     public partial class GenericUnionDeclaration
     {
-        public const string INTERFACE = "global::ZBase.Foundation.Mvvm.Unions.IUnion<";
-
         public ImmutableArray<StructRef> ValueTypeRefs { get; }
 
         public ImmutableArray<StructRef> RefTypeRefs { get; }

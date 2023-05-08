@@ -20,5 +20,9 @@ namespace ZBase.Foundation.Mvvm.Unions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Union(in Union<T> union)
             => union.Value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IUnionConverter<T> GetConverter()
+            => UnionConverter.GetConverter<T>();
     }
 }
