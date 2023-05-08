@@ -1,11 +1,25 @@
+using System;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.Unions;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Adapters
 {
-    public abstract class ScriptableAdapter : ScriptableObject, IAdapter
+    [Serializable]
+    [Label("Scriptable Adapter", "Default")]
+    public sealed class ScriptableAdapter : IAdapter
     {
-        public abstract Union Convert(in Union union);
+        [SerializeField, HideInInspector]
+        private ScriptableAdapterAsset _asset;
+
+        public Union Convert(in Union union)
+        {
+            if (_asset)
+            {
+                return _asset.Convert(union);
+            }
+
+            return union;
+        }
     }
 }

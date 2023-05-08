@@ -80,37 +80,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                             continue;
                         }
 
-                        var bindingPropLabel = "";
-                        var converterLabel = "";
-                        var args = attribute.ConstructorArguments;
-
-                        for (var i = 0; i < args.Length; i++)
-                        {
-                            var arg = args[i];
-
-                            if (arg.Value is string label)
-                            {
-                                if (i == 0)
-                                    bindingPropLabel = label;
-                                else if (i == 1)
-                                    converterLabel = label;
-                            }
-                        }
-
-                        if (string.IsNullOrEmpty(bindingPropLabel) == false
-                            && string.IsNullOrEmpty(converterLabel)
-                        )
-                        {
-                            converterLabel = bindingPropLabel;
-                        }
-
                         var argumentType = parameter.Type;
                         var isNotUnion = argumentType.ToFullName() != UNION_TYPE;
 
                         memberRefs.Add(new MemberRef {
                             Member = method,
-                            BindingPropertyLabel = bindingPropLabel,
-                            ConverterLabel = converterLabel,
                             NonUnionArgumentType = isNotUnion ? argumentType : null,
                         });
 
@@ -174,10 +148,6 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         public class MemberRef
         {
             public IMethodSymbol Member { get; set; }
-
-            public string BindingPropertyLabel { get; set; }
-
-            public string ConverterLabel { get; set; }
 
             public ITypeSymbol NonUnionArgumentType { get; set; }
 

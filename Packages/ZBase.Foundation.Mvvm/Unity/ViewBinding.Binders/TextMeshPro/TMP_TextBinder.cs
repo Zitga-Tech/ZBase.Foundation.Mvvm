@@ -29,7 +29,8 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding("Text")]
+        [Binding]
+        [field: Label("Text")]
         [field: HideInInspector]
         private void SetText(string value)
         {

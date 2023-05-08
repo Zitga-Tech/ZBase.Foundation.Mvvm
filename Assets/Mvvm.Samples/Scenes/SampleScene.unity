@@ -755,11 +755,11 @@ MonoBehaviour:
     <TargetPropertyName>k__BackingField: Time
   _converterForSetText:
     <Adapter>k__BackingField:
-      rid: 4789600387384213505
+      rid: 7863444608787152898
   references:
     version: 2
     RefIds:
-    - rid: 4789600387384213505
+    - rid: 7863444608787152898
       type: {class: FloatToStringAdapter, ns: ZBase.Foundation.Mvvm.ViewBinding.Adapters, asm: ZBase.Foundation.Mvvm}
 --- !u!1 &1865242959
 GameObject:
@@ -771,7 +771,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1865242960}
   - component: {fileID: 1865242961}
-  - component: {fileID: 1865242962}
   m_Layer: 5
   m_Name: UI
   m_TagString: Untagged
@@ -827,28 +826,3 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &1865242962
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1865242959}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e817c8d9bc8ab134eb467fcfb75faed6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _context: {fileID: 606846926}
-  _targets: []
-  _includeMonoBinders: 0
-  _bindingFieldForSetEnabled:
-    <TargetPropertyName>k__BackingField: 
-  _converterForSetEnabled:
-    <Adapter>k__BackingField:
-      rid: -2
-  references:
-    version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }

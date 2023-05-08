@@ -5,7 +5,7 @@ using ZBase.Foundation.Mvvm.Unity.ViewBinding.Adapters;
 namespace Mvvm.Samples
 {
     [CreateAssetMenu(fileName = "FloatToStringScriptableAdapter", menuName = "MVVM/Adapters/Float => String")]
-    public sealed class FloatToStringScriptableAdapter : ScriptableAdapter
+    public sealed class FloatToStringScriptableAdapter : ScriptableAdapterAsset
     {
         public override Union Convert(in Union union)
         {

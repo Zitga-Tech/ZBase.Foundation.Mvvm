@@ -196,17 +196,6 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     readonlyKeyword = "readonly ";
                 }
 
-                string label;
-
-                if (string.IsNullOrWhiteSpace(member.BindingPropertyLabel))
-                {
-                    label = ConstName(member);
-                }
-                else
-                {
-                    label = $"\"{member.BindingPropertyLabel}\"";
-                }
-
                 var typeName = member.NonUnionArgumentType.ToFullName();
 
                 p.PrintLine($"/// <summary>The binding property for <see cref=\"{member.Member.Name}\"/></summary>");
@@ -219,7 +208,6 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
                 }
 
-                p.PrintLine($"[global::ZBase.Foundation.Mvvm.Label({label})]");
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine(string.Format(GENERATED_BINDING_PROPERTY, ConstName(member), typeName));
                 p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.BindingProperty {BindingPropertyName(member)} =  new global::ZBase.Foundation.Mvvm.ViewBinding.BindingProperty();");
@@ -249,17 +237,6 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     readonlyKeyword = "readonly ";
                 }
 
-                string label;
-
-                if (string.IsNullOrWhiteSpace(member.ConverterLabel))
-                {
-                    label = ConstName(member);
-                }
-                else
-                {
-                    label = $"\"{member.ConverterLabel}\"";
-                }
-
                 var typeName = member.NonUnionArgumentType.ToFullName();
 
                 p.PrintLine($"/// <summary>The converter for the parameter of <see cref=\"{member.Member.Name}\"/></summary>");
@@ -272,7 +249,6 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
                 }
 
-                p.PrintLine($"[global::ZBase.Foundation.Mvvm.Label({label})]");
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine(string.Format(GENERATED_CONVERTER, ConstName(member), typeName));
                 p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.Converter {ConverterName(member)} = new global::ZBase.Foundation.Mvvm.ViewBinding.Converter();");

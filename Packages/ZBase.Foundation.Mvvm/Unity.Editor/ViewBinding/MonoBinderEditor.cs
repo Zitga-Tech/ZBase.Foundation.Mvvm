@@ -6,12 +6,55 @@ using UnityEditor;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ComponentModel;
 using ZBase.Foundation.Mvvm.ViewBinding;
+using ZBase.Foundation.Mvvm.ViewBinding.Adapters;
+using ZBase.Foundation.Mvvm.Unity.ViewBinding.Adapters;
+using UnityEditorInternal;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     [UnityEditor.CustomEditor(typeof(MonoBinder), editorForChildClasses: true)]
     public class MonoBinderEditor : UnityEditor.Editor
     {
+        /// <summary>
+        /// To Type => From Type => Adapter Type HashSet
+        /// </summary>
+        /// <remarks>
+        /// Does not include <see cref="ScriptableAdapter"/>
+        /// and <see cref="CompositeAdapter"/>
+        /// </remarks>
+        private readonly static Dictionary<Type, Dictionary<Type, HashSet<Type>>> s_adapterMap = new();
+
+        static MonoBinderEditor()
+        {
+            Init();
+        }
+
+        private static void Init()
+        {
+            var adapterTypes = TypeCache.GetTypesDerivedFrom<IAdapter>()
+                .Where(static x => x.IsAbstract == false && x.IsSubclassOf(typeof(UnityEngine.Object)) == false)
+                .Select(static x => (x, x.GetCustomAttribute<AdapterAttribute>()))
+                .Where(static x => x.Item2 != null);
+
+            foreach (var (adapterType, attrib) in adapterTypes)
+            {
+                if (s_adapterMap.TryGetValue(attrib.ToType, out var map) == false)
+                {
+                    s_adapterMap[attrib.ToType] = map = new Dictionary<Type, HashSet<Type>>();
+                }
+
+                if (map.TryGetValue(attrib.ToType, out var types) == false)
+                {
+                    map[attrib.FromType] = types = new HashSet<Type>();
+                }
+
+                types.Add(adapterType);
+            }
+        }
+
+        private readonly Dictionary<string, bool> _foldoutMap = new();
+        private readonly Dictionary<string, ReorderableList> _rolMap = new();
+
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
@@ -26,7 +69,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             var contextProp = this.serializedObject.FindProperty(nameof(MonoBinder._context));
 
             DrawContextField(this.serializedObject, contextProp, binder);
-            DrawFindNearestButton(this.serializedObject, contextProp, binder);
+            DrawFindNearestContext(this.serializedObject, contextProp, binder);
 
             if (contextProp.objectReferenceValue is not IBindingContext)
             {
@@ -34,14 +77,70 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
 
             var serializedContext = new SerializedObject(contextProp.objectReferenceValue);
-            var targetKindProp = serializedContext.FindProperty(nameof(MonoBindingContext._targetKind));
-            var systemObjectProp = serializedContext.FindProperty(nameof(MonoBindingContext._targetSystemObject));
-            var unityObjectProp = serializedContext.FindProperty(nameof(MonoBindingContext._targetUnityObject));
+            var target = GetContextTarget(serializedContext);
 
-            var target = GetContextTarget(targetKindProp, systemObjectProp, unityObjectProp);
-            DrawContextTarget(target);
-            DrawBindingProperties(this.serializedObject, contextProp, binder, target);
-            DrawConverters(this.serializedObject, contextProp, binder);
+            if (DrawContextTarget(target) == false)
+            {
+                return;
+            }
+
+            var binderType = binder.GetType();
+            var binderAttributes = binderType.GetCustomAttributes<BindingMethodInfoAttribute>();
+            var bindingMap = new Dictionary<string, Type>();
+
+            foreach (var attribute in binderAttributes)
+            {
+                if (bindingMap.ContainsKey(attribute.MethodName) == false)
+                {
+                    bindingMap[attribute.MethodName] = attribute.ParameterType;
+                }
+            }
+
+            var targetType = target.GetType();
+            var targetAttributes = targetType.GetCustomAttributes<NotifyPropertyChangedInfoAttribute>();
+            var targetPropertyMap = new Dictionary<string, Type>();
+
+            foreach (var attribute in targetAttributes)
+            {
+                if (targetPropertyMap.ContainsKey(attribute.PropertyName) == false)
+                {
+                    targetPropertyMap[attribute.PropertyName] = attribute.PropertyType;
+                }
+            }
+
+            var labelMap = new Dictionary<string, string>();
+            var fieldInfos = TypeCache.GetFieldsWithAttribute<GeneratedBindingPropertyAttribute>()
+                .Where(x => x.DeclaringType == binderType);
+
+            foreach (var fieldInfo in fieldInfos)
+            {
+                var propAttrib = fieldInfo.GetCustomAttribute<GeneratedBindingPropertyAttribute>();
+                var labelAttrib = fieldInfo.GetCustomAttribute<LabelAttribute>();
+
+                if (labelMap.ContainsKey(propAttrib.ForMemberName) == false)
+                {
+                    var name = ObjectNames.NicifyVariableName(propAttrib.ForMemberName);
+                    labelMap[propAttrib.ForMemberName] = labelAttrib?.Label ?? name;
+                }
+            }
+
+            var serializedBinder = this.serializedObject;
+
+            foreach (var (bindingName, bindingType) in bindingMap)
+            {
+                DrawBinding(
+                      binder
+                    , serializedBinder
+                    , binderType
+                    , bindingName
+                    , bindingType
+                    , targetType
+                    , targetPropertyMap
+                    , labelMap
+                    , _foldoutMap
+                    , _rolMap
+                );
+            }
         }
 
         private void DrawContextField(
@@ -65,7 +164,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
         }
 
-        private void DrawFindNearestButton(
+        private void DrawFindNearestContext(
               SerializedObject serializedObject
             , SerializedProperty serializedProperty
             , MonoBinder binder
@@ -99,12 +198,11 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             serializedObject.Update();
         }
 
-        private static IObservableObject GetContextTarget(
-              SerializedProperty targetKindProp
-            , SerializedProperty systemObjectProp
-            , SerializedProperty unityObjectProp
-        )
+        private static IObservableObject GetContextTarget(SerializedObject serializedContext)
         {
+            var targetKindProp = serializedContext.FindProperty(nameof(MonoBindingContext._targetKind));
+            var systemObjectProp = serializedContext.FindProperty(nameof(MonoBindingContext._targetSystemObject));
+            var unityObjectProp = serializedContext.FindProperty(nameof(MonoBindingContext._targetUnityObject));
             var targetKind = (MonoBindingContext.ContextTargetKind)targetKindProp.enumValueIndex;
 
             return targetKind switch {
@@ -114,7 +212,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             };
         }
 
-        private static void DrawContextTarget(IObservableObject target)
+        private static bool DrawContextTarget(IObservableObject target)
         {
             if (target is null)
             {
@@ -123,175 +221,241 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                     , MessageType.Error
                 );
 
-                return;
+                return false;
             }
 
             EditorGUILayout.HelpBox(
                 $"This binder can now listen and react to Property Changed events published by {target.GetType()}."
                 , MessageType.Info
             );
+
+            return true;
         }
 
-        private static void DrawBindingProperties(
-              SerializedObject serializedBinder
-            , SerializedProperty contextProp
-            , MonoBinder binder
-            , IObservableObject target
+        private static void DrawBinding(
+              MonoBinder binder
+            , SerializedObject serializedBinder
+            , Type binderType
+            , string bindingName
+            , Type bindingType
+            , Type targetType
+            , Dictionary<string, Type> targetPropertyMap
+            , Dictionary<string, string> labelMap
+            , Dictionary<string, bool> foldoutMap
+            , Dictionary<string, ReorderableList> rolMap
         )
         {
-            if (contextProp.objectReferenceValue is not IBindingContext)
-            {
-                return;
-            }
+            var targetPropertyNameSPPath = $"_bindingFieldFor{bindingName}.<TargetPropertyName>k__BackingField";
+            var adapterSPPath = $"_converterFor{bindingName}.<Adapter>k__BackingField";
 
-            var binderType = binder.GetType();
-            var fieldInfos = TypeCache.GetFieldsWithAttribute<GeneratedBindingPropertyAttribute>()
-                .Where(x => x.DeclaringType == binderType);
+            var targetPropertyNameSP = serializedBinder.FindProperty(targetPropertyNameSPPath);
+            var adapterPropertySP = serializedBinder.FindProperty(adapterSPPath);
 
-            var adapterTypes = TypeCache.GetTypesDerivedFrom<IAdapter>()
-                .Where(static x => x.IsAbstract == false && x.IsSubclassOf(typeof(UnityEngine.Object)) == false)
-                .Select(static x => (x, x.GetCustomAttribute<AdapterAttribute>()))
-                .Where(static x => x.Item2 is not null)
-                .OrderBy(static x => x.Item2.Order);
-
-            var adapterMap = new Dictionary<Type, Dictionary<Type, Type>>();
-
-            foreach (var (adapterType, attrib) in adapterTypes)
-            {
-                if (adapterMap.TryGetValue(attrib.FromType, out var map) == false)
-                {
-                    adapterMap[attrib.FromType] = map = new Dictionary<Type, Type>();
-                }
-
-                if (map.ContainsKey(attrib.ToType) == false)
-                {
-                    map[attrib.ToType] = adapterType;
-                }
-            }
-
-            var targetType = target.GetType();
-            var targetAttributes = targetType.GetCustomAttributes<NotifyPropertyChangedInfoAttribute>();
-
-            EditorGUILayout.LabelField("Binding Properties", EditorStyles.boldLabel);
-            EditorGUILayout.BeginVertical(GUI.skin.box);
-
-            EditorGUILayout.HelpBox(
-                $"Select a target property on {target.GetType().Name} to bind."
-                , MessageType.None
+            GetTargetPropertyData(
+                  targetType
+                , targetPropertyMap
+                , targetPropertyNameSP
+                , out var targetPropertyName
+                , out var targetPropertyType
+                , out var targetPropertyLabel
             );
 
-            EditorGUILayout.Space(3f);
+            GetAdapterPropertyData(
+                  adapterPropertySP
+                , out var adapterType
+                , out var adapterPropertyLabel
+                , out var scriptableAdapter
+                , out var compositeAdapter
+            );
 
-            foreach (var fieldInfo in fieldInfos)
+            if (labelMap.TryGetValue(bindingName, out var bindingLabelText) == false)
             {
-                DrawBindingProperty(
-                    serializedBinder
-                    , binder
-                    , targetType
-                    , targetAttributes
-                    , adapterMap
-                    , fieldInfo
-                );
+                bindingLabelText = ObjectNames.NicifyVariableName(bindingName);
             }
 
+            var bindingTypeName = bindingType.GetName();
+            var bindingTypeLabel = new GUIContent(bindingTypeName, bindingType.GetFullName());
+            var bindingLabel = new GUIContent(
+                  bindingLabelText
+                , $"{binderType.Name}.{bindingName} ( {bindingTypeName} )"
+            );
+
+            EditorGUILayout.Space();
+            EditorGUILayout.BeginVertical(GUI.skin.box);
+            {
+                var color = GUI.color;
+                GUI.color = Color.green;
+                EditorGUILayout.BeginHorizontal(GUI.skin.box);
+                EditorGUILayout.LabelField(bindingLabel, bindingTypeLabel);
+                EditorGUILayout.EndHorizontal();
+                GUI.color = color;
+
+                EditorGUILayout.BeginVertical();
+                EditorGUILayout.BeginHorizontal();
+                {
+                    EditorGUILayout.PrefixLabel("Bind To");
+
+                    if (GUILayout.Button(targetPropertyLabel))
+                    {
+                        DrawBindingPropertyMenu(
+                              binder
+                            , serializedBinder
+                            , targetPropertyNameSP
+                            , adapterPropertySP
+                            , bindingType
+                            , targetType
+                            , targetPropertyName
+                            , targetPropertyMap
+                        );
+                    }
+
+                }
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                {
+                    EditorGUILayout.PrefixLabel("Convert By");
+
+                    if (GUILayout.Button(adapterPropertyLabel))
+                    {
+                        DrawAdapterPropertyMenu(
+                              binder
+                            , serializedBinder
+                            , bindingType
+                            , targetPropertyType
+                            , adapterPropertySP
+                            , adapterType
+                        );
+                    }
+                }
+                EditorGUILayout.EndHorizontal();
+
+                DrawScriptableAdapter(
+                      serializedBinder
+                    , adapterPropertySP
+                    , scriptableAdapter
+                );
+
+                DrawCompositeAdapter(
+                      serializedBinder
+                    , adapterPropertySP
+                    , compositeAdapter
+                    , foldoutMap
+                    , rolMap
+                );
+
+                EditorGUILayout.EndVertical();
+            }
             EditorGUILayout.EndVertical();
         }
 
-        private static void DrawBindingProperty(
-              SerializedObject serializedBinder
-            , MonoBinder binder
-            , Type targetType
-            , IEnumerable<NotifyPropertyChangedInfoAttribute> targetAttributes
-            , Dictionary<Type, Dictionary<Type, Type>> adapterMap
-            , FieldInfo fieldInfo
+        private static void GetTargetPropertyData(
+              Type targetType
+            , Dictionary<string, Type> targetPropertyMap
+            , SerializedProperty targetPropertyNameSP
+            , out string targetPropertyName
+            , out Type targetPropertyType
+            , out GUIContent targetPropertyLabel
         )
         {
-            var binderProp = serializedBinder.FindProperty(fieldInfo.Name);
-            var propertyNameProp = binderProp.FindPropertyRelative("<TargetPropertyName>k__BackingField");
-
-            string propertyName;
-            GUIContent propertyLabel;
-
-            if (string.IsNullOrWhiteSpace(propertyNameProp.stringValue))
+            if (string.IsNullOrWhiteSpace(targetPropertyNameSP.stringValue))
             {
-                propertyLabel = new GUIContent("< undefined >");
-                propertyName = "";
+                targetPropertyName = "";
+                targetPropertyType = null;
+                targetPropertyLabel = new GUIContent("< undefined >");
             }
             else
             {
-                var candidate = propertyNameProp.stringValue;
-                var propAttrib = targetAttributes.FirstOrDefault(x => x.PropertyName == candidate);
+                var candidate = targetPropertyNameSP.stringValue;
 
-                if (propAttrib == null)
+                if (targetPropertyMap.TryGetValue(candidate, out var propertyType) == false)
                 {
-                    propertyLabel = new GUIContent(
+                    targetPropertyName = "";
+                    targetPropertyType = null;
+                    targetPropertyLabel = new GUIContent(
                           $"< invalid > {candidate}"
                         , $"{targetType.FullName} does not contain a property named {candidate}"
                     );
-
-                    propertyName = "";
                 }
                 else
                 {
-                    propertyLabel = new GUIContent(
-                          $"{propAttrib.PropertyName} : {propAttrib.PropertyType.GetName()}"
-                        , $"class {targetType.Name}\nin {targetType.Namespace}"
+                    var returnTypeName = propertyType.GetName();
+                    targetPropertyName = candidate;
+                    targetPropertyType = propertyType;
+                    targetPropertyLabel = new GUIContent(
+                          $"{candidate} : {returnTypeName}"
+                        , $"property {candidate} : {returnTypeName}\nclass {targetType.Name}\nnamespace {targetType.Namespace}"
                     );
-                    propertyName = propAttrib.PropertyName;
                 }
             }
+        }
 
-            var attrib = fieldInfo.GetCustomAttribute<LabelAttribute>();
-            var label = attrib != null ? attrib.Label : ObjectNames.NicifyVariableName(fieldInfo.Name);
-
-            EditorGUILayout.BeginHorizontal();
-
-            EditorGUILayout.PrefixLabel(label);
-
-            if (GUILayout.Button(propertyLabel))
+        private static void GetAdapterPropertyData(
+              SerializedProperty adapterPropertySP
+            , out Type adapterType
+            , out GUIContent adapterPropertyLabel
+            , out ScriptableAdapter scriptableAdapter
+            , out CompositeAdapter compositeAdapter
+        )
+        {
+            if (adapterPropertySP.managedReferenceValue is IAdapter adapter)
             {
-                DrawBindingPropertyMenu(
-                    serializedBinder
-                    , binder
-                    , propertyNameProp
-                    , targetType
-                    , fieldInfo
-                    , targetAttributes
-                    , adapterMap
-                    , propertyName
-                );
-            }
+                adapterType = adapter.GetType();
 
-            EditorGUILayout.EndHorizontal();
+                var keyword = adapterType.IsValueType ? "struct" : "class";
+                var adapterLabelAttrib = adapterType.GetCustomAttribute<LabelAttribute>();
+
+                adapterPropertyLabel = new GUIContent(
+                      adapterLabelAttrib?.Label ?? adapterType.Name
+                    , $"{keyword} {adapterType.Name}\nnamespace {adapterType.Namespace}"
+                );
+
+                scriptableAdapter = adapter as ScriptableAdapter;
+                compositeAdapter = adapter as CompositeAdapter;
+            }
+            else
+            {
+                adapterType = null;
+                adapterPropertyLabel = new GUIContent("< undefined >");
+                scriptableAdapter = null;
+                compositeAdapter = null;
+            }
         }
 
         private static void DrawBindingPropertyMenu(
-              SerializedObject serializedBinder
-            , MonoBinder binder
-            , SerializedProperty propertyNameProp
+              MonoBinder binder
+            , SerializedObject serializedBinder
+            , SerializedProperty targetPropertyNameSP
+            , SerializedProperty adapterPropertySP
+            , Type bindingType
             , Type targetType
-            , FieldInfo fieldInfo
-            , IEnumerable<NotifyPropertyChangedInfoAttribute> targetAttributes
-            , Dictionary<Type, Dictionary<Type, Type>> adapterMap
-            , string propertyName
+            , string targetPropertyName
+            , Dictionary<string, Type> targetPropertyMap
         )
         {
             var menu = new GenericMenu();
-            var isEmpty = true;
 
-            foreach (var attribute in targetAttributes)
+            if (targetPropertyMap.Count > 0)
             {
                 menu.AddItem(
-                      new GUIContent($"{attribute.PropertyName} : {attribute.PropertyType.GetName()}")
-                    , propertyName == attribute.PropertyName
-                    , x => SetBindingPropertyName(serializedBinder, binder, propertyNameProp, fieldInfo, adapterMap, x)
-                    , attribute
+                      new GUIContent("None")
+                    , false
+                    , RemoveBindingProperty
+                    , (binder, serializedBinder, targetPropertyNameSP, adapterPropertySP)
                 );
-
-                isEmpty = false;
             }
 
-            if (isEmpty)
+            foreach (var (propName, propType) in targetPropertyMap)
+            {
+                menu.AddItem(
+                      new GUIContent($"{propName} : {propType.GetName()}")
+                    , propName == targetPropertyName
+                    , SetBindingProperty
+                    , (binder, serializedBinder, targetPropertyNameSP, adapterPropertySP, bindingType, propName, propType)
+                );
+            }
+
+            if (targetPropertyMap.Count < 1)
             {
                 menu.AddDisabledItem(new GUIContent($"{targetType.FullName} contains no [ObservableProperty]"));
             }
@@ -299,67 +463,74 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             menu.ShowAsContext();
         }
 
-        private static void SetBindingPropertyName(
-              SerializedObject serializedBinder
-            , MonoBinder binder
-            , SerializedProperty propertyNameProp
-            , FieldInfo fieldInfo
-            , Dictionary<Type, Dictionary<Type, Type>> adapterMap
-            , object attribute
-        )
+        private static void RemoveBindingProperty(object param)
         {
-            if (attribute is not NotifyPropertyChangedInfoAttribute infoAttrib
-                || propertyNameProp.stringValue == infoAttrib.PropertyName
-            )
+            if (param is not (
+                  MonoBinder binder
+                , SerializedObject serializedBinder
+                , SerializedProperty targetPropertyNameSP
+                , SerializedProperty adapterPropertySP
+            ))
             {
                 return;
             }
 
-            Undo.RecordObject(binder, $"Set {propertyNameProp.propertyPath}");
-            propertyNameProp.stringValue = infoAttrib.PropertyName;
+            Undo.RecordObject(binder, $"Remove {targetPropertyNameSP.propertyPath}");
+            targetPropertyNameSP.stringValue = string.Empty;
+            adapterPropertySP.managedReferenceValue = null;
+            serializedBinder.ApplyModifiedProperties();
+            serializedBinder.Update();
+        }
 
-            SetBindingPropertyAdapter(
-                  serializedBinder
-                , fieldInfo
-                , adapterMap
-                , infoAttrib
-            );
+        private static void SetBindingProperty(object param)
+        {
+            if (param is not (
+                  MonoBinder binder
+                , SerializedObject serializedBinder
+                , SerializedProperty targetPropertyNameSP
+                , SerializedProperty adapterPropertySP
+                , Type bindingType
+                , string selectedPropName
+                , Type selectedPropType
+            ))
+            {
+                return;
+            }
+
+            Undo.RecordObject(binder, $"Set {targetPropertyNameSP.propertyPath}");
+
+            targetPropertyNameSP.stringValue = selectedPropName;
+
+            if (TryCreateDefaultAdapter(selectedPropType, bindingType, out var adapter))
+            {
+                adapterPropertySP.managedReferenceValue = adapter;
+            }
 
             serializedBinder.ApplyModifiedProperties();
             serializedBinder.Update();
         }
 
-        private static void SetBindingPropertyAdapter(
-              SerializedObject serializedBinder
-            , FieldInfo fieldInfo
-            , Dictionary<Type, Dictionary<Type, Type>> adapterMap
-            , NotifyPropertyChangedInfoAttribute infoAttrib
-        )
+        private static bool TryCreateDefaultAdapter(Type fromType, Type toType, out IAdapter adapter)
         {
-            var bindingAttrib = fieldInfo.GetCustomAttribute<GeneratedBindingPropertyAttribute>();
+            adapter = null;
 
-            if (bindingAttrib == null)
-            {
-                return;
-            }
-
-            var adapterPropertyPath = $"_converterFor{bindingAttrib.ForMemberName}.<Adapter>k__BackingField";
-            var adapterProp = serializedBinder.FindProperty(adapterPropertyPath);
-
-            if (adapterProp == null)
-            {
-                return;
-            }
-
-            IAdapter adapter = null;
-
-            if (adapterMap.TryGetValue(infoAttrib.PropertyType, out var map)
-                && map.TryGetValue(bindingAttrib.ForMemberType, out var adapterType)
+            if (s_adapterMap.TryGetValue(toType, out var map)
+                && map.TryGetValue(fromType, out var adapterTypes)
             )
             {
                 try
                 {
-                    adapter = Activator.CreateInstance(adapterType) as IAdapter;
+                    var sortedTypes = adapterTypes.OrderBy(x => {
+                        var attrib = x.GetCustomAttribute<AdapterAttribute>();
+                        return attrib?.Order ?? AdapterAttribute.DEFAULT_ORDER;
+                    });
+
+                    var adapterType = sortedTypes.FirstOrDefault();
+
+                    if (adapterType != null)
+                    {
+                        adapter = Activator.CreateInstance(adapterType) as IAdapter;
+                    }
                 }
                 catch
                 {
@@ -367,196 +538,435 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 }
             }
 
-            if (adapter != null)
-            {
-                adapterProp.managedReferenceValue = adapter;
-            }
+            return adapter != null;
         }
 
-        private static void DrawConverters(
-              SerializedObject serializedBinder
-            , SerializedProperty contextProp
-            , MonoBinder binder
+        private static void DrawAdapterPropertyMenu(
+              MonoBinder binder
+            , SerializedObject serializedBinder
+            , Type bindingType
+            , Type targetPropertyType
+            , SerializedProperty adapterPropertySP
+            , Type adapterTypeSaved
         )
         {
-            if (contextProp.objectReferenceValue is not IBindingContext)
+            var adapterTypes = new List<Type> {
+                typeof(CompositeAdapter),
+                typeof(ScriptableAdapter)
+            };
+
+            if (s_adapterMap.TryGetValue(bindingType, out var map)
+                && map.TryGetValue(targetPropertyType, out var types)
+            )
             {
-                return;
+                var orderedTypes = types.OrderBy(x => {
+                    var attrib = x.GetCustomAttribute<AdapterAttribute>();
+                    return attrib?.Order ?? AdapterAttribute.DEFAULT_ORDER;
+                });
+
+                adapterTypes.AddRange(orderedTypes);
             }
 
-            var binderType = binder.GetType();
-            var fieldInfos = TypeCache.GetFieldsWithAttribute<GeneratedConverterAttribute>()
-                .Where(x => x.DeclaringType == binderType);
-
-            var adapterTypes = TypeCache.GetTypesDerivedFrom<IAdapter>()
-                .Where(static x => x.IsAbstract == false && x.IsSubclassOf(typeof(UnityEngine.Object)) == false);
-
-            var adapterTypesIsEmpty = adapterTypes.Count() == 0;
-
-            EditorGUILayout.LabelField("Converters", EditorStyles.boldLabel);
-            EditorGUILayout.BeginVertical(GUI.skin.box);
-
-            EditorGUILayout.HelpBox(
-                $"Select an IAdapter to convert the data transferred from the source property."
-                , MessageType.None
-            );
-
-            foreach (var fieldInfo in fieldInfos)
-            {
-                DrawConverter(serializedBinder, binder, fieldInfo, adapterTypes, adapterTypesIsEmpty);
-            }
-
-            EditorGUILayout.EndVertical();
-        }
-
-        private static void DrawConverter(
-              SerializedObject serializedBinder
-            , MonoBinder binder
-            , FieldInfo fieldInfo
-            , IEnumerable<Type> adapterTypes
-            , bool adapterTypesIsEmpty
-        )
-        {
-            var converterProp = serializedBinder.FindProperty(fieldInfo.Name);
-            var adapterProp = converterProp.FindPropertyRelative("<Adapter>k__BackingField");
-
-            GUIContent adapterLabel;
-            string adapterFullName;
-            Type adapterType;
-            AdapterUsingScriptableAdapter scriptableAdapter;
-
-            if (adapterProp.managedReferenceValue is IAdapter adapter)
-            {
-                adapterType = adapter.GetType();
-                var keyword = adapterType.IsValueType ? "struct" : "class";
-                var labelAttrib = adapterType.GetCustomAttribute<LabelAttribute>();
-                
-                adapterLabel = new GUIContent(
-                      labelAttrib?.Label ?? adapterType.Name
-                    , $"{keyword} {adapterType.Name}\nin {adapterType.Namespace}"
-                );
-
-                adapterFullName = adapterType.FullName;
-                scriptableAdapter = adapterProp.managedReferenceValue as AdapterUsingScriptableAdapter;
-            }
-            else
-            {
-                adapterType = null;
-                adapterLabel = new GUIContent("< undefined >");
-                adapterFullName = "";
-                scriptableAdapter = null;
-            }
-
-            var attrib = fieldInfo.GetCustomAttribute<LabelAttribute>();
-            var label = attrib != null ? attrib.Label : ObjectNames.NicifyVariableName(fieldInfo.Name);
-
-            EditorGUILayout.BeginHorizontal();
-
-            EditorGUILayout.PrefixLabel(label);
-
-            if (GUILayout.Button(adapterLabel))
-            {
-                DrawAdapterMenu(serializedBinder, binder, adapterProp, adapterTypes, adapterTypesIsEmpty, adapterType, adapterFullName);
-            }
-
-            if (scriptableAdapter != null)
-            {
-                EditorGUI.BeginChangeCheck();
-
-                var scriptableAdapterProp = adapterProp.FindPropertyRelative("_scriptableAdapter");
-                EditorGUILayout.PropertyField(scriptableAdapterProp, GUIContent.none, false);
-
-                serializedBinder.ApplyModifiedProperties();
-                EditorGUI.EndChangeCheck();
-            }
-
-            EditorGUILayout.EndHorizontal();
-        }
-
-        private static void DrawAdapterMenu(
-              SerializedObject serializedBinder
-            , MonoBinder binder
-            , SerializedProperty adapterProp
-            , IEnumerable<Type> adapterTypes
-            , bool adapterTypesIsEmpty
-            , Type adapterType
-            , string adapterFullName
-        )
-        {
             var menu = new GenericMenu();
 
-            if (adapterTypesIsEmpty == false)
-            {
-                menu.AddItem(
-                      new GUIContent("None")
-                    , string.IsNullOrWhiteSpace(adapterFullName)
-                    , () => RemoveAdapter(serializedBinder, binder, adapterProp)
-                );
-            }
+            menu.AddItem(
+                  new GUIContent("None")
+                , false
+                , RemoveAdapterProperty
+                , (binder, serializedBinder, adapterPropertySP)
+            );
 
-            foreach (var type in adapterTypes)
-            {
-                var labelAttrib = type.GetCustomAttribute<LabelAttribute>();
-                var labelText = labelAttrib?.Label ?? type.Name;
-                var keyword = type.IsValueType ? "struct" : "class";
-                var directory = labelAttrib?.Directory ?? type.Namespace;
-                var label = new GUIContent(
-                      $"{directory}/{labelText}"
-                    , $"{keyword} {type.Name}\nin {type.Namespace}"
-                );
+            AddAdapterTypesToMenu(
+                  menu
+                , binder
+                , serializedBinder
+                , adapterPropertySP
+                , adapterTypeSaved
+                , adapterTypes
+                , false
+                , string.Empty
+            );
 
-                menu.AddItem(
-                      label
-                    , type.FullName == adapterFullName
-                    , x => SetAdapter(serializedBinder, binder, adapterProp, adapterType, (Type)x)
-                    , type
-                );
-            }
-
-            if (adapterTypesIsEmpty)
-            {
-                menu.AddDisabledItem(new GUIContent($"No type implements {typeof(IAdapter)}"));
-            }
+            AddAdapterTypesToMenu(
+                  menu
+                , binder
+                , serializedBinder
+                , adapterPropertySP
+                , adapterTypeSaved
+                , GetOtherAdapterTypes(targetPropertyType)
+                , true
+                , "Other/"
+            );
 
             menu.ShowAsContext();
         }
 
-        private static void RemoveAdapter(
-              SerializedObject serializedBinder
+        private static IEnumerable<Type> GetOtherAdapterTypes(Type targetPropertyType)
+        {
+            var result = new List<Type>();
+
+            foreach (var (toType, map) in s_adapterMap)
+            {
+                foreach (var (fromType, types) in map)
+                {
+                    if (fromType == targetPropertyType)
+                    {
+                        continue;
+                    }
+
+                    var orderedTypes = types.OrderBy(x => {
+                        var attrib = x.GetCustomAttribute<AdapterAttribute>();
+                        return attrib?.Order ?? AdapterAttribute.DEFAULT_ORDER;
+                    });
+
+                    result.AddRange(orderedTypes);
+                }
+            }
+
+            return result;
+        }
+
+        private static void AddAdapterTypesToMenu(
+              GenericMenu menu
             , MonoBinder binder
-            , SerializedProperty adapterProp
+            , SerializedObject serializedBinder
+            , SerializedProperty adapterPropertySP
+            , Type adapterTypeSaved
+            , IEnumerable<Type> adapterTypes
+            , bool includeDirectory
+            , string directoryPrefix
         )
         {
-            Undo.RecordObject(binder, $"Remove {adapterProp.propertyPath}");
-            adapterProp.managedReferenceValue = null;
+            foreach (var adapterType in adapterTypes)
+            {
+                var adapterAttrib = adapterType.GetCustomAttribute<AdapterAttribute>();
+                var labelAttrib = adapterType.GetCustomAttribute<LabelAttribute>();
+                var labelText = labelAttrib?.Label ?? adapterType.Name;
+                var keyword = adapterType.IsValueType ? "struct" : "class";
+                var directory = labelAttrib?.Directory ?? adapterType.Namespace;
+                directory = $"{directoryPrefix}{directory}";
+
+                if (adapterAttrib?.ToType != null)
+                {
+                    directory = $"{directory}/{adapterAttrib.ToType.GetName()}";
+                }
+
+                var label = new GUIContent(
+                      includeDirectory ? $"{directory}/{labelText}" : labelText
+                    , $"{keyword} {adapterType.Name}\nnamespace {adapterType.Namespace}"
+                );
+
+                menu.AddItem(
+                      label
+                    , adapterType == adapterTypeSaved
+                    , SetAdapterProperty
+                    , (binder, serializedBinder, adapterPropertySP, adapterType)
+                );
+            }
+        }
+
+        private static void RemoveAdapterProperty(object param)
+        {
+            if (param is not (
+                  MonoBinder binder
+                , SerializedObject serializedBinder
+                , SerializedProperty adapterPropertySP
+            ))
+            {
+                return;
+            }
+
+            Undo.RecordObject(binder, $"Remove {adapterPropertySP.propertyPath}");
+            adapterPropertySP.managedReferenceValue = null;
             serializedBinder.ApplyModifiedProperties();
             serializedBinder.Update();
         }
 
-        private static void SetAdapter(
-              SerializedObject serializedBinder
-            , MonoBinder binder
-            , SerializedProperty adapterProp
-            , Type currentType
-            , Type newType
-        )
+        private static void SetAdapterProperty(object param)
         {
-            if (currentType == newType || newType == null)
+            if (param is not (
+                  MonoBinder binder
+                , SerializedObject serializedBinder
+                , SerializedProperty adapterPropertySP
+                , Type selectedAdapterType
+            ))
             {
                 return;
             }
 
             try
             {
-                var instance = Activator.CreateInstance(newType) as IAdapter;
-                Undo.RecordObject(binder, $"Set {adapterProp.propertyPath}");
-                adapterProp.managedReferenceValue = instance;
+                var adapter = Activator.CreateInstance(selectedAdapterType);
+
+                Undo.RecordObject(binder, $"Set {adapterPropertySP.propertyPath}");
+                adapterPropertySP.managedReferenceValue = adapter;
                 serializedBinder.ApplyModifiedProperties();
                 serializedBinder.Update();
             }
             catch (Exception ex)
             {
                 Debug.LogException(ex, binder);
+            }
+        }
+
+        private static void DrawScriptableAdapter(
+              SerializedObject serializedBinder
+            , SerializedProperty adapterPropertySP
+            , ScriptableAdapter scriptableAdapter
+        )
+        {
+            if (scriptableAdapter == null)
+            {
+                return;
+            }
+
+            var assetSP = adapterPropertySP.FindPropertyRelative("_asset");
+
+            if (assetSP == null)
+            {
+                return;
+            }
+
+            var label = new GUIContent(
+                  "Asset"
+                , $"An adapter derived from {typeof(ScriptableAdapterAsset).Name}."
+            );
+
+            EditorGUI.BeginChangeCheck();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(15f);
+            GUILayout.BeginVertical();
+
+            EditorGUILayout.PropertyField(assetSP, label, false);
+
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedBinder.ApplyModifiedProperties();
+            }
+        }
+
+        private static void DrawCompositeAdapter(
+              SerializedObject serializedBinder
+            , SerializedProperty adapterPropertySP
+            , CompositeAdapter compositeAdapter
+            , Dictionary<string, bool> foldoutMap
+            , Dictionary<string, ReorderableList> rolMap
+        )
+        {
+            if (compositeAdapter == null)
+            {
+                return;
+            }
+
+            var adapterListSP = adapterPropertySP.FindPropertyRelative("_adapters");
+
+            if (adapterListSP == null)
+            {
+                return;
+            }
+
+            var mapKey = adapterListSP.propertyPath;
+
+            if (foldoutMap.TryGetValue(mapKey, out var foldout) == false)
+            {
+                foldoutMap[mapKey] = foldout = false;
+            }
+
+            if (rolMap.TryGetValue(mapKey, out var rol) == false || rol == null)
+            {
+                rolMap[mapKey] = rol = new ReorderableList(serializedBinder, adapterListSP, true, false, true, true) {
+                    elementHeight = 25f,
+                    onAddDropdownCallback = OnAddDropdown,
+                    onRemoveCallback = OnRemove,
+                    drawElementCallback = (rect, index, isActive, isFocused) => DrawElement(rect, index, isActive, isFocused, rol),
+                };
+            }
+
+            var label = new GUIContent(
+                  "Adapters"
+                , "These adapters will process the input data in an order."
+            );
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(15f);
+            GUILayout.BeginVertical();
+
+            foldoutMap[mapKey] = foldout = EditorGUILayout.Foldout(foldout, label);
+
+            if (foldout)
+            {
+                rol.DoLayoutList();
+            }
+
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+
+            static void OnAddDropdown(Rect rect, ReorderableList rol)
+            {
+                var menu = new GenericMenu();
+                var adapterTypes = GetOtherAdapterTypes(null);
+                
+                foreach (var adapterType in adapterTypes)
+                {
+                    var adapterAttrib = adapterType.GetCustomAttribute<AdapterAttribute>();
+                    var labelAttrib = adapterType.GetCustomAttribute<LabelAttribute>();
+                    var labelText = labelAttrib?.Label ?? adapterType.Name;
+                    var keyword = adapterType.IsValueType ? "struct" : "class";
+                    var directory = labelAttrib?.Directory ?? adapterType.Namespace;
+
+                    if (adapterAttrib?.ToType != null)
+                    {
+                        directory = $"{directory}/{adapterAttrib.ToType.GetName()}";
+                    }
+
+                    var label = new GUIContent(
+                          $"{directory}/{labelText}"
+                        , $"{keyword} {adapterType.Name}\nnamespace {adapterType.Namespace}"
+                    );
+
+                    menu.AddItem(label, false, AddAdapter, (rol, adapterType));
+                }
+
+                menu.ShowAsContext();
+            }
+
+            static void OnRemove(ReorderableList rol)
+            {
+                if (rol.selectedIndices.Count < 1)
+                {
+                    EditorUtility.DisplayDialog(
+                          "Cannot Remove Adapter From List"
+                        , "Must select at least 1 entry to remove."
+                        , "I understand"
+                    );
+                    return;
+                }
+                
+                var serializedObject = rol.serializedProperty.serializedObject;
+                var target = serializedObject.targetObject;
+
+                Undo.RecordObject(target, $"Remove {rol.selectedIndices.Count} items at {rol.serializedProperty.propertyPath}");
+
+                foreach (var index in rol.selectedIndices)
+                {
+                    rol.serializedProperty.DeleteArrayElementAtIndex(index);
+                }
+
+                serializedObject.ApplyModifiedProperties();
+                serializedObject.Update();
+            }
+
+            static void AddAdapter(object param)
+            {
+                if (param is not (ReorderableList rol, Type adapterType))
+                {
+                    return;
+                }
+
+                var serializedObject = rol.serializedProperty.serializedObject;
+                var target = serializedObject.targetObject;
+
+                try
+                {
+                    var adapter = Activator.CreateInstance(adapterType);
+                    var index = rol.serializedProperty.arraySize;
+
+                    Undo.RecordObject(target, $"Set {rol.serializedProperty.propertyPath}.Array.data[{index}]");
+
+                    rol.serializedProperty.arraySize++;
+                    rol.index = index;
+
+                    var elementSP = rol.serializedProperty.GetArrayElementAtIndex(index);
+                    elementSP.managedReferenceValue = adapter;
+                    serializedObject.ApplyModifiedProperties();
+                    serializedObject.Update();
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex, target);
+                }
+            }
+
+            static void DrawElement(Rect rect, int index, bool isActive, bool isFocused, ReorderableList rol)
+            {
+                var elementSP = rol.serializedProperty.GetArrayElementAtIndex(index);
+                var margin = 50f;
+                rect = new Rect(rect.x + (margin / 2f), rect.y + 3f, rect.width - margin, 21f);
+
+                GetAdapterPropertyData(
+                      elementSP
+                    , out var adapterTypeSaved
+                    , out var adapterPropertyLabel
+                    , out _
+                    , out _
+                );
+
+                if (GUI.Button(rect, adapterPropertyLabel))
+                {
+                    var menu = new GenericMenu();
+                    var adapterTypes = GetOtherAdapterTypes(adapterTypeSaved);
+
+                    foreach (var adapterType in adapterTypes)
+                    {
+                        var adapterAttrib = adapterType.GetCustomAttribute<AdapterAttribute>();
+                        var labelAttrib = adapterType.GetCustomAttribute<LabelAttribute>();
+                        var labelText = labelAttrib?.Label ?? adapterType.Name;
+                        var keyword = adapterType.IsValueType ? "struct" : "class";
+                        var directory = labelAttrib?.Directory ?? adapterType.Namespace;
+
+                        if (adapterAttrib?.ToType != null)
+                        {
+                            directory = $"{directory}/{adapterAttrib.ToType.GetName()}";
+                        }
+
+                        var label = new GUIContent(
+                              $"{directory}/{labelText}"
+                            , $"{keyword} {adapterType.Name}\nnamespace {adapterType.Namespace}"
+                        );
+
+                        menu.AddItem(
+                              label
+                            , adapterType == adapterTypeSaved
+                            , SetAdapterAtElement
+                            , (rol, elementSP, adapterType)
+                        );
+                    }
+
+                    menu.ShowAsContext();
+                }
+            }
+
+            static void SetAdapterAtElement(object param)
+            {
+                if (param is not (
+                      ReorderableList rol
+                    , SerializedProperty elementSP
+                    , Type selectedAdapterType
+                ))
+                {
+                    return;
+                }
+
+                var serializedObject = rol.serializedProperty.serializedObject;
+                var target = serializedObject.targetObject;
+
+                try
+                {
+                    var adapter = Activator.CreateInstance(selectedAdapterType);
+
+                    Undo.RecordObject(target, $"Set {elementSP.propertyPath}");
+                    elementSP.managedReferenceValue = adapter;
+                    serializedObject.ApplyModifiedProperties();
+                    serializedObject.Update();
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex, target);
+                }
             }
         }
 
