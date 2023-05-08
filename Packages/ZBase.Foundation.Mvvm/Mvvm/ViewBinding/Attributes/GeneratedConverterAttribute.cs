@@ -12,5 +12,16 @@ namespace ZBase.Foundation.Mvvm.ViewBinding
     /// </remarks>
     /// <seealso cref="Converter"/>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
-    public sealed class GeneratedConverterAttribute : Attribute { }
+    public sealed class GeneratedConverterAttribute : Attribute
+    {
+        public string ForMemberName { get; }
+
+        public Type ForMemberType { get; }
+
+        public GeneratedConverterAttribute(string forMemberName, Type forMemberType)
+        {
+            this.ForMemberName = forMemberName;
+            this.ForMemberType = forMemberType;
+        }
+    }
 }

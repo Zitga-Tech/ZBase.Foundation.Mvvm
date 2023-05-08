@@ -12,5 +12,13 @@ namespace ZBase.Foundation.Mvvm.Input
     /// </remarks>
     /// <seealso cref="RelayCommandAttribute"/>
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-    public sealed class GeneratedRelayCommandAttribute : Attribute { }
+    public sealed class GeneratedRelayCommandAttribute : Attribute
+    {
+        public string ForMemberName { get; }
+
+        public GeneratedRelayCommandAttribute(string forMemberName)
+        {
+            this.ForMemberName = forMemberName;
+        }
+    }
 }

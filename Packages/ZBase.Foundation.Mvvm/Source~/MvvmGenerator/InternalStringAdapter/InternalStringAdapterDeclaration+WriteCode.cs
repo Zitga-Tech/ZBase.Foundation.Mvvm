@@ -13,7 +13,7 @@ namespace ZBase.Foundation.Mvvm.InternalStringAdapterSourceGen
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.InternalUnionGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
         private const string IADAPTER = "global::ZBase.Foundation.Mvvm.ViewBinding.IAdapter";
-        private const string ADAPTER_ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ViewBinding.Adapter(typeof({0}), typeof(string))]";
+        private const string ADAPTER_ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ViewBinding.Adapter(fromType: typeof({0}), toType: typeof(string), order: 1)]";
         private const string LABEL_ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.Label(\"{0}\", \"{1}\")]";
         private const string UNION = "global::ZBase.Foundation.Mvvm.Unions.Union";
         private const string GENERATOR_NAME = nameof(InternalStringAdapterGenerator);

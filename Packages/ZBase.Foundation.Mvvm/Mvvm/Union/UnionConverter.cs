@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using ZBase.Foundation.Mvvm.Unions.Converters;
 
@@ -80,12 +79,8 @@ namespace ZBase.Foundation.Mvvm.Unions
         public static bool TrySetValueTo<T>(in Union union, ref T dest)
             => GetConverter<T>().TrySetValueTo(union, ref dest);
 
-        [DoesNotReturn]
-        private static void ThrowUndefinedException<T>()
-        {
-            throw new InvalidOperationException(
-                $"Unexpected exception: Cannot get {nameof(UnionTypeKind)} value from {typeof(T)}."
-            );
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ToString<T>(in Union union)
+            => GetConverter<T>().ToString(union);
     }
 }

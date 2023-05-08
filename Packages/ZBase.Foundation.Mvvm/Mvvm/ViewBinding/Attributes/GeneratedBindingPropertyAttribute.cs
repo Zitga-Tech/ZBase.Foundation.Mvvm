@@ -12,5 +12,16 @@ namespace ZBase.Foundation.Mvvm.ViewBinding
     /// </remarks>
     /// <seealso cref="BindingProperty"/>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
-    public sealed class GeneratedBindingPropertyAttribute : Attribute { }
+    public sealed class GeneratedBindingPropertyAttribute : Attribute
+    {
+        public string ForMemberName { get; }
+
+        public Type ForMemberType { get; }
+
+        public GeneratedBindingPropertyAttribute(string forMemberName, Type forMemberType)
+        {
+            this.ForMemberName = forMemberName;
+            this.ForMemberType = forMemberType;
+        }
+    }
 }

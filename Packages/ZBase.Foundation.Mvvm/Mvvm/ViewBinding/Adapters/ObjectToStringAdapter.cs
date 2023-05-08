@@ -5,17 +5,14 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 {
     [Serializable]
     [Label("Object ⇒ String", "Default")]
-    [Adapter(typeof(object), typeof(string))]
+    [Adapter(fromType: typeof(object), toType: typeof(string), order: 0)]
     public sealed class ObjectToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
         {
-            if (union.TypeKind == UnionTypeKind.Object)
+            if (union.TryGetValue(out object result))
             {
-                if (union.TryGetValue(out object result))
-                {
-                    return result.ToString();
-                }
+                return result.ToString();
             }
 
             return union;

@@ -20,14 +20,14 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 
     [Serializable]
     [Label("Bool ⇒ String", "Default")]
-    [Adapter(typeof(bool), typeof(string))]
+    [Adapter(fromType: typeof(bool), toType: typeof(string), order: 0)]
     public sealed class BoolToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
         {
-            if (union.TypeKind == UnionTypeKind.Bool)
+            if (union.TryGetValue(out bool result))
             {
-                return union.Bool.ToString();
+                return result.ToString();
             }
 
             return union;
@@ -36,14 +36,14 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 
     [Serializable]
     [Label("Byte ⇒ String", "Default")]
-    [Adapter(typeof(byte), typeof(string))]
+    [Adapter(fromType: typeof(byte), toType: typeof(string), order: 0)]
     public sealed class ByteToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
         {
-            if (union.TypeKind == UnionTypeKind.Byte)
+            if (union.TryGetValue(out byte result))
             {
-                return union.Byte.ToString();
+                return result.ToString();
             }
 
             return union;
@@ -52,14 +52,14 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 
     [Serializable]
     [Label("SByte ⇒ String", "Default")]
-    [Adapter(typeof(sbyte), typeof(string))]
+    [Adapter(fromType: typeof(sbyte), toType: typeof(string), order: 0)]
     public sealed class SByteToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
         {
-            if (union.TypeKind == UnionTypeKind.SByte)
+            if (union.TryGetValue(out sbyte result))
             {
-                return union.SByte.ToString();
+                return result.ToString();
             }
 
             return union;
@@ -68,14 +68,14 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 
     [Serializable]
     [Label("Char ⇒ String", "Default")]
-    [Adapter(typeof(char), typeof(string))]
+    [Adapter(fromType: typeof(char), toType: typeof(string), order: 0)]
     public sealed class CharToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
         {
-            if (union.TypeKind == UnionTypeKind.Char)
+            if (union.TryGetValue(out char result))
             {
-                return union.Char.ToString();
+                return result.ToString();
             }
 
             return union;
@@ -84,14 +84,14 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 
     [Serializable]
     [Label("Double ⇒ String", "Default")]
-    [Adapter(typeof(double), typeof(string))]
+    [Adapter(fromType: typeof(double), toType: typeof(string), order: 0)]
     public sealed class DoubleToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
         {
-            if (union.TypeKind == UnionTypeKind.Double)
+            if (union.TryGetValue(out double result))
             {
-                return union.Double.ToString();
+                return result.ToString();
             }
 
             return union;
@@ -100,14 +100,14 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 
     [Serializable]
     [Label("Float ⇒ String", "Default")]
-    [Adapter(typeof(float), typeof(string))]
+    [Adapter(fromType: typeof(float), toType: typeof(string), order: 0)]
     public sealed class FloatToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
         {
-            if (union.TypeKind == UnionTypeKind.Float)
+            if (union.TryGetValue(out float result))
             {
-                return union.Float.ToString();
+                return result.ToString();
             }
 
             return union;
@@ -116,14 +116,14 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 
     [Serializable]
     [Label("Int ⇒ String", "Default")]
-    [Adapter(typeof(int), typeof(string))]
+    [Adapter(fromType: typeof(int), toType: typeof(string), order: 0)]
     public sealed class IntToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
         {
-            if (union.TypeKind == UnionTypeKind.Int)
+            if (union.TryGetValue(out int result))
             {
-                return union.Int.ToString();
+                return result.ToString();
             }
 
             return union;
@@ -132,14 +132,14 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 
     [Serializable]
     [Label("UInt ⇒ String", "Default")]
-    [Adapter(typeof(uint), typeof(string))]
+    [Adapter(fromType: typeof(uint), toType: typeof(string), order: 0)]
     public sealed class UIntToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
         {
-            if (union.TypeKind == UnionTypeKind.UInt)
+            if (union.TryGetValue(out uint result))
             {
-                return union.UInt.ToString();
+                return result.ToString();
             }
 
             return union;
@@ -148,14 +148,14 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 
     [Serializable]
     [Label("Long ⇒ String", "Default")]
-    [Adapter(typeof(long), typeof(string))]
+    [Adapter(fromType: typeof(long), toType: typeof(string), order: 0)]
     public sealed class LongToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
         {
-            if (union.TypeKind == UnionTypeKind.Long)
+            if (union.TryGetValue(out long result))
             {
-                return union.Long.ToString();
+                return result.ToString();
             }
 
             return union;
@@ -164,14 +164,14 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 
     [Serializable]
     [Label("ULong ⇒ String", "Default")]
-    [Adapter(typeof(ulong), typeof(string))]
+    [Adapter(fromType: typeof(ulong), toType: typeof(string), order: 0)]
     public sealed class ULongToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
         {
-            if (union.TypeKind == UnionTypeKind.ULong)
+            if (union.TryGetValue(out ulong result))
             {
-                return union.ULong.ToString();
+                return result.ToString();
             }
 
             return union;
@@ -180,14 +180,14 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 
     [Serializable]
     [Label("Short ⇒ String", "Default")]
-    [Adapter(typeof(short), typeof(string))]
+    [Adapter(fromType: typeof(short), toType: typeof(string), order: 0)]
     public sealed class ShortToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
         {
-            if (union.TypeKind == UnionTypeKind.Short)
+            if (union.TryGetValue(out short result))
             {
-                return union.Short.ToString();
+                return result.ToString();
             }
 
             return union;
@@ -196,14 +196,14 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 
     [Serializable]
     [Label("UShort ⇒ String", "Default")]
-    [Adapter(typeof(ushort), typeof(string))]
+    [Adapter(fromType: typeof(ushort), toType: typeof(string), order: 0)]
     public sealed class UShortToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
         {
-            if (union.TypeKind == UnionTypeKind.UShort)
+            if (union.TryGetValue(out ushort result))
             {
-                return union.UShort.ToString();
+                return result.ToString();
             }
 
             return union;

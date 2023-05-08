@@ -8,8 +8,8 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.BinderGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
         private const string OBSOLETE_METHOD = "[global::System.Obsolete(\"This method is not intended to be use directly by user code.\")]";
-        private const string GENERATED_BINDING_PROPERTY = "[global::ZBase.Foundation.Mvvm.ViewBinding.GeneratedBindingProperty]";
-        private const string GENERATED_CONVERTER = "[global::ZBase.Foundation.Mvvm.ViewBinding.GeneratedConverter]";
+        private const string GENERATED_BINDING_PROPERTY = "[global::ZBase.Foundation.Mvvm.ViewBinding.GeneratedBindingProperty({0}, typeof({1}))]";
+        private const string GENERATED_CONVERTER = "[global::ZBase.Foundation.Mvvm.ViewBinding.GeneratedConverter({0}, typeof({1}))]";
 
         public string WriteCodeWithoutMember()
         {
@@ -207,6 +207,8 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     label = $"\"{member.BindingPropertyLabel}\"";
                 }
 
+                var typeName = member.NonUnionArgumentType.ToFullName();
+
                 p.PrintLine($"/// <summary>The binding property for <see cref=\"{member.Member.Name}\"/></summary>");
                 p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
                 p.PrintLine("[global::UnityEngine.SerializeField]");
@@ -218,7 +220,8 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 }
 
                 p.PrintLine($"[global::ZBase.Foundation.Mvvm.Label({label})]");
-                p.PrintLine(GENERATED_CODE).PrintLine(GENERATED_BINDING_PROPERTY);
+                p.PrintLine(GENERATED_CODE);
+                p.PrintLine(string.Format(GENERATED_BINDING_PROPERTY, ConstName(member), typeName));
                 p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.BindingProperty {BindingPropertyName(member)} =  new global::ZBase.Foundation.Mvvm.ViewBinding.BindingProperty();");
                 p.PrintEndLine();
             }
@@ -257,6 +260,8 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     label = $"\"{member.ConverterLabel}\"";
                 }
 
+                var typeName = member.NonUnionArgumentType.ToFullName();
+
                 p.PrintLine($"/// <summary>The converter for the parameter of <see cref=\"{member.Member.Name}\"/></summary>");
                 p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
                 p.PrintLine("[global::UnityEngine.SerializeField]");
@@ -268,7 +273,8 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 }
 
                 p.PrintLine($"[global::ZBase.Foundation.Mvvm.Label({label})]");
-                p.PrintLine(GENERATED_CODE).PrintLine(GENERATED_CONVERTER);
+                p.PrintLine(GENERATED_CODE);
+                p.PrintLine(string.Format(GENERATED_CONVERTER, ConstName(member), typeName));
                 p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.Converter {ConverterName(member)} = new global::ZBase.Foundation.Mvvm.ViewBinding.Converter();");
                 p.PrintEndLine();
             }

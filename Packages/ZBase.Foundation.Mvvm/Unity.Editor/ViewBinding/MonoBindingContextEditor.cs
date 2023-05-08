@@ -93,7 +93,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             if (GUILayout.Button(targetTypeName))
             {
                 var types = TypeCache.GetTypesDerivedFrom<IObservableObject>()
-                    .Where(x => x.IsAbstract == false && x.IsSubclassOf(typeof(UnityEngine.Object)) == false);
+                    .Where(static x => x.IsAbstract == false && x.IsSubclassOf(typeof(UnityEngine.Object)) == false);
 
                 var menu = new GenericMenu();
                 var isEmpty = true;

@@ -54,14 +54,14 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.Adapters
 #>
     [Serializable]
     [Label("<#= typeName #> ⇒ String", "Default")]
-    [Adapter(typeof(<#= type #>), typeof(string))]
+    [Adapter(fromType: typeof(<#= type #>), toType: typeof(string), order: 0)]
     public sealed class <#= typeName #>ToStringAdapter : IAdapter
     {
         public Union Convert(in Union union)
         {
-            if (union.TypeKind == UnionTypeKind.<#= typeName #>)
+            if (union.TryGetValue(out <#= type #> result))
             {
-                return union.<#= typeName #>.ToString();
+                return result.ToString();
             }
 
             return union;

@@ -148,6 +148,27 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             var fieldInfos = TypeCache.GetFieldsWithAttribute<GeneratedBindingPropertyAttribute>()
                 .Where(x => x.DeclaringType == binderType);
 
+            var adapterTypes = TypeCache.GetTypesDerivedFrom<IAdapter>()
+                .Where(static x => x.IsAbstract == false && x.IsSubclassOf(typeof(UnityEngine.Object)) == false)
+                .Select(static x => (x, x.GetCustomAttribute<AdapterAttribute>()))
+                .Where(static x => x.Item2 is not null)
+                .OrderBy(static x => x.Item2.Order);
+
+            var adapterMap = new Dictionary<Type, Dictionary<Type, Type>>();
+
+            foreach (var (adapterType, attrib) in adapterTypes)
+            {
+                if (adapterMap.TryGetValue(attrib.FromType, out var map) == false)
+                {
+                    adapterMap[attrib.FromType] = map = new Dictionary<Type, Type>();
+                }
+
+                if (map.ContainsKey(attrib.ToType) == false)
+                {
+                    map[attrib.ToType] = adapterType;
+                }
+            }
+
             var targetType = target.GetType();
             var targetAttributes = targetType.GetCustomAttributes<NotifyPropertyChangedInfoAttribute>();
 
@@ -163,7 +184,14 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             foreach (var fieldInfo in fieldInfos)
             {
-                DrawBindingProperty(serializedBinder, binder, targetType, targetAttributes, fieldInfo);
+                DrawBindingProperty(
+                    serializedBinder
+                    , binder
+                    , targetType
+                    , targetAttributes
+                    , adapterMap
+                    , fieldInfo
+                );
             }
 
             EditorGUILayout.EndVertical();
@@ -174,6 +202,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             , MonoBinder binder
             , Type targetType
             , IEnumerable<NotifyPropertyChangedInfoAttribute> targetAttributes
+            , Dictionary<Type, Dictionary<Type, Type>> adapterMap
             , FieldInfo fieldInfo
         )
         {
@@ -221,7 +250,16 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             if (GUILayout.Button(propertyLabel))
             {
-                DrawBindingPropertyMenu(serializedBinder, binder, propertyNameProp, targetType, targetAttributes, propertyName);
+                DrawBindingPropertyMenu(
+                    serializedBinder
+                    , binder
+                    , propertyNameProp
+                    , targetType
+                    , fieldInfo
+                    , targetAttributes
+                    , adapterMap
+                    , propertyName
+                );
             }
 
             EditorGUILayout.EndHorizontal();
@@ -232,7 +270,9 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             , MonoBinder binder
             , SerializedProperty propertyNameProp
             , Type targetType
+            , FieldInfo fieldInfo
             , IEnumerable<NotifyPropertyChangedInfoAttribute> targetAttributes
+            , Dictionary<Type, Dictionary<Type, Type>> adapterMap
             , string propertyName
         )
         {
@@ -244,8 +284,8 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 menu.AddItem(
                       new GUIContent($"{attribute.PropertyName} : {attribute.PropertyType.GetName()}")
                     , propertyName == attribute.PropertyName
-                    , x => SetBindingPropertyName(serializedBinder, binder, propertyNameProp, (string)x)
-                    , attribute.PropertyName
+                    , x => SetBindingPropertyName(serializedBinder, binder, propertyNameProp, fieldInfo, adapterMap, x)
+                    , attribute
                 );
 
                 isEmpty = false;
@@ -263,15 +303,73 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
               SerializedObject serializedBinder
             , MonoBinder binder
             , SerializedProperty propertyNameProp
-            , string propertyName
+            , FieldInfo fieldInfo
+            , Dictionary<Type, Dictionary<Type, Type>> adapterMap
+            , object attribute
         )
         {
-            if (propertyNameProp.stringValue != propertyName)
+            if (attribute is not NotifyPropertyChangedInfoAttribute infoAttrib
+                || propertyNameProp.stringValue == infoAttrib.PropertyName
+            )
             {
-                Undo.RecordObject(binder, $"Set {propertyNameProp.propertyPath}");
-                propertyNameProp.stringValue = propertyName;
-                serializedBinder.ApplyModifiedProperties();
-                serializedBinder.Update();
+                return;
+            }
+
+            Undo.RecordObject(binder, $"Set {propertyNameProp.propertyPath}");
+            propertyNameProp.stringValue = infoAttrib.PropertyName;
+
+            SetBindingPropertyAdapter(
+                  serializedBinder
+                , fieldInfo
+                , adapterMap
+                , infoAttrib
+            );
+
+            serializedBinder.ApplyModifiedProperties();
+            serializedBinder.Update();
+        }
+
+        private static void SetBindingPropertyAdapter(
+              SerializedObject serializedBinder
+            , FieldInfo fieldInfo
+            , Dictionary<Type, Dictionary<Type, Type>> adapterMap
+            , NotifyPropertyChangedInfoAttribute infoAttrib
+        )
+        {
+            var bindingAttrib = fieldInfo.GetCustomAttribute<GeneratedBindingPropertyAttribute>();
+
+            if (bindingAttrib == null)
+            {
+                return;
+            }
+
+            var adapterPropertyPath = $"_converterFor{bindingAttrib.ForMemberName}.<Adapter>k__BackingField";
+            var adapterProp = serializedBinder.FindProperty(adapterPropertyPath);
+
+            if (adapterProp == null)
+            {
+                return;
+            }
+
+            IAdapter adapter = null;
+
+            if (adapterMap.TryGetValue(infoAttrib.PropertyType, out var map)
+                && map.TryGetValue(bindingAttrib.ForMemberType, out var adapterType)
+            )
+            {
+                try
+                {
+                    adapter = Activator.CreateInstance(adapterType) as IAdapter;
+                }
+                catch
+                {
+                    adapter = null;
+                }
+            }
+
+            if (adapter != null)
+            {
+                adapterProp.managedReferenceValue = adapter;
             }
         }
 
@@ -291,7 +389,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 .Where(x => x.DeclaringType == binderType);
 
             var adapterTypes = TypeCache.GetTypesDerivedFrom<IAdapter>()
-                .Where(x => x.IsAbstract == false && x.IsSubclassOf(typeof(UnityEngine.Object)) == false);
+                .Where(static x => x.IsAbstract == false && x.IsSubclassOf(typeof(UnityEngine.Object)) == false);
 
             var adapterTypesIsEmpty = adapterTypes.Count() == 0;
 
