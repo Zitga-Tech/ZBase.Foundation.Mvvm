@@ -1,6 +1,6 @@
 using UnityEngine;
 using ZBase.Foundation.Mvvm.Unions;
-using ZBase.Foundation.Mvvm.Unity.ViewBinding;
+using ZBase.Foundation.Mvvm.Unity.ViewBinding.Adapters;
 
 namespace Mvvm.Samples
 {

@@ -149,13 +149,13 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteBindingMethodInfoAttributes(ref Printer p)
         {
-            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ViewBinding.BindingMethodInfo({0}.{1}, typeof(global::ZBase.Foundation.Mvvm.Unions.Union))]";
+            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ViewBinding.BindingMethodInfo({0}.{1}, typeof({2}))]";
 
             var className = Symbol.ToFullName();
 
             foreach (var member in MemberRefs)
             {
-                p.PrintLine(string.Format(ATTRIBUTE, className, ConstName(member)));
+                p.PrintLine(string.Format(ATTRIBUTE, className, ConstName(member), member.Member.Parameters[0].Type.ToFullName()));
             }
         }
 
