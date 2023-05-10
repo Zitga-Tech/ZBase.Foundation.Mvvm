@@ -10,6 +10,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         private const string OBSOLETE_METHOD = "[global::System.Obsolete(\"This method is not intended to be use directly by user code.\")]";
         private const string GENERATED_BINDING_PROPERTY = "[global::ZBase.Foundation.Mvvm.ViewBinding.GeneratedBindingProperty({0}, typeof({1}))]";
         private const string GENERATED_CONVERTER = "[global::ZBase.Foundation.Mvvm.ViewBinding.GeneratedConverter({0}, typeof({1}))]";
+        private const string IADAPTER = "global::ZBase.Foundation.Mvvm.ViewBinding.IAdapter";
 
         public string WriteCodeWithoutMember()
         {
@@ -83,6 +84,24 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                         }
                     }
                     p.CloseScope();
+
+                    p.PrintEndLine();
+
+                    p.PrintLine("/// <inheritdoc/>");
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine($"public {keyword}bool SetAdapter(string bindingPropertyName, {IADAPTER} adapter)");
+                    p.OpenScope();
+                    {
+                        if (IsBaseBinder)
+                        {
+                            p.PrintLine("return base.SetAdapter(bindingPropertyName, adapter);");
+                        }
+                        else
+                        {
+                            p.PrintLine("return false;");
+                        }
+                    }
+                    p.CloseScope();
                 }
             }
             p.CloseScope();
@@ -134,6 +153,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 WriteStartListeningMethod(ref p);
                 WriteStopListeningMethod(ref p);
                 WriteSetTargetPropertyNameMethod(ref p);
+                WriteSetAdapterMethod(ref p);
 
                 if (NonUnionTypes.Length > 0)
                 {
@@ -412,6 +432,46 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                         p.OpenScope();
                         {
                             p.PrintLine($"this.{BindingPropertyName(member)}.TargetPropertyName = targetPropertyName;");
+                            p.PrintLine("return true;");
+                        }
+                        p.CloseScope();
+                        p.PrintEndLine();
+                    }
+                }
+                p.CloseScope();
+                p.PrintEndLine();
+
+                p.PrintLine("return false;");
+            }
+            p.CloseScope();
+
+            p.PrintEndLine();
+        }
+
+        private void WriteSetAdapterMethod(ref Printer p)
+        {
+            var keyword = IsBaseBinder ? "override " : Symbol.IsSealed ? "" : "virtual ";
+
+            p.PrintLine("/// <inheritdoc/>");
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public {keyword}bool SetAdapter(string bindingPropertyName, {IADAPTER} adapter)");
+            p.OpenScope();
+            {
+                if (IsBaseBinder)
+                {
+                    p.PrintLine("if (base.SetAdapter(bindingPropertyName, adapter)) return true;");
+                    p.PrintEndLine();
+                }
+
+                p.PrintLine("switch (bindingPropertyName)");
+                p.OpenScope();
+                {
+                    foreach (var member in MemberRefs)
+                    {
+                        p.PrintLine($"case {ConstName(member)}:");
+                        p.OpenScope();
+                        {
+                            p.PrintLine($"this.{ConverterName(member)}.Adapter = adapter;");
                             p.PrintLine("return true;");
                         }
                         p.CloseScope();

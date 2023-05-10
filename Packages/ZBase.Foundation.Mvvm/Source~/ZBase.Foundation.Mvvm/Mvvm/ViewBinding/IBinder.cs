@@ -21,6 +21,13 @@
         public bool SetTargetPropertyName(string bindingPropertyName, string targetPropertyName) => false;
 
         /// <summary>
+        /// Sets an instance of <see cref="IAdapter"/> to the converter of a binding property.
+        /// </summary>
+        /// <param name="bindingPropertyName">The binding property whose corresponding <see cref="Converter.Adapter"/> will be set.</param>
+        /// <param name="adapter">An instance of <see cref="IAdapter"/>.</param>
+        public bool SetAdapter(string bindingPropertyName, IAdapter adapter) => false;
+
+        /// <summary>
         /// Start listening to events from the <see cref="Context"/>.
         /// </summary>
         public void StartListening() { }
