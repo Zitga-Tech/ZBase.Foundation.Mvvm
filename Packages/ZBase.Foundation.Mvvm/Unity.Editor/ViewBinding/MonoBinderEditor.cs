@@ -52,7 +52,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
         }
 
-        private readonly Dictionary<string, bool> _foldoutMap = new();
         private readonly Dictionary<string, ReorderableList> _rolMap = new();
 
         public override void OnInspectorGUI()
@@ -137,7 +136,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                     , targetType
                     , targetPropertyMap
                     , labelMap
-                    , _foldoutMap
                     , _rolMap
                 );
             }
@@ -241,7 +239,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             , Type targetType
             , Dictionary<string, Type> targetPropertyMap
             , Dictionary<string, string> labelMap
-            , Dictionary<string, bool> foldoutMap
             , Dictionary<string, ReorderableList> rolMap
         )
         {
@@ -340,7 +337,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                       serializedBinder
                     , adapterPropertySP
                     , compositeAdapter
-                    , foldoutMap
                     , rolMap
                 );
 
@@ -753,7 +749,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
               SerializedObject serializedBinder
             , SerializedProperty adapterPropertySP
             , CompositeAdapter compositeAdapter
-            , Dictionary<string, bool> foldoutMap
             , Dictionary<string, ReorderableList> rolMap
         )
         {
@@ -768,12 +763,15 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             {
                 return;
             }
-
+            
             var mapKey = adapterListSP.propertyPath;
+            var instanceId = serializedBinder.targetObject.GetInstanceID();
+            var foldoutKey = $"__foldout__{instanceId}.{mapKey}";
+            var foldoutStr = EditorUserSettings.GetConfigValue(foldoutKey);
 
-            if (foldoutMap.TryGetValue(mapKey, out var foldout) == false)
+            if (bool.TryParse(foldoutStr, out var foldout) == false)
             {
-                foldoutMap[mapKey] = foldout = false;
+                foldout = false;
             }
 
             if (rolMap.TryGetValue(mapKey, out var rol) == false || rol == null)
@@ -795,7 +793,8 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             GUILayout.Space(15f);
             GUILayout.BeginVertical();
 
-            foldoutMap[mapKey] = foldout = EditorGUILayout.Foldout(foldout, label);
+            foldout = EditorGUILayout.Foldout(foldout, label);
+            EditorUserSettings.SetConfigValue(foldoutKey, foldout.ToString());
 
             if (foldout)
             {
