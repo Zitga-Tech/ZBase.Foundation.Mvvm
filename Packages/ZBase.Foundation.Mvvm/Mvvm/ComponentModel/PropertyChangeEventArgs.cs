@@ -6,13 +6,15 @@ namespace ZBase.Foundation.Mvvm.ComponentModel
     {
         public readonly IObservableObject Sender;
         public readonly string PropertyName;
-        public readonly Union Value;
+        public readonly Union OldValue;
+        public readonly Union NewValue;
 
-        public PropertyChangeEventArgs(IObservableObject sender, string propertyName, in Union value)
+        public PropertyChangeEventArgs(IObservableObject sender, string propertyName, in Union oldValue, in Union newValue)
         {
             Sender = sender;
             PropertyName = propertyName;
-            Value = value;
+            OldValue = oldValue;
+            NewValue = newValue;
         }
     }
 }

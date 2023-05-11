@@ -10,9 +10,9 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
         private const string AGGRESSIVE_INLINING = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]";
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.ObservablePropertyGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
-        private const string GENERATED_OBSERVABLE_PROPERTY = "[global::ZBase.Foundation.Mvvm.ComponentModel.GeneratedObservableProperty]";
-        private const string GENERATED_PROPERTY_CHANGING_HANDLER = "[global::ZBase.Foundation.Mvvm.ComponentModel.GeneratedPropertyChangingEventHandler]";
-        private const string GENERATED_PROPERTY_CHANGED_HANDLER = "[global::ZBase.Foundation.Mvvm.ComponentModel.GeneratedPropertyChangedEventHandler]";
+        private const string GENERATED_OBSERVABLE_PROPERTY = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.GeneratedObservableProperty]";
+        private const string GENERATED_PROPERTY_CHANGING_HANDLER = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.GeneratedPropertyChangingEventHandler]";
+        private const string GENERATED_PROPERTY_CHANGED_HANDLER = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.GeneratedPropertyChangedEventHandler]";
 
         public string WriteCodeWithoutMember()
         {
@@ -218,6 +218,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 var typeName = member.Member.Type.ToFullName();
                 var argsName = OnChangedArgsName(member);
                 var converterForField = GeneratorHelpers.ToTitleCase(member.Member.Type.ToValidIdentifier().AsSpan());
+                var converterForFieldVariable = $"converter{converterForField}";
                 var willNotifyPropertyChanged = NotifyPropertyChangedForMap.TryGetValue(fieldName, out var property);
                 var constName = ConstName(member);
 
@@ -253,7 +254,8 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                             p.PrintLine($"{OnChangingMethodName(member)}(oldValue, value);");
                             p.PrintEndLine();
 
-                            p.PrintLine($"var {argsName} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventArgs(this, {constName}, this._unionConverters.{converterForField}.ToUnion(value));");
+                            p.PrintLine($"var {converterForFieldVariable} = this._unionConverters.{converterForField};");
+                            p.PrintLine($"var {argsName} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventArgs(this, {constName}, {converterForFieldVariable}.ToUnion(oldValue), {converterForFieldVariable}.ToUnion(value));");
                             p.PrintLine($"this.{OnChangingEventName(member)}?.Invoke({argsName});");
                             p.PrintEndLine();
 
@@ -268,13 +270,15 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                             {
                                 var otherArgsName = OnChangedArgsName(property);
                                 var converterForProperty = GeneratorHelpers.ToTitleCase(property.Type.ToValidIdentifier().AsSpan());
+                                var converterForPropertyVariable = $"converter{converterForProperty}";
 
                                 p.PrintEndLine();
                                 p.PrintLine($"{OnChangedMethodName(property)}(this.{property.Name});");
                                 p.PrintLine($"{OnChangedMethodName(property)}(oldPropertyValue, this.{property.Name});");
                                 p.PrintEndLine();
 
-                                p.PrintLine($"var {otherArgsName} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventArgs(this, {ConstName(property)}, this._unionConverters.{converterForProperty}.ToUnion(this.{property.Name}));");
+                                p.PrintLine($"var {converterForPropertyVariable} = this._unionConverters.{converterForProperty};");
+                                p.PrintLine($"var {otherArgsName} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventArgs(this, {ConstName(property)}, {converterForPropertyVariable}.ToUnion(oldPropertyValue), {converterForPropertyVariable}.ToUnion(this.{property.Name}));");
                                 p.PrintLine($"this.{OnChangedEventName(property)}?.Invoke({otherArgsName});");
                             }
 
@@ -493,7 +497,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
         private void WriteNotifyPropertyChangingInfoAttributes(ref Printer p)
         {
-            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ComponentModel.NotifyPropertyChangingInfo({0}.{1}, typeof({2}))]";
+            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.NotifyPropertyChangingInfo({0}.{1}, typeof({2}))]";
 
             var className = Symbol.ToFullName();
 
@@ -508,7 +512,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
         private void WriteNotifyPropertyChangedInfoAttributes(ref Printer p)
         {
-            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ComponentModel.NotifyPropertyChangedInfo({0}.{1}, typeof({2}))]";
+            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.NotifyPropertyChangedInfo({0}.{1}, typeof({2}))]";
 
             var className = Symbol.ToFullName();
             var additionalProperties = new Dictionary<string, IPropertySymbol>();

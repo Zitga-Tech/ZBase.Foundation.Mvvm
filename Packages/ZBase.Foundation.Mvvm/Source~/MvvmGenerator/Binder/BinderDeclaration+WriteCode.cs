@@ -326,7 +326,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                     p.PrintLine($"this.{ListenerName(member)} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener<{className}>(this)");
                     p.OpenScope();
-                    p.PrintLine($"OnEventAction = (instance, args) => instance.{methodName}(this.{ConverterName(member)}.Convert(args.Value))");
+                    p.PrintLine($"OnEventAction = (instance, args) => instance.{methodName}(this.{ConverterName(member)}.Convert(args.NewValue))");
                     p.CloseScope("};");
                     p.PrintEndLine();
                 }
