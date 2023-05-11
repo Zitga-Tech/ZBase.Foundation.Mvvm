@@ -19,7 +19,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
         public const string UNION_TYPE_KIND = "global::ZBase.Foundation.Mvvm.Unions.UnionTypeKind";
         public const string DOES_NOT_RETURN = "[global::System.Diagnostics.CodeAnalysis.DoesNotReturn]";
         public const string RUNTIME_INITIALIZE_ON_LOAD_METHOD = "[global::UnityEngine.RuntimeInitializeOnLoadMethod(global::UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]";
-        public const string GENERATED_INTERNAL_UNIONS = "[global::ZBase.Foundation.Mvvm.Unions.GeneratedInternalUnions]";
+        public const string GENERATED_INTERNAL_UNIONS = "[global::ZBase.Foundation.Mvvm.Unions.SourceGen.GeneratedInternalUnions]";
 
         public const string GENERATOR_NAME = nameof(InternalUnionGenerator);
 

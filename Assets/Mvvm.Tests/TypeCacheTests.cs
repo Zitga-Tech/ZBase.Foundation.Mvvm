@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Unity.PerformanceTesting;
 using UnityEditor;
 using ZBase.Foundation.Mvvm.ViewBinding;
+using ZBase.Foundation.Mvvm.ViewBinding.SourceGen;
 
 namespace ZBase.Foundation.Mvvm.Tests
 {

@@ -238,62 +238,59 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                     p.PrintLine("set");
                     p.OpenScope();
                     {
-                        p.PrintLine($"if (global::System.Collections.Generic.EqualityComparer<{typeName}>.Default.Equals(this.{fieldName}, value) == false)");
-                        p.OpenScope();
+                        p.PrintLine($"if (global::System.Collections.Generic.EqualityComparer<{typeName}>.Default.Equals(this.{fieldName}, value)) return;");
+                        p.PrintEndLine();
+
+                        p.PrintLine($"var oldValue = this.{fieldName};");
+
+                        if (willNotifyPropertyChanged)
                         {
-                            p.PrintLine($"var oldValue = this.{fieldName};");
+                            p.PrintLine($"var oldPropertyValue = this.{property.Name};");
+                        }
 
-                            if (willNotifyPropertyChanged)
+                        p.PrintEndLine();
+
+                        p.PrintLine($"{OnChangingMethodName(member)}(value);");
+                        p.PrintLine($"{OnChangingMethodName(member)}(oldValue, value);");
+                        p.PrintEndLine();
+
+                        p.PrintLine($"var {converterForFieldVariable} = this._unionConverters.{converterForField};");
+                        p.PrintLine($"var {argsName} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventArgs(this, {constName}, {converterForFieldVariable}.ToUnion(oldValue), {converterForFieldVariable}.ToUnion(value));");
+                        p.PrintLine($"this.{OnChangingEventName(member)}?.Invoke({argsName});");
+                        p.PrintEndLine();
+
+                        p.PrintLine($"this.{fieldName} = value;");
+                        p.PrintEndLine();
+
+                        p.PrintLine($"{OnChangedMethodName(member)}(value);");
+                        p.PrintLine($"{OnChangedMethodName(member)}(oldValue, value);");
+                        p.PrintLine($"this.{OnChangedEventName(member)}?.Invoke({argsName});");
+
+                        if (willNotifyPropertyChanged)
+                        {
+                            var otherArgsName = OnChangedArgsName(property);
+                            var converterForProperty = GeneratorHelpers.ToTitleCase(property.Type.ToValidIdentifier().AsSpan());
+                            var converterForPropertyVariable = $"converter{converterForProperty}";
+
+                            p.PrintEndLine();
+                            p.PrintLine($"{OnChangedMethodName(property)}(this.{property.Name});");
+                            p.PrintLine($"{OnChangedMethodName(property)}(oldPropertyValue, this.{property.Name});");
+                            p.PrintEndLine();
+
+                            p.PrintLine($"var {converterForPropertyVariable} = this._unionConverters.{converterForProperty};");
+                            p.PrintLine($"var {otherArgsName} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventArgs(this, {ConstName(property)}, {converterForPropertyVariable}.ToUnion(oldPropertyValue), {converterForPropertyVariable}.ToUnion(this.{property.Name}));");
+                            p.PrintLine($"this.{OnChangedEventName(property)}?.Invoke({otherArgsName});");
+                        }
+
+                        p.PrintEndLine();
+
+                        foreach (var commandName in member.CommandNames)
+                        {
+                            if (NotifyCanExecuteChangedForSet.Contains(commandName))
                             {
-                                p.PrintLine($"var oldPropertyValue = this.{property.Name};");
-                            }
-
-                            p.PrintEndLine();
-
-                            p.PrintLine($"{OnChangingMethodName(member)}(value);");
-                            p.PrintLine($"{OnChangingMethodName(member)}(oldValue, value);");
-                            p.PrintEndLine();
-
-                            p.PrintLine($"var {converterForFieldVariable} = this._unionConverters.{converterForField};");
-                            p.PrintLine($"var {argsName} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventArgs(this, {constName}, {converterForFieldVariable}.ToUnion(oldValue), {converterForFieldVariable}.ToUnion(value));");
-                            p.PrintLine($"this.{OnChangingEventName(member)}?.Invoke({argsName});");
-                            p.PrintEndLine();
-
-                            p.PrintLine($"this.{fieldName} = value;");
-                            p.PrintEndLine();
-
-                            p.PrintLine($"{OnChangedMethodName(member)}(value);");
-                            p.PrintLine($"{OnChangedMethodName(member)}(oldValue, value);");
-                            p.PrintLine($"this.{OnChangedEventName(member)}?.Invoke({argsName});");
-
-                            if (willNotifyPropertyChanged)
-                            {
-                                var otherArgsName = OnChangedArgsName(property);
-                                var converterForProperty = GeneratorHelpers.ToTitleCase(property.Type.ToValidIdentifier().AsSpan());
-                                var converterForPropertyVariable = $"converter{converterForProperty}";
-
-                                p.PrintEndLine();
-                                p.PrintLine($"{OnChangedMethodName(property)}(this.{property.Name});");
-                                p.PrintLine($"{OnChangedMethodName(property)}(oldPropertyValue, this.{property.Name});");
-                                p.PrintEndLine();
-
-                                p.PrintLine($"var {converterForPropertyVariable} = this._unionConverters.{converterForProperty};");
-                                p.PrintLine($"var {otherArgsName} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventArgs(this, {ConstName(property)}, {converterForPropertyVariable}.ToUnion(oldPropertyValue), {converterForPropertyVariable}.ToUnion(this.{property.Name}));");
-                                p.PrintLine($"this.{OnChangedEventName(property)}?.Invoke({otherArgsName});");
-                            }
-
-                            p.PrintEndLine();
-
-                            foreach (var commandName in member.CommandNames)
-                            {
-                                if (NotifyCanExecuteChangedForSet.Contains(commandName))
-                                {
-                                    p.PrintLine($"{commandName}.NotifyCanExecuteChanged();");
-                                }
+                                p.PrintLine($"{commandName}.NotifyCanExecuteChanged();");
                             }
                         }
-                        p.CloseScope();
-
                     }
                     p.CloseScope();
                 }

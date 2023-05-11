@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ComponentModel;
 using ZBase.Foundation.Mvvm.ViewBinding;
 using ZBase.Foundation.Mvvm.ViewBinding.Adapters;
 using ZBase.Foundation.Mvvm.Unity.ViewBinding.Adapters;
-using UnityEditorInternal;
+using ZBase.Foundation.Mvvm.ViewBinding.SourceGen;
+using ZBase.Foundation.Mvvm.ComponentModel.SourceGen;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {

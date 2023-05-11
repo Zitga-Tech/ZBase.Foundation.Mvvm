@@ -7,7 +7,7 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
     {
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.RelayCommandGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
-        private const string GENERATED_RELAY_COMMAND = "[global::ZBase.Foundation.Mvvm.Input.GeneratedRelayCommand({0})]";
+        private const string GENERATED_RELAY_COMMAND = "[global::ZBase.Foundation.Mvvm.Input.SourceGen.GeneratedRelayCommand({0})]";
 
         public string WriteCode()
         {

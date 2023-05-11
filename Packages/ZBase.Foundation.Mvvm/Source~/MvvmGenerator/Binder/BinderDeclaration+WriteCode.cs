@@ -8,8 +8,8 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.BinderGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
         private const string OBSOLETE_METHOD = "[global::System.Obsolete(\"This method is not intended to be use directly by user code.\")]";
-        private const string GENERATED_BINDING_PROPERTY = "[global::ZBase.Foundation.Mvvm.ViewBinding.GeneratedBindingProperty({0}, typeof({1}))]";
-        private const string GENERATED_CONVERTER = "[global::ZBase.Foundation.Mvvm.ViewBinding.GeneratedConverter({0}, typeof({1}))]";
+        private const string GENERATED_BINDING_PROPERTY = "[global::ZBase.Foundation.Mvvm.ViewBinding.SourceGen.GeneratedBindingProperty({0}, typeof({1}))]";
+        private const string GENERATED_CONVERTER = "[global::ZBase.Foundation.Mvvm.ViewBinding.SourceGen.GeneratedConverter({0}, typeof({1}))]";
         private const string IADAPTER = "global::ZBase.Foundation.Mvvm.ViewBinding.IAdapter";
 
         public string WriteCodeWithoutMember()
@@ -169,7 +169,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteBindingMethodInfoAttributes(ref Printer p)
         {
-            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ViewBinding.BindingMethodInfo({0}.{1}, typeof({2}))]";
+            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ViewBinding.SourceGen.BindingMethodInfo({0}.{1}, typeof({2}))]";
 
             var className = Symbol.ToFullName();
 
