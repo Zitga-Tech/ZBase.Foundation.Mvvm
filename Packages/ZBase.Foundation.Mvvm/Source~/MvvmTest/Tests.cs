@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using ZBase.Foundation.Mvvm.ComponentModel;
 using ZBase.Foundation.Mvvm.Input;
 using ZBase.Foundation.Mvvm.Unions;
@@ -8,6 +9,11 @@ namespace MvvmTest
 {
     public class Program
     {
+        public static void PrintSize<T>()
+        {
+            Console.WriteLine(Unsafe.SizeOf<T>());
+        }
+
         public static void Main()
         {
             var model = new Model();

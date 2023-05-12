@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using ZBase.Foundation.Mvvm.Unions.Converters;
 
@@ -39,8 +40,7 @@ namespace ZBase.Foundation.Mvvm.Unions
 
         public static bool TryRegister<T>(IUnionConverter<T> converter)
         {
-            if (converter == null)
-                throw new ArgumentNullException(nameof(converter));
+            ThrowIfNullOrSizeOfTIsBiggerThanUnionDataSize(converter);
 
             return s_converters.TryAdd(UnionTypeId.Of<T>(), converter);
         }
@@ -82,5 +82,47 @@ namespace ZBase.Foundation.Mvvm.Unions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ToString<T>(in Union union)
             => GetConverter<T>().ToString(union);
+
+        [DoesNotReturn]
+        private static void ThrowIfNullOrSizeOfTIsBiggerThanUnionDataSize<T>(IUnionConverter<T> converter)
+        {
+            if (converter == null)
+            {
+                throw new ArgumentNullException(nameof(converter));
+            }
+
+            var sizeOfT = Unsafe.SizeOf<T>();
+
+            if (sizeOfT > UnionData.SIZE)
+            {
+                throw new NotSupportedException(
+                    $"The size of {typeof(T)} is {sizeOfT} bytes, " +
+                    $"while a Union can only store {UnionData.SIZE} bytes of custom data. " +
+                    $"To enable the automatic conversion between {typeof(T)} and {typeof(Union)}, please {GetDefineSymbolMessage(sizeOfT)}"
+                );
+            }
+
+            static string GetDefineSymbolMessage(int size)
+            {
+                if (size > 128) return "contact the author to increase the maximum data size of the Union type.";
+                if (size > 120) return "define UNION_SIZE_128_BYTES.";
+                if (size > 112) return "define UNION_SIZE_120_BYTES.";
+                if (size > 104) return "define UNION_SIZE_112_BYTES.";
+                if (size > 96) return "define UNION_SIZE_104_BYTES.";
+                if (size > 88) return "define UNION_SIZE_96_BYTES.";
+                if (size > 80) return "define UNION_SIZE_88_BYTES.";
+                if (size > 72) return "define UNION_SIZE_80_BYTES.";
+                if (size > 64) return "define UNION_SIZE_72_BYTES.";
+                if (size > 56) return "define UNION_SIZE_64_BYTES.";
+                if (size > 48) return "define UNION_SIZE_56_BYTES.";
+                if (size > 40) return "define UNION_SIZE_48_BYTES.";
+                if (size > 32) return "define UNION_SIZE_40_BYTES.";
+                if (size > 24) return "define UNION_SIZE_32_BYTES.";
+                if (size > 16) return "define UNION_SIZE_24_BYTES.";
+                if (size > 8) return "define UNION_SIZE_16_BYTES.";
+
+                return "report to the author, because this is an unexpected error.";
+            }
+        }
     }
 }

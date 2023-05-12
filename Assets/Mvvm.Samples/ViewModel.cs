@@ -1,5 +1,6 @@
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ComponentModel;
+using ZBase.Foundation.Mvvm.Unions;
 using ZBase.Foundation.Mvvm.Unity.ViewBinding;
 using ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders;
 using ZBase.Foundation.Mvvm.ViewBinding;
@@ -10,6 +11,9 @@ namespace Mvvm.Samples
     {
         [ObservableProperty]
         private float _time;
+
+        [ObservableProperty]
+        private Vector3 _vector2;
 
         private bool _updating;
 
