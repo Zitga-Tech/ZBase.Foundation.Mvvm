@@ -25,19 +25,13 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             {
                 Debug.LogWarning($"The toggle list is empty.", this);
             }
-
-            for (int i = 0; i < _targets.Length; i++)
-            {
-                Debug.Log(_targets[i].isOn);
-            }
         }
 
         [Binding]
-        [field: Label("SetIsOn")]
+        [field: Label("Is On")]
         [field: HideInInspector]
         private void SetActive(bool isOn)
         {
-            Debug.Log(isOn);
             var targets = _targets.AsSpan();
             var length = targets.Length;
 
@@ -47,7 +41,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
                 if (target)
                 {
-                    Debug.Log(target.isOn);
                     target.isOn = isOn;
                 }
             }

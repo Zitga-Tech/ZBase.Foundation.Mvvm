@@ -28,7 +28,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         [Binding]
-        [field: Label("color")]
+        [field: Label("Color")]
         [field: HideInInspector]
         private void SetColor(Color color)
         {
@@ -47,7 +47,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         [Binding]
-        [field: Label("sprite")]
+        [field: Label("Sprite")]
         [field: HideInInspector]
         private void SetSprite(Sprite sprite)
         {

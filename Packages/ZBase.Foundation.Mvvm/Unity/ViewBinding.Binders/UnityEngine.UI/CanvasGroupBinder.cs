@@ -27,25 +27,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         [Binding]
-        [field: Label("Active")]
-        [field: HideInInspector]
-        private void SetActive(bool active)
-        {
-            var targets = _targets.AsSpan();
-            var length = targets.Length;
-
-            for (var i = 0; i < length; i++)
-            {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.gameObject.SetActive(active);
-                }
-            }
-        }
-
-        [Binding]
         [field: Label("Alpha")]
         [field: HideInInspector]
         private void SetAlpha( float alpha)
@@ -65,7 +46,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         [Binding]
-        [field: Label("Raycast")]
+        [field: Label("Block Raycasts")]
         [field: HideInInspector]
         private void SetBlockRaycast(bool blockRaycast)
         {
@@ -84,7 +65,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         [Binding]
-        [field: Label("interactable")]
+        [field: Label("Interactable")]
         [field: HideInInspector]
         private void SetInteractable(bool interactable)
         {
