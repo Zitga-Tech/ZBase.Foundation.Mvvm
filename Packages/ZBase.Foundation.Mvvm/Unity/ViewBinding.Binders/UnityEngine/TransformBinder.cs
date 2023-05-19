@@ -1,36 +1,27 @@
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
-    [AddComponentMenu("MVVM/Binders/Image Binder")]
-    public partial class ImageBinder : MonoBinder
+    [AddComponentMenu("MVVM/Binders/Transform Binder")]
+    public partial class TransformBinder : MonoBinder
     {
         [SerializeField]
-        private Image[] _targets = new Image[0];
+        private Transform[] _targets = new Transform[0];
 
         protected override void OnAwake()
         {
             if (_targets.Length < 1)
             {
-                if (this.gameObject.TryGetComponent<Image>(out var target))
-                {
-                    _targets = new Image[] { target };
-                }
-            }
-
-            if (_targets.Length < 1)
-            {
-                Debug.LogWarning($"The target list is empty.", this);
+                _targets = new Transform[1] { this.gameObject.transform };
             }
         }
 
         [Binding]
-        [field: Label("Color")]
+        [field: Label("Position")]
         [field: HideInInspector]
-        private void SetColor(Color value)
+        private void SetPosition(in Vector3 value)
         {
             var targets = _targets.AsSpan();
             var length = targets.Length;
@@ -41,15 +32,15 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
                 if (target)
                 {
-                    target.color = value;
+                    target.position = value;
                 }
             }
         }
 
         [Binding]
-        [field: Label("Sprite")]
+        [field: Label("Rotation")]
         [field: HideInInspector]
-        private void SetSprite(Sprite value)
+        private void SetRotation(in Quaternion value)
         {
             var targets = _targets.AsSpan();
             var length = targets.Length;
@@ -60,15 +51,15 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
                 if (target)
                 {
-                    target.sprite = value;
+                    target.rotation = value;
                 }
             }
         }
 
         [Binding]
-        [field: Label("Fill Method")]
+        [field: Label("Euler Angles")]
         [field: HideInInspector]
-        private void SetFillMethod(Image.FillMethod value)
+        private void SetEulerAngles(in Vector3 value)
         {
             var targets = _targets.AsSpan();
             var length = targets.Length;
@@ -79,15 +70,15 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
                 if (target)
                 {
-                    target.fillMethod = value;
+                    target.eulerAngles = value;
                 }
             }
         }
 
         [Binding]
-        [field: Label("Fill Origin")]
+        [field: Label("Local Position")]
         [field: HideInInspector]
-        private void SetFillOrigin(int value)
+        private void SetLocalPosition(in Vector3 value)
         {
             var targets = _targets.AsSpan();
             var length = targets.Length;
@@ -98,15 +89,15 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
                 if (target)
                 {
-                    target.fillOrigin = value;
+                    target.localPosition = value;
                 }
             }
         }
 
         [Binding]
-        [field: Label("Fill Amount")]
+        [field: Label("Local Rotation")]
         [field: HideInInspector]
-        private void SetFillAmount(float value)
+        private void SetLocalRotation(in Quaternion value)
         {
             var targets = _targets.AsSpan();
             var length = targets.Length;
@@ -117,7 +108,45 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
                 if (target)
                 {
-                    target.fillAmount = value;
+                    target.localRotation = value;
+                }
+            }
+        }
+
+        [Binding]
+        [field: Label("Local Euler Angles")]
+        [field: HideInInspector]
+        private void SetLocalEulerAngles(in Vector3 value)
+        {
+            var targets = _targets.AsSpan();
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                var target = targets[i];
+
+                if (target)
+                {
+                    target.localEulerAngles = value;
+                }
+            }
+        }
+
+        [Binding]
+        [field: Label("Local Scale")]
+        [field: HideInInspector]
+        private void SetLocalScale(in Vector3 value)
+        {
+            var targets = _targets.AsSpan();
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                var target = targets[i];
+
+                if (target)
+                {
+                    target.localScale = value;
                 }
             }
         }

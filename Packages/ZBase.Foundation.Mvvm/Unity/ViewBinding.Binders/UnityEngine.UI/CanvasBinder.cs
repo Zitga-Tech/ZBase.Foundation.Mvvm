@@ -1,23 +1,22 @@
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
-    [AddComponentMenu("MVVM/Binders/Slider Binder")]
-    public partial class SliderBinder : MonoBinder
+    [AddComponentMenu("MVVM/Binders/Canvas Binder")]
+    public partial class CanvasBinder : MonoBinder
     {
         [SerializeField]
-        private Slider[] _targets = new Slider[0];
+        private Canvas[] _targets = new Canvas[0];
 
         protected override void OnAwake()
         {
             if (_targets.Length < 1)
             {
-                if (this.gameObject.TryGetComponent<Slider>(out var target))
+                if (this.gameObject.TryGetComponent<Canvas>(out var target))
                 {
-                    _targets = new Slider[] { target };
+                    _targets = new Canvas[] { target };
                 }
             }
 
@@ -28,9 +27,9 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         [Binding]
-        [field: Label("Min Value")]
+        [field: Label("Override Sorting")]
         [field: HideInInspector]
-        private void SetMinValue(int value)
+        private void SetOverrideSorting(bool value)
         {
             var targets = _targets.AsSpan();
             var length = targets.Length;
@@ -41,15 +40,15 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
                 if (target)
                 {
-                    target.minValue = value;
+                    target.overrideSorting = value;
                 }
             }
         }
 
         [Binding]
-        [field: Label("Max Value")]
+        [field: Label("Sorting Layer ID")]
         [field: HideInInspector]
-        private void SetMaxValue(int value)
+        private void SetSortingLayerId(int value)
         {
             var targets = _targets.AsSpan();
             var length = targets.Length;
@@ -60,15 +59,15 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
                 if (target)
                 {
-                    target.maxValue = value;
+                    target.sortingLayerID = value;
                 }
             }
         }
 
         [Binding]
-        [field: Label("Whole Numbers")]
+        [field: Label("Sorting Layer Name")]
         [field: HideInInspector]
-        private void SetWholeNumbers(bool value)
+        private void SetSortingLayerName(string value)
         {
             var targets = _targets.AsSpan();
             var length = targets.Length;
@@ -79,15 +78,15 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
                 if (target)
                 {
-                    target.wholeNumbers = value;
+                    target.sortingLayerName = value;
                 }
             }
         }
 
         [Binding]
-        [field: Label("Value")]
+        [field: Label("Order In Layer")]
         [field: HideInInspector]
-        private void SetValue(float value)
+        private void SetOrderInLayer(int value)
         {
             var targets = _targets.AsSpan();
             var length = targets.Length;
@@ -98,7 +97,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
                 if (target)
                 {
-                    target.value = value;
+                    target.sortingOrder = value;
                 }
             }
         }
