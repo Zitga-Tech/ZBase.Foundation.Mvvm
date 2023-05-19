@@ -250,7 +250,6 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
                         p.PrintEndLine();
 
-                        p.PrintLine($"{OnChangingMethodName(member)}(value);");
                         p.PrintLine($"{OnChangingMethodName(member)}(oldValue, value);");
                         p.PrintEndLine();
 
@@ -262,7 +261,6 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                         p.PrintLine($"this.{fieldName} = value;");
                         p.PrintEndLine();
 
-                        p.PrintLine($"{OnChangedMethodName(member)}(value);");
                         p.PrintLine($"{OnChangedMethodName(member)}(oldValue, value);");
                         p.PrintLine($"this.{OnChangedEventName(member)}?.Invoke({argsName});");
 
@@ -273,7 +271,6 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                             var converterForPropertyVariable = $"converter{converterForProperty}";
 
                             p.PrintEndLine();
-                            p.PrintLine($"{OnChangedMethodName(property)}(this.{property.Name});");
                             p.PrintLine($"{OnChangedMethodName(property)}(oldPropertyValue, this.{property.Name});");
                             p.PrintEndLine();
 
@@ -307,25 +304,11 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 var propName = member.PropertyName;
 
                 p.PrintLine($"/// <summary>Executes the logic for when <see cref=\"{propName}\"/> is changing.</summary>");
-                p.PrintLine("/// <param name=\"value\">The new property value being set.</param>");
-                p.PrintLine($"/// <remarks>This method is invoked right before the value of <see cref=\"{propName}\"/> is changed.</remarks>");
-                p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"partial void {OnChangingMethodName(member)}({typeName} value);");
-                p.PrintEndLine();
-
-                p.PrintLine($"/// <summary>Executes the logic for when <see cref=\"{propName}\"/> is changing.</summary>");
                 p.PrintLine("/// <param name=\"oldValue\">The previous property value that is being replaced.</param>");
                 p.PrintLine("/// <param name=\"newValue\">The new property value being set.</param>");
                 p.PrintLine($"/// <remarks>This method is invoked right before the value of <see cref=\"{propName}\"/> is changed.</remarks>");
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine($"partial void {OnChangingMethodName(member)}({typeName} oldValue, {typeName} newValue);");
-                p.PrintEndLine();
-
-                p.PrintLine($"/// <summary>Executes the logic for when <see cref=\"{propName}\"/> just changed.</summary>");
-                p.PrintLine("/// <param name=\"value\">The new property value that was set.</param>");
-                p.PrintLine($"/// <remarks>This method is invoked right after the value of <see cref=\"{propName}\"/> is changed.</remarks>");
-                p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"partial void {OnChangedMethodName(member)}({typeName} value);");
                 p.PrintEndLine();
 
                 p.PrintLine($"/// <summary>Executes the logic for when <see cref=\"{propName}\"/> just changed.</summary>");
@@ -351,13 +334,6 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             {
                 var propName = property.Name;
                 var typeName = property.Type.ToFullName();
-
-                p.PrintLine($"/// <summary>Executes the logic for when <see cref=\"{propName}\"/> just changed.</summary>");
-                p.PrintLine("/// <param name=\"value\">The new property value that was set.</param>");
-                p.PrintLine($"/// <remarks>This method is invoked right after the value of <see cref=\"{propName}\"/> is changed.</remarks>");
-                p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"partial void {OnChangedMethodName(property)}({typeName} value);");
-                p.PrintEndLine();
 
                 p.PrintLine($"/// <summary>Executes the logic for when <see cref=\"{propName}\"/> just changed.</summary>");
                 p.PrintLine("/// <param name=\"value\">The new property value that was set.</param>");
