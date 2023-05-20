@@ -78,7 +78,7 @@ namespace ZBase.Foundation.Mvvm.Input
             => _canExecute?.Invoke(parameter) != false;
 
         /// <inheritdoc/>
-        public bool CanExecute(Union parameter)
+        public bool CanExecute(in Union parameter)
         {
             if (_converter.TryGetValue(parameter, out T result) == false)
             {
@@ -93,7 +93,7 @@ namespace ZBase.Foundation.Mvvm.Input
         public void Execute(T parameter) => _execute(parameter);
 
         /// <inheritdoc/>
-        public void Execute(Union parameter)
+        public void Execute(in Union parameter)
         {
             if (_converter.TryGetValue(parameter, out T result) == false)
             {

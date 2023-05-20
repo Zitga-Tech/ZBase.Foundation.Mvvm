@@ -27,22 +27,22 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             p = p.IncreasedIndent();
 
             p.PrintBeginLine();
-            p.Print("partial class ").Print(Syntax.Identifier.Text);
-            p.PrintEndLine();
+            p.Print($"partial class {Syntax.Identifier.Text}");
 
             p = p.IncreasedIndent();
 
             if (IsBaseObservableObject)
             {
-                p.PrintLine(": global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject");
-                p.PrintLine(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
+                p.Print(": global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject");
+                p.Print(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
             }
             else
             {
-                p.PrintLine(": global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
+                p.Print(": global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
             }
 
-            p.PrintLine(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged");
+            p.Print(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged");
+            p.PrintEndLine();
             p = p.DecreasedIndent();
 
             p.OpenScope();
@@ -105,22 +105,22 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             WriteNotifyPropertyChangedInfoAttributes(ref p);
 
             p.PrintBeginLine();
-            p.Print("partial class ").Print(Syntax.Identifier.Text);
-            p.PrintEndLine();
+            p.Print($"partial class {Syntax.Identifier.Text}");
 
             p = p.IncreasedIndent();
 
             if (IsBaseObservableObject)
             {
-                p.PrintLine(": global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject");
-                p.PrintLine(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
+                p.Print(": global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject");
+                p.Print(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
             }
             else
             {
-                p.PrintLine(": global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
+                p.Print(": global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
             }
 
-            p.PrintLine(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged");
+            p.Print(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged");
+            p.PrintEndLine();
             p = p.DecreasedIndent();
 
             p.OpenScope();
@@ -203,6 +203,42 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             {
                 p.PrintLine(GENERATED_CODE).PrintLine(GENERATED_PROPERTY_CHANGED_HANDLER);
                 p.PrintLine($"private event global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangedEventHandler {OnChangedEventName(property)};");
+                p.PrintEndLine();
+            }
+        }
+
+        private void WriteUnionConverters(ref Printer p)
+        {
+            var types = new Dictionary<string, ITypeSymbol>();
+
+            foreach (var member in MemberRefs)
+            {
+                var fieldName = member.Member.Name;
+                var name = member.Member.Type.ToFullName();
+
+                if (types.ContainsKey(name) == false)
+                {
+                    types.Add(name, member.Member.Type);
+                }
+
+                if (NotifyPropertyChangedForMap.TryGetValue(fieldName, out var property))
+                {
+                    name = property.Type.ToFullName();
+
+                    if (types.ContainsKey(name) == false)
+                    {
+                        types.Add(name, property.Type);
+                    }
+                }
+            }
+
+            foreach (var type in types.Values)
+            {
+                var typeName = type.ToFullName();
+                var propertyName = GeneratorHelpers.ToTitleCase(type.ToValidIdentifier().AsSpan());
+
+                p.PrintLine(GENERATED_CODE);
+                p.PrintLine($"private readonly {CACHED_UNION_CONVERTER}<{typeName}> _unionConverter{propertyName} = new {CACHED_UNION_CONVERTER}<{typeName}>();");
                 p.PrintEndLine();
             }
         }
@@ -508,43 +544,6 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             foreach (var property in additionalProperties.Values)
             {
                 p.PrintLine(string.Format(ATTRIBUTE, className, ConstName(property), property.Type.ToFullName()));
-            }
-        }
-
-        private void WriteUnionConverters(ref Printer p)
-        {
-            var types = new Dictionary<string, ITypeSymbol>();
-
-            foreach (var member in MemberRefs)
-            {
-                var fieldName = member.Member.Name;
-                var name = member.Member.Type.ToFullName();
-
-                if (types.ContainsKey(name) == false)
-                {
-                    types.Add(name, member.Member.Type);
-                }
-
-                if (NotifyPropertyChangedForMap.TryGetValue(fieldName, out var property))
-                {
-                    name = property.Type.ToFullName();
-
-                    if (types.ContainsKey(name) == false)
-                    {
-                        types.Add(name, property.Type);
-                    }
-                }
-            }
-
-            foreach (var type in types.Values)
-            {
-                var typeName = type.ToFullName();
-                var fieldName = type.ToValidIdentifier();
-                var propertyName = GeneratorHelpers.ToTitleCase(fieldName.AsSpan());
-
-                p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"private readonly {CACHED_UNION_CONVERTER}<{typeName}> _unionConverter{propertyName} = new {CACHED_UNION_CONVERTER}<{typeName}>();");
-                p.PrintEndLine();
             }
         }
 

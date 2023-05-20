@@ -60,21 +60,26 @@ namespace ZBase.Foundation.Mvvm.Input
         /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void NotifyCanExecuteChanged()
-        {
-            _canExecuteChanged?.Invoke(new MvvmEventArgs(this, Union.Undefined));
-        }
+            => _canExecuteChanged?.Invoke(new MvvmEventArgs(this, Union.Undefined));
 
         /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool CanExecute(Union parameter)
-        {
-            return _canExecute?.Invoke() != false;
-        }
+        public bool CanExecute()
+            => _canExecute?.Invoke() != false;
 
         /// <inheritdoc/>
-        public void Execute(Union parameter)
-        {
-            _execute();
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Execute()
+            => _execute();
+
+        /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool CanExecute(in Union parameter)
+            => _canExecute?.Invoke() != false;
+
+        /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Execute(in Union parameter)
+            => _execute();
     }
 }

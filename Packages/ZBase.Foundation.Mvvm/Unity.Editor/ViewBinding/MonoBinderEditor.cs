@@ -118,10 +118,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 var propAttrib = fieldInfo.GetCustomAttribute<GeneratedBindingPropertyAttribute>();
                 var labelAttrib = fieldInfo.GetCustomAttribute<LabelAttribute>();
 
-                if (labelMap.ContainsKey(propAttrib.ForMemberName) == false)
+                if (labelMap.ContainsKey(propAttrib.MethodName) == false)
                 {
-                    var name = ObjectNames.NicifyVariableName(propAttrib.ForMemberName);
-                    labelMap[propAttrib.ForMemberName] = labelAttrib?.Label ?? name;
+                    var name = ObjectNames.NicifyVariableName(propAttrib.MethodName);
+                    labelMap[propAttrib.MethodName] = labelAttrib?.Label ?? name;
                 }
             }
 

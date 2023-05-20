@@ -15,12 +15,12 @@ namespace ZBase.Foundation.Mvvm.Input
         /// </summary>
         /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
         /// <returns>true if this command can be executed; otherwise, false.</returns>
-        bool CanExecute(Union parameter);
+        bool CanExecute(in Union parameter);
 
         /// <summary>
         /// Defines the method to be called when the command is invoked.
         /// </summary>
         /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
-        void Execute(Union parameter);
+        void Execute(in Union parameter);
     }
 }

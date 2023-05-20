@@ -1,16 +1,20 @@
 ﻿using System;
+using Microsoft.CodeAnalysis;
 using ZBase.Foundation.SourceGen;
 
 namespace ZBase.Foundation.Mvvm.BinderSourceGen
 {
     partial class BinderDeclaration
     {
+        private const string AGGRESSIVE_INLINING = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]";
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.BinderGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
         private const string OBSOLETE_METHOD = "[global::System.Obsolete(\"This method is not intended to be use directly by user code.\")]";
         private const string GENERATED_BINDING_PROPERTY = "[global::ZBase.Foundation.Mvvm.ViewBinding.SourceGen.GeneratedBindingProperty({0}, typeof({1}))]";
+        private const string GENERATED_BINDING_COMMAND = "[global::ZBase.Foundation.Mvvm.ViewBinding.SourceGen.GeneratedBindingCommand(";
         private const string GENERATED_CONVERTER = "[global::ZBase.Foundation.Mvvm.ViewBinding.SourceGen.GeneratedConverter({0}, typeof({1}))]";
         private const string IADAPTER = "global::ZBase.Foundation.Mvvm.ViewBinding.IAdapter";
+        private const string CACHED_UNION_CONVERTER = "global::ZBase.Foundation.Mvvm.Unions.CachedUnionConverter";
 
         public string WriteCodeWithoutMember()
         {
@@ -121,6 +125,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             p = p.IncreasedIndent();
 
             WriteBindingPropertyMethodInfoAttributes(ref p);
+            WriteBindingCommandMethodInfoAttributes(ref p);
 
             p.PrintBeginLine();
             p.Print("partial class ").Print(Syntax.Identifier.Text);
@@ -137,17 +142,19 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
             p.OpenScope();
             {
-                if (NonUnionTypes.Length > 0)
-                {
-                    p.PrintLine(GENERATED_CODE);
-                    p.PrintLine("private readonly UnionConverters _unionConverters = new UnionConverters();");
-                    p.PrintEndLine();
-                }
-
-                WriteConstantFields(ref p);
+                WriteConstantBindingProperties(ref p);
+                WriteConstantBindingCommands(ref p);
                 WriteBindingProperties(ref p);
                 WriteConverters(ref p);
+                WriteBindingCommands(ref p);
+
+                if (NonUnionTypes.Length > 0)
+                {
+                    WriteUnionConverters(ref p);
+                }
+
                 WriteListeners(ref p);
+                WriteRelayCommands(ref p);
                 WriteFlags(ref p);
                 WriteConstructor(ref p);
                 WriteStartListeningMethod(ref p);
@@ -158,8 +165,9 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 if (NonUnionTypes.Length > 0)
                 {
                     WriteUnionOverloads(ref p);
-                    WriteUnionConverters(ref p);
                 }
+
+                WritePartialBindingCommandMethods(ref p);
             }
             p.CloseScope();
 
@@ -169,21 +177,63 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteBindingPropertyMethodInfoAttributes(ref Printer p)
         {
-            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ViewBinding.SourceGen.BindingPropertyMethodInfo({0}.{1}, typeof({2}))]";
-
             var className = Symbol.ToFullName();
 
             foreach (var member in BindingPropertyRefs)
             {
-                p.PrintLine(string.Format(ATTRIBUTE, className, ConstName(member), member.Symbol.Parameters[0].Type.ToFullName()));
+                p.PrintBeginLine()
+                    .Print("[global::ZBase.Foundation.Mvvm.ViewBinding.SourceGen.BindingPropertyMethodInfo(")
+                    .Print($"{className}.{ConstName(member)}, typeof(")
+                    .Print(member.Symbol.Parameters[0].Type.ToFullName()).Print("))]")
+                    .PrintEndLine();
             }
         }
 
-        private void WriteConstantFields(ref Printer p)
+        private void WriteBindingCommandMethodInfoAttributes(ref Printer p)
+        {
+            var className = Symbol.ToFullName();
+
+            foreach (var member in BindingCommandRefs)
+            {
+                p.PrintBeginLine()
+                    .Print("[global::ZBase.Foundation.Mvvm.ViewBinding.SourceGen.BindingCommandMethodInfo(")
+                    .Print($"{className}.{ConstName(member)}, ");
+
+                if (member.Parameter == null)
+                {
+                    p.Print("null");
+                }
+                else
+                {
+                    p.Print("typeof(").Print(member.Symbol.Parameters[0].Type.ToFullName()).Print(")");
+                }
+
+                p.Print(")]").PrintEndLine();
+            }
+        }
+
+        private void WriteConstantBindingProperties(ref Printer p)
         {
             var className = Syntax.Identifier.Text;
 
             foreach (var member in BindingPropertyRefs)
+            {
+                var name = member.Symbol.Name;
+
+                p.PrintLine($"/// <summary>The name of <see cref=\"{name}\"/></summary>");
+                p.PrintLine(GENERATED_CODE);
+                p.PrintLine($"public const string {ConstName(member)} = nameof({className}.{name});");
+                p.PrintEndLine();
+            }
+
+            p.PrintEndLine();
+        }
+
+        private void WriteConstantBindingCommands(ref Printer p)
+        {
+            var className = Syntax.Identifier.Text;
+
+            foreach (var member in BindingCommandRefs)
             {
                 var name = member.Symbol.Name;
 
@@ -216,7 +266,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     readonlyKeyword = "readonly ";
                 }
 
-                var typeName = member.NonUnionArgumentType.ToFullName();
+                var typeName = member.Parameter.Type.ToFullName();
 
                 p.PrintLine($"/// <summary>The binding property for <see cref=\"{member.Symbol.Name}\"/></summary>");
                 p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
@@ -257,7 +307,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     readonlyKeyword = "readonly ";
                 }
 
-                var typeName = member.NonUnionArgumentType.ToFullName();
+                var typeName = member.Parameter.Type.ToFullName();
 
                 p.PrintLine($"/// <summary>The converter for the parameter of <see cref=\"{member.Symbol.Name}\"/></summary>");
                 p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
@@ -278,6 +328,66 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             p.PrintEndLine();
         }
 
+        private void WriteBindingCommands(ref Printer p)
+        {
+            foreach (var member in BindingCommandRefs)
+            {
+                if (member.SkipBindingCommand)
+                {
+                    continue;
+                }
+
+                string readonlyKeyword;
+
+                if (ReferenceUnityEngine)
+                {
+                    readonlyKeyword = "";
+                }
+                else
+                {
+                    readonlyKeyword = "readonly ";
+                }
+
+                p.PrintLine($"/// <summary>The binding command for <see cref=\"{member.Symbol.Name}\"/></summary>");
+                p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
+                p.PrintLine("[global::UnityEngine.SerializeField]");
+                p.Print("#endif").PrintEndLine();
+
+                foreach (var attribute in member.ForwardedFieldAttributes)
+                {
+                    p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
+                }
+
+                p.PrintLine(GENERATED_CODE);
+                p.PrintBeginLine()
+                    .Print(GENERATED_BINDING_COMMAND)
+                    .Print(ConstName(member));
+
+                if (member.Parameter != null)
+                {
+                    p.Print($", typeof({member.Parameter.Type.ToFullName()})");
+                }
+
+                p.Print(")]").PrintEndLine();
+
+                p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.BindingCommand {BindingCommandName(member)} =  new global::ZBase.Foundation.Mvvm.ViewBinding.BindingCommand();");
+                p.PrintEndLine();
+            }
+        }
+
+        private void WriteUnionConverters(ref Printer p)
+        {
+            foreach (var type in NonUnionTypes)
+            {
+                var typeName = type.ToFullName();
+                var propertyName = GeneratorHelpers.ToTitleCase(type.ToValidIdentifier().AsSpan());
+
+                p.PrintLine(GENERATED_CODE);
+                p.PrintLine($"private readonly {CACHED_UNION_CONVERTER}<{typeName}> _unionConverter{propertyName} = new {CACHED_UNION_CONVERTER}<{typeName}>();");
+                p.PrintEndLine();
+            }
+        }
+
         private void WriteListeners(ref Printer p)
         {
             var className = Syntax.Identifier.Text;
@@ -286,7 +396,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             {
                 p.PrintLine($"/// <summary>");
                 p.PrintLine($"/// The listener that binds <see cref=\"{member.Symbol.Name}\"/>");
-                p.PrintLine($"/// to the property chosen by {BindingPropertyName(member)}.");
+                p.PrintLine($"/// to the property chosen by <see cref=\"{BindingPropertyName(member)}\"/>.");
                 p.PrintLine($"/// </summary>");
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine($"private readonly global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener<{className}> {ListenerName(member)};");
@@ -294,6 +404,29 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             }
 
             p.PrintEndLine();
+        }
+
+        private void WriteRelayCommands(ref Printer p)
+        {
+            foreach (var member in BindingCommandRefs)
+            {
+                p.PrintLine($"/// <summary>");
+                p.PrintLine($"/// The relay command that binds <see cref=\"{member.Symbol.Name}\"/>");
+                p.PrintLine($"/// to the command chosen by <see cref=\"{BindingCommandName(member)}\"/>.");
+                p.PrintLine($"/// </summary>");
+                p.PrintLine(GENERATED_CODE);
+
+                if (member.Parameter == null)
+                {
+                    p.PrintLine($"private global::ZBase.Foundation.Mvvm.Input.IRelayCommand {RelayCommandName(member)};");
+                }
+                else
+                {
+                    p.PrintLine($"private global::ZBase.Foundation.Mvvm.Input.IRelayCommand<{member.Parameter.Type.ToFullName()}> {RelayCommandName(member)};");
+                }
+
+                p.PrintEndLine();
+            }
         }
 
         private void WriteFlags(ref Printer p)
@@ -358,19 +491,32 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     p.PrintEndLine();
                 }
 
-                p.PrintLine("if (this.Context.Target is not global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged inpc) return;");
-                p.PrintEndLine();
-
                 p.PrintLine($"if (this._isListening) return;");
                 p.PrintEndLine();
 
                 p.PrintLine($"this._isListening = true;");
                 p.PrintEndLine();
 
-                foreach (var member in BindingPropertyRefs)
+                p.PrintLine("if (this.Context.Target is global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged inpc)");
+                p.OpenScope();
                 {
-                    p.PrintLine($"inpc.PropertyChanged(this.{BindingPropertyName(member)}.TargetPropertyName, this.{ListenerName(member)});");
+                    foreach (var member in BindingPropertyRefs)
+                    {
+                        p.PrintLine($"inpc.PropertyChanged(this.{BindingPropertyName(member)}.TargetPropertyName, this.{ListenerName(member)});");
+                    }
                 }
+                p.CloseScope();
+                p.PrintEndLine();
+
+                p.PrintLine("if (this.Context.Target is global::ZBase.Foundation.Mvvm.Input.ICommandListener cl)");
+                p.OpenScope();
+                {
+                    foreach (var member in BindingCommandRefs)
+                    {
+                        p.PrintLine($"cl.TryGetCommand(this.{BindingCommandName(member)}.TargetCommandName, out this.{RelayCommandName(member)});");
+                    }
+                }
+                p.CloseScope();
             }
             p.CloseScope();
 
@@ -401,6 +547,13 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 foreach (var member in BindingPropertyRefs)
                 {
                     p.PrintLine($"this.{ListenerName(member)}.Detach();");
+                }
+
+                p.PrintEndLine();
+
+                foreach (var member in BindingCommandRefs)
+                {
+                    p.PrintLine($"this.{RelayCommandName(member)} = null;");
                 }
             }
             p.CloseScope();
@@ -492,30 +645,38 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         {
             foreach (var member in BindingPropertyRefs)
             {
-                if (member.NonUnionArgumentType == null)
+                if (member.IsParameterTypeNotUnion == false)
                 {
                     continue;
                 }
 
-                var origName = member.Symbol.Name;
-                var typeName = member.NonUnionArgumentType.ToFullName();
+                var originalMethodName = member.Symbol.Name;
+                var param = member.Parameter;
+                var paramTypeName = param.Type.ToFullName();
                 var methodName = MethodName(member);
-                var converter = GeneratorHelpers.ToTitleCase(member.NonUnionArgumentType.ToValidIdentifier().AsSpan());
+                var converter = GeneratorHelpers.ToTitleCase(param.Type.ToValidIdentifier().AsSpan());
 
                 p.PrintLine($"/// <summary>");
-                p.PrintLine($"/// This overload will try to get the value of type <see cref=\"{typeName}\"/>");
+                p.PrintLine($"/// This overload will try to get the value of type <see cref=\"{paramTypeName}\"/>");
                 p.PrintLine($"/// from <see cref=\"global::ZBase.Foundation.Mvvm.Unions.Union\"/>");
-                p.PrintLine($"/// to pass into <see cref=\"{origName}\"/>.");
+                p.PrintLine($"/// to pass into <see cref=\"{originalMethodName}\"/>.");
                 p.PrintLine($"/// </summary>");
                 p.PrintLine($"/// <remarks>This method is not intended to be use directly by user code.</remarks>");
                 p.PrintLine(OBSOLETE_METHOD).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                 p.PrintLine($"private void {methodName}(in global::ZBase.Foundation.Mvvm.Unions.Union union)");
                 p.OpenScope();
                 {
-                    p.PrintLine($"if (this._unionConverters.{converter}.TryGetValue(union, out {typeName} value))");
+                    p.PrintLine($"if (this._unionConverter{converter}.TryGetValue(union, out {paramTypeName} value))");
                     p.OpenScope();
                     {
-                        p.PrintLine($"{origName}(value);");
+                        p.PrintBeginLine().Print($"{originalMethodName}(");
+
+                        if (param.RefKind == RefKind.Ref)
+                        {
+                            p.Print("ref ");
+                        }
+
+                        p.Print("value);").PrintEndLine();
                     }
                     p.CloseScope();
                 }
@@ -525,44 +686,50 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             p.PrintEndLine();
         }
 
-        private void WriteUnionConverters(ref Printer p)
+        private void WritePartialBindingCommandMethods(ref Printer p)
         {
-            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-            p.PrintLine("private class UnionConverters");
-            p.OpenScope();
+            foreach (var member in BindingCommandRefs)
             {
-                foreach (var type in NonUnionTypes)
+                p.PrintLine(OBSOLETE_METHOD).PrintLine(AGGRESSIVE_INLINING)
+                    .PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+
+                if (member.Parameter == null)
                 {
-                    var typeName = type.ToFullName();
-                    var fieldName = type.ToValidIdentifier();
-
-                    p.PrintLine(GENERATED_CODE);
-                    p.PrintLine($"private global::ZBase.Foundation.Mvvm.Unions.IUnionConverter<{typeName}> _{fieldName};");
-                    p.PrintEndLine();
-                }
-
-                foreach (var type in NonUnionTypes)
-                {
-                    var typeName = type.ToFullName();
-                    var fieldName = type.ToValidIdentifier();
-                    var propertyName = GeneratorHelpers.ToTitleCase(fieldName.AsSpan());
-
-                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public global::ZBase.Foundation.Mvvm.Unions.IUnionConverter<{typeName}> {propertyName}");
+                    p.PrintLine($"partial void {member.Symbol.Name}()");
                     p.OpenScope();
                     {
-                        p.PrintLine($"get => this._{fieldName} ??= global::ZBase.Foundation.Mvvm.Unions.UnionConverter.GetConverter<{typeName}>();");
+                        p.PrintLine($"this.{RelayCommandName(member)}?.Execute();");
                     }
                     p.CloseScope();
-                    p.PrintEndLine();
                 }
+                else
+                {
+                    p.PrintBeginLine().Print($"partial void {member.Symbol.Name}(");
+
+                    var param = member.Parameter;
+
+                    if (param.RefKind == RefKind.Ref)
+                    {
+                        p.Print("ref ");
+                    }
+
+                    p.Print($"{param.Type.ToFullName()} {param.Name})").PrintEndLine();
+                    p.OpenScope();
+                    {
+                        p.PrintLine($"this.{RelayCommandName(member)}?.Execute({param.Name});");
+                    }
+                    p.CloseScope();
+                }
+                
+                p.PrintEndLine();
             }
-            p.CloseScope();
-            p.PrintEndLine();
         }
 
         private static string ConstName(BindingPropertyRef member)
             => $"BindingProperty_{member.Symbol.Name}";
+
+        private static string ConstName(BindingCommandRef member)
+            => $"BindingCommand_{member.Symbol.Name}";
 
         private static string BindingPropertyName(BindingPropertyRef member)
             => $"_bindingFieldFor{member.Symbol.Name}";
@@ -577,12 +744,18 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         {
             var name = member.Symbol.Name;
 
-            if (member.NonUnionArgumentType != null)
+            if (member.IsParameterTypeNotUnion)
             {
                 return $"{name}__Union";
             }
 
             return name;
         }
+
+        private static string BindingCommandName(BindingCommandRef member)
+            => $"_bindingCommandFor{member.Symbol.Name}";
+
+        private static string RelayCommandName(BindingCommandRef member)
+            => $"_relayCommandFor{member.Symbol.Name}";
     }
 }

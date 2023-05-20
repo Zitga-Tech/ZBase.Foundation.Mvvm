@@ -33,8 +33,7 @@ namespace ZBase.Foundation.Mvvm
         category: "ObservablePropertyGenerator",
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        description: "Fields with [ObservableProperty] should not be directly referenced, and the generated properties should be used instead.",
-        helpLinkUri: "https://aka.ms/mvvmtoolkit/errors/mvvmtk0034");
+        description: "Fields with [ObservableProperty] should not be directly referenced, and the generated properties should be used instead.");
 
         /// <summary>
         /// Gets a <see cref="DiagnosticDescriptor"/> indicating when a field with <c>[ObservableProperty]</c> is using an invalid attribute targeting the property.
@@ -49,8 +48,7 @@ namespace ZBase.Foundation.Mvvm
         category: "ObservablePropertyGenerator",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "All attributes targeting the generated property for a field annotated with [ObservableProperty] must correctly be resolved to valid types.",
-        helpLinkUri: "https://aka.ms/mvvmtoolkit/errors/mvvmtk0035");
+        description: "All attributes targeting the generated property for a field annotated with [ObservableProperty] must correctly be resolved to valid types.");
 
         /// <summary>
         /// Gets a <see cref="DiagnosticDescriptor"/> indicating when a method with <c>[RelayCommand]</c> is using an invalid attribute targeting the field or property.
@@ -65,23 +63,36 @@ namespace ZBase.Foundation.Mvvm
         category: "RelayCommandGenerator",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "All attributes targeting the generated field or property for a method annotated with [RelayCommand] must correctly be resolved to valid types.",
-        helpLinkUri: "https://aka.ms/mvvmtoolkit/errors/mvvmtk0036");
+        description: "All attributes targeting the generated field or property for a method annotated with [RelayCommand] must correctly be resolved to valid types.");
 
         /// <summary>
-        /// Gets a <see cref="DiagnosticDescriptor"/> indicating when a method with <c>[Binding]</c> is using an invalid attribute targeting the field.
+        /// Gets a <see cref="DiagnosticDescriptor"/> indicating when a method with <c>[BindingProperty]</c> is using an invalid attribute targeting the field.
         /// <para>
-        /// Format: <c>"The method {0} annotated with [Binding] is using attribute "{1}" which was not recognized as a valid type (are you missing a using directive?)"</c>.
+        /// Format: <c>"The method {0} annotated with [BindingProperty] is using attribute "{1}" which was not recognized as a valid type (are you missing a using directive?)"</c>.
         /// </para>
         /// </summary>
-        public static readonly DiagnosticDescriptor InvalidFieldTargetedAttributeOnBindingMethod = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor InvalidFieldTargetedAttributeOnBindingPropertyMethod = new DiagnosticDescriptor(
         id: "MVVMTK0037",
         title: "Invalid field targeted attribute type",
-        messageFormat: "The method {0} annotated with [Binding] is using attribute \"{1}\" which was not recognized as a valid type (are you missing a using directive?)",
+        messageFormat: "The method {0} annotated with [BindingProperty] is using attribute \"{1}\" which was not recognized as a valid type (are you missing a using directive?)",
         category: "BinderGenerator",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "All attributes targeting the generated field for a method annotated with [Binding] must correctly be resolved to valid types.",
-        helpLinkUri: "https://aka.ms/mvvmtoolkit/errors/mvvmtk0036");
+        description: "All attributes targeting the generated field for a method annotated with [BindingProperty] must correctly be resolved to valid types.");
+
+        /// <summary>
+        /// Gets a <see cref="DiagnosticDescriptor"/> indicating when a method with <c>[BindingCommand]</c> is using an invalid attribute targeting the field.
+        /// <para>
+        /// Format: <c>"The method {0} annotated with [BindingCommand] is using attribute "{1}" which was not recognized as a valid type (are you missing a using directive?)"</c>.
+        /// </para>
+        /// </summary>
+        public static readonly DiagnosticDescriptor InvalidFieldTargetedAttributeOnBindingCommandMethod = new DiagnosticDescriptor(
+        id: "MVVMTK0038",
+        title: "Invalid field targeted attribute type",
+        messageFormat: "The method {0} annotated with [BindingCommand] is using attribute \"{1}\" which was not recognized as a valid type (are you missing a using directive?)",
+        category: "BinderGenerator",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "All attributes targeting the generated field for a method annotated with [BindingCommand] must correctly be resolved to valid types.");
     }
 }

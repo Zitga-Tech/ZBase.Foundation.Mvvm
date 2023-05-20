@@ -9,9 +9,6 @@ namespace ZBase.Foundation.Mvvm.Input
 
         public Type ParameterType { get; }
 
-        public RelayCommandInfoAttribute(string commandName) : this(commandName, null)
-        { }
-
         public RelayCommandInfoAttribute(string commandName, Type parameterType)
         {
             this.CommandName = commandName;

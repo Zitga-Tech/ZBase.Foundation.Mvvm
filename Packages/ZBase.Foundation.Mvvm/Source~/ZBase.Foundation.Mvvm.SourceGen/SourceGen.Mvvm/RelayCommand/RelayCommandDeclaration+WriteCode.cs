@@ -21,15 +21,14 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
 
             WriteRelayCommandInfoAttributes(ref p);
 
-            p.PrintBeginLine();
-            p.Print("partial class ").Print(Syntax.Identifier.Text);
-            p.PrintEndLine();
+            p.PrintLine($"partial class {Syntax.Identifier.Text} : global::ZBase.Foundation.Mvvm.Input.ICommandListener");
 
             p.OpenScope();
             {
                 WriteConstantFields(ref p);
                 WriteFields(ref p);
                 WriteProperties(ref p);
+                WriteTryGetCommand(ref p);
             }
             p.CloseScope();
 
@@ -45,17 +44,22 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
             {
                 var constName = ConstName(member);
 
+                p.PrintBeginLine()
+                    .Print($"[global::ZBase.Foundation.Mvvm.Input.RelayCommandInfo({className}.{constName}, ");
+
                 if (member.Member.Parameters.Length > 0)
                 {
                     var param = member.Member.Parameters[0];
                     var paramType = param.Type.ToFullName();
 
-                    p.PrintLine($"[global::ZBase.Foundation.Mvvm.Input.RelayCommandInfo({className}.{constName}, typeof({paramType}))]");
+                    p.Print($"typeof({paramType})");
                 }
                 else
                 {
-                    p.PrintLine($"[global::ZBase.Foundation.Mvvm.Input.RelayCommandInfo({className}.{constName})]");
+                    p.Print($"null");
                 }
+
+                p.Print(")]").PrintEndLine();
             }
         }
 
@@ -143,6 +147,53 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
             p.PrintEndLine();
         }
 
+        private void WriteTryGetCommand(ref Printer p)
+        {
+            p.PrintLine("/// <inheritdoc/>");
+            p.PrintLine("public bool TryGetCommand<TCommand>(string commandName, out TCommand command) where TCommand : global::ZBase.Foundation.Mvvm.Input.ICommand");
+            p.OpenScope();
+            {
+                p.PrintLine("switch (commandName)");
+                p.OpenScope();
+                {
+                    foreach (var member in MemberRefs)
+                    {
+                        var constName = ConstName(member);
+                        var fieldName = CommandFieldName(member);
+
+                        p.PrintLine($"case {constName}:");
+                        p.OpenScope();
+                        {
+                            p.PrintLine($"if (this.{fieldName} is TCommand commandT)");
+                            p.OpenScope();
+                            {
+                                p.PrintLine("command = commandT;");
+                                p.PrintLine("return true;");
+                            }
+                            p.CloseScope();
+                            p.PrintEndLine();
+
+                            p.PrintLine("command = default;");
+                            p.PrintLine("return false;");
+                        }
+                        p.CloseScope();
+                        p.PrintEndLine();
+                    }
+
+                    p.PrintLine($"default:");
+                    p.OpenScope();
+                    {
+                        p.PrintLine("command = default;");
+                        p.PrintLine("return false;");
+                    }
+                    p.CloseScope();
+                }
+                p.CloseScope();
+            }
+            p.CloseScope();
+            p.PrintEndLine();
+        }
+        
         private static string ConstName(MemberRef member)
             => $"CommandName_{CommandPropertyName(member)}";
 

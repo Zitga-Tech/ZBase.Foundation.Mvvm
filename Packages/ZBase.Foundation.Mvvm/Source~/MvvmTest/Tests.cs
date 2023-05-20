@@ -66,6 +66,11 @@ namespace MvvmTest
         public IObservableObject Target => this;
 
         [RelayCommand]
+        private void UpdateNothing()
+        {
+        }
+
+        [RelayCommand]
         private void UpdateInt(int value)
         {
 
@@ -77,9 +82,21 @@ namespace MvvmTest
         public IBindingContext Context { get; set; }
 
         [BindingProperty]
-        private void OnUpdate(int value)
+        private void SetIntValue(int value)
         {
             Console.WriteLine(value);
         }
+
+        [BindingProperty]
+        private void SetTypeCode(ref TypeCode value)
+        {
+
+        }
+
+        [BindingCommand]
+        partial void OnValueChanged();
+
+        [BindingCommand]
+        partial void OnBoolValueChanged(ref bool value);
     }
 }
