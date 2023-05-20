@@ -7,6 +7,8 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Adapters
     public abstract class ResourcesAdapter<T> : IAdapter
        where T : UnityEngine.Object
     {
+        private readonly CachedUnionConverter<T> _converter = new CachedUnionConverter<T>();
+
         public Union Convert(in Union union)
         {
             if (union.TryGetValue(out string assetPath))
@@ -18,8 +20,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Adapters
                     return union;
                 }
 
-                var converter = Union<T>.GetConverter();
-                return converter.ToUnionT(asset);
+                return _converter.ToUnionT(asset);
             }
 
             return union;

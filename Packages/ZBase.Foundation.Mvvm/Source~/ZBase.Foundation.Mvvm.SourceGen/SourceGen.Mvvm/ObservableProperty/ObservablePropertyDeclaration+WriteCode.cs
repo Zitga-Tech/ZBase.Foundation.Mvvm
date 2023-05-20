@@ -13,6 +13,8 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
         private const string GENERATED_OBSERVABLE_PROPERTY = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.GeneratedObservableProperty]";
         private const string GENERATED_PROPERTY_CHANGING_HANDLER = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.GeneratedPropertyChangingEventHandler]";
         private const string GENERATED_PROPERTY_CHANGED_HANDLER = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.GeneratedPropertyChangedEventHandler]";
+        private const string UNION = "global::ZBase.Foundation.Mvvm.Unions.Union";
+        private const string CACHED_UNION_CONVERTER = "global::ZBase.Foundation.Mvvm.Unions.CachedUnionConverter";
 
         public string WriteCodeWithoutMember()
         {
@@ -123,17 +125,13 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
             p.OpenScope();
             {
-                p.PrintLine(GENERATED_CODE);
-                p.PrintLine("private readonly UnionConverters _unionConverters = new UnionConverters();");
-                p.PrintEndLine();
-
                 WriteConstantFields(ref p);
                 WriteEvents(ref p);
+                WriteUnionConverters(ref p);
                 WriteProperties(ref p);
                 WritePartialMethods(ref p);
                 WritePropertyChangingMethod(ref p);
                 WritePropertyChangedMethod(ref p);
-                WriteUnionConverters(ref p);
             }
             p.CloseScope();
 
@@ -218,7 +216,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 var typeName = member.Member.Type.ToFullName();
                 var argsName = OnChangedArgsName(member);
                 var converterForField = GeneratorHelpers.ToTitleCase(member.Member.Type.ToValidIdentifier().AsSpan());
-                var converterForFieldVariable = $"converter{converterForField}";
+                var converterForFieldVariable = $"unionConverter{converterForField}";
                 var willNotifyPropertyChanged = NotifyPropertyChangedForMap.TryGetValue(fieldName, out var property);
                 var constName = ConstName(member);
 
@@ -253,7 +251,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                         p.PrintLine($"{OnChangingMethodName(member)}(oldValue, value);");
                         p.PrintEndLine();
 
-                        p.PrintLine($"var {converterForFieldVariable} = this._unionConverters.{converterForField};");
+                        p.PrintLine($"var {converterForFieldVariable} = this._unionConverter{converterForField};");
                         p.PrintLine($"var {argsName} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventArgs(this, {constName}, {converterForFieldVariable}.ToUnion(oldValue), {converterForFieldVariable}.ToUnion(value));");
                         p.PrintLine($"this.{OnChangingEventName(member)}?.Invoke({argsName});");
                         p.PrintEndLine();
@@ -274,7 +272,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                             p.PrintLine($"{OnChangedMethodName(property)}(oldPropertyValue, this.{property.Name});");
                             p.PrintEndLine();
 
-                            p.PrintLine($"var {converterForPropertyVariable} = this._unionConverters.{converterForProperty};");
+                            p.PrintLine($"var {converterForPropertyVariable} = this._unionConverter{converterForProperty};");
                             p.PrintLine($"var {otherArgsName} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventArgs(this, {ConstName(property)}, {converterForPropertyVariable}.ToUnion(oldPropertyValue), {converterForPropertyVariable}.ToUnion(this.{property.Name}));");
                             p.PrintLine($"this.{OnChangedEventName(property)}?.Invoke({otherArgsName});");
                         }
@@ -538,38 +536,16 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 }
             }
 
-            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-            p.PrintLine("private class UnionConverters");
-            p.OpenScope();
+            foreach (var type in types.Values)
             {
-                foreach (var type in types.Values)
-                {
-                    var typeName = type.ToFullName();
-                    var fieldName = type.ToValidIdentifier();
+                var typeName = type.ToFullName();
+                var fieldName = type.ToValidIdentifier();
+                var propertyName = GeneratorHelpers.ToTitleCase(fieldName.AsSpan());
 
-                    p.PrintLine(GENERATED_CODE);
-                    p.PrintLine($"private global::ZBase.Foundation.Mvvm.Unions.IUnionConverter<{typeName}> _{fieldName};");
-                    p.PrintEndLine();
-                }
-
-                foreach (var type in types.Values)
-                {
-                    var typeName = type.ToFullName();
-                    var fieldName = type.ToValidIdentifier();
-                    var propertyName = GeneratorHelpers.ToTitleCase(fieldName.AsSpan());
-
-                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public global::ZBase.Foundation.Mvvm.Unions.IUnionConverter<{typeName}> {propertyName}");
-                    p.OpenScope();
-                    {
-                        p.PrintLine($"get => this._{fieldName} ??= global::ZBase.Foundation.Mvvm.Unions.UnionConverter.GetConverter<{typeName}>();");
-                    }
-                    p.CloseScope();
-                    p.PrintEndLine();
-                }
+                p.PrintLine(GENERATED_CODE);
+                p.PrintLine($"private readonly {CACHED_UNION_CONVERTER}<{typeName}> _unionConverter{propertyName} = new {CACHED_UNION_CONVERTER}<{typeName}>();");
+                p.PrintEndLine();
             }
-            p.CloseScope();
-            p.PrintEndLine();
         }
 
         private static string ConstName(MemberRef member)

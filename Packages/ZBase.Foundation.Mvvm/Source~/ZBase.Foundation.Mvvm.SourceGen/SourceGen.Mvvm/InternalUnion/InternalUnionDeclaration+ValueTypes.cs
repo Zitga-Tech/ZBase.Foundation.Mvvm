@@ -164,6 +164,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
                     p.CloseScope();
                 }
                 p.CloseScope();
+                p.PrintEndLine();
                 return p;
             }
 
@@ -270,6 +271,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
                     p.PrintEndLine();
                 }
                 p.CloseScope();
+                p.PrintEndLine();
                 return p;
             }
         }

@@ -16,6 +16,7 @@ namespace ZBase.Foundation.Mvvm.InternalStringAdapterSourceGen
         private const string ADAPTER_ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ViewBinding.Adapter(fromType: typeof({0}), toType: typeof(string), order: 1)]";
         private const string LABEL_ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.Label(\"{0}\", \"{1}\")]";
         private const string UNION = "global::ZBase.Foundation.Mvvm.Unions.Union";
+        private const string CACHED_UNION_CONVERTER = "global::ZBase.Foundation.Mvvm.Unions.CachedUnionConverter";
         private const string GENERATOR_NAME = nameof(InternalStringAdapterGenerator);
 
         public void GenerateAdapters(
@@ -90,15 +91,21 @@ namespace ZBase.Foundation.Mvvm.InternalStringAdapterSourceGen
                     p.PrintLine($"public sealed class {adapterTypeName} : {IADAPTER}");
                     p.OpenScope();
                     {
+                        p.PrintLine(GENERATED_CODE);
+                        p.PrintLine($"private readonly {CACHED_UNION_CONVERTER}<{typeName}> _converter = new {CACHED_UNION_CONVERTER}<{typeName}>();");
+                        p.PrintEndLine();
+
                         p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                         p.PrintLine($"public {UNION} Convert(in {UNION} union)");
                         p.OpenScope();
                         {
-                            p.PrintLine($"return {UNION}<{typeName}>.GetConverter().ToString(union);");
+                            p.PrintLine("return this._converter.ToString(union);");
                         }
                         p.CloseScope();
+                        p.PrintEndLine();
                     }
                     p.CloseScope();
+                    p.PrintEndLine();
                 }
             }
             p.CloseScope();

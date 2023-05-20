@@ -2,7 +2,6 @@
 using System.Runtime.CompilerServices;
 using ZBase.Foundation.Mvvm.ComponentModel;
 using ZBase.Foundation.Mvvm.Input;
-using ZBase.Foundation.Mvvm.Unions;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace MvvmTest
@@ -59,6 +58,7 @@ namespace MvvmTest
     public partial class Model : IObservableObject, IBindingContext
     {
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(UpdateIntCommand))]
         private int _intField;
 
         public TypeCode Type { get; }
@@ -80,20 +80,6 @@ namespace MvvmTest
         private void OnUpdate(int value)
         {
             Console.WriteLine(value);
-        }
-    }
-
-    public partial struct UnionForA : IUnion<A>
-    {
-
-    }
-
-    [Adapter(typeof(TypeCode), typeof(string))]
-    public class TypeCodeToStringAdapter : IAdapter
-    {
-        public Union Convert(in Union union)
-        {
-            return Union<TypeCode>.GetConverter().ToString(union);
         }
     }
 }

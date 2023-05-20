@@ -27,6 +27,8 @@ namespace ZBase.Foundation.Mvvm.Input
 
         private event MvvmEventHandler _canExecuteChanged;
 
+        private readonly CachedUnionConverter<T> _converter = new CachedUnionConverter<T>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RelayCommand{T}"/> class that can always execute.
         /// </summary>
@@ -68,21 +70,17 @@ namespace ZBase.Foundation.Mvvm.Input
         /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void NotifyCanExecuteChanged()
-        {
-            _canExecuteChanged?.Invoke(new MvvmEventArgs(this, Union.Undefined));
-        }
+            => _canExecuteChanged?.Invoke(new MvvmEventArgs(this, Union.Undefined));
 
         /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool CanExecute(T parameter)
-        {
-            return _canExecute?.Invoke(parameter) != false;
-        }
+            => _canExecute?.Invoke(parameter) != false;
 
         /// <inheritdoc/>
         public bool CanExecute(Union parameter)
         {
-            if (UnionConverter.TryGetValue(parameter, out T result) == false)
+            if (_converter.TryGetValue(parameter, out T result) == false)
             {
                 ThrowArgumentException();
             }
@@ -92,15 +90,12 @@ namespace ZBase.Foundation.Mvvm.Input
 
         /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Execute(T parameter)
-        {
-            _execute(parameter);
-        }
+        public void Execute(T parameter) => _execute(parameter);
 
         /// <inheritdoc/>
         public void Execute(Union parameter)
         {
-            if (UnionConverter.TryGetValue(parameter, out T result) == false)
+            if (_converter.TryGetValue(parameter, out T result) == false)
             {
                 ThrowArgumentException();
             }
@@ -111,8 +106,6 @@ namespace ZBase.Foundation.Mvvm.Input
         [DoesNotReturn]
         [MethodImpl(MethodImplOptions.NoInlining)]
         internal static void ThrowArgumentException()
-        {
-            throw new ArgumentException($"The command type requires an argument of type {typeof(T)}.");
-        }
+            => throw new ArgumentException($"The command type requires an argument of type {typeof(T)}.");
     }
 }
