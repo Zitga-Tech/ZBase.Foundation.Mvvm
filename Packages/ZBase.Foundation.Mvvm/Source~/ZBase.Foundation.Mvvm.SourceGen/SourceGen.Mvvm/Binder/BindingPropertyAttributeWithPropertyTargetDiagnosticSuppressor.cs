@@ -15,14 +15,14 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 {
     /// <summary>
     /// <para>
-    /// A diagnostic suppressor to suppress CS0657 warnings for methods with [Binding] using a [field:] attribute list.
+    /// A diagnostic suppressor to suppress CS0657 warnings for methods with [BindingProperty] using a [field:] attribute list.
     /// </para>
     /// <para>
     /// That is, this diagnostic suppressor will suppress the following diagnostic:
     /// <code>
     /// public partial class MyBinder : IBinder
     /// {
-    ///     [Binding]
+    ///     [BindingProperty]
     ///     [field: UnityEngine.SerializeField]
     ///     private void OnUpdate(int value) { }
     /// }
@@ -30,10 +30,10 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
     /// </para>
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class BindingAttributeWithPropertyTargetDiagnosticSuppressor : DiagnosticSuppressor
+    public sealed class BindingPropertyAttributeWithPropertyTargetDiagnosticSuppressor : DiagnosticSuppressor
     {
         /// <inheritdoc/>
-        public override ImmutableArray<SuppressionDescriptor> SupportedSuppressions => ImmutableArray.Create(FieldAttributeListForBindingMethod);
+        public override ImmutableArray<SuppressionDescriptor> SupportedSuppressions => ImmutableArray.Create(BindingPropertyAttributeListForBindingMethod);
 
         /// <inheritdoc/>
         public override void ReportSuppressions(SuppressionAnalysisContext context)
@@ -55,11 +55,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                     // Check if the method is using [Binding], in which case we should suppress the warning
                     if (declaredSymbol is IMethodSymbol methodSymbol
-                        && semanticModel.Compilation.GetTypeByMetadataName("ZBase.Foundation.Mvvm.ViewBinding.BindingAttribute") is INamedTypeSymbol bindingSymbol
+                        && semanticModel.Compilation.GetTypeByMetadataName("ZBase.Foundation.Mvvm.ViewBinding.BindingPropertyAttribute") is INamedTypeSymbol bindingSymbol
                         && methodSymbol.HasAttributeWithType(bindingSymbol)
                     )
                     {
-                        context.ReportSuppression(Suppression.Create(FieldAttributeListForBindingMethod, diagnostic));
+                        context.ReportSuppression(Suppression.Create(BindingPropertyAttributeListForBindingMethod, diagnostic));
                     }
                 }
             }

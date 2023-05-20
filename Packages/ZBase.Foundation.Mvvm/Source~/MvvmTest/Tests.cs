@@ -19,7 +19,7 @@ namespace MvvmTest
             var binder = new Binder();
 
             binder.Context = model;
-            binder.SetTargetPropertyName(Binder.BindingProperty_OnUpdate, Model.PropertyName_IntField);
+            //binder.SetTargetPropertyName(Binder.BindingProperty_OnUpdate, Model.PropertyName_IntField);
             binder.StartListening();
 
             while (true)
@@ -76,7 +76,7 @@ namespace MvvmTest
     {
         public IBindingContext Context { get; set; }
 
-        [Binding]
+        [BindingProperty]
         private void OnUpdate(int value)
         {
             Console.WriteLine(value);

@@ -27,7 +27,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Min Value")]
         [field: HideInInspector]
         private void SetMinValue(int value)
@@ -46,7 +46,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Max Value")]
         [field: HideInInspector]
         private void SetMaxValue(int value)
@@ -65,7 +65,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Whole Numbers")]
         [field: HideInInspector]
         private void SetWholeNumbers(bool value)
@@ -84,7 +84,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Value")]
         [field: HideInInspector]
         private void SetValue(float value)

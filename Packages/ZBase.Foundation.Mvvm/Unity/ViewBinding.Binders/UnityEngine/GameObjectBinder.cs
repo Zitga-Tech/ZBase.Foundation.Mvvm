@@ -18,7 +18,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Active Self")]
         [field: HideInInspector]
         private void SetActive(bool value)

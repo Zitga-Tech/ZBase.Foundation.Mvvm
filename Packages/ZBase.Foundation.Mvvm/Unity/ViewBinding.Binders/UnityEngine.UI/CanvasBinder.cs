@@ -26,7 +26,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Override Sorting")]
         [field: HideInInspector]
         private void SetOverrideSorting(bool value)
@@ -45,7 +45,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Sorting Layer ID")]
         [field: HideInInspector]
         private void SetSortingLayerId(int value)
@@ -64,7 +64,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Sorting Layer Name")]
         [field: HideInInspector]
         private void SetSortingLayerName(string value)
@@ -83,7 +83,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Order In Layer")]
         [field: HideInInspector]
         private void SetOrderInLayer(int value)

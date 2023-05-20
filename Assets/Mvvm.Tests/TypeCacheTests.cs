@@ -57,7 +57,7 @@ namespace ZBase.Foundation.Mvvm.Tests
     {
         public IBindingContext Context { get; set; }
 
-        [Binding]
+        [BindingProperty]
         private void OnUpdate(int _) { }
     }
 }

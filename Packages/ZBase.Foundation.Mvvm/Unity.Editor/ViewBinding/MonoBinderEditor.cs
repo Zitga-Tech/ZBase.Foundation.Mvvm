@@ -86,14 +86,14 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
 
             var binderType = binder.GetType();
-            var binderAttributes = binderType.GetCustomAttributes<BindingMethodInfoAttribute>();
-            var bindingMap = new Dictionary<string, Type>();
+            var bindingPropertyAttributes = binderType.GetCustomAttributes<BindingPropertyMethodInfoAttribute>();
+            var bindingPropertyMap = new Dictionary<string, Type>();
 
-            foreach (var attribute in binderAttributes)
+            foreach (var attribute in bindingPropertyAttributes)
             {
-                if (bindingMap.ContainsKey(attribute.MethodName) == false)
+                if (bindingPropertyMap.ContainsKey(attribute.MethodName) == false)
                 {
-                    bindingMap[attribute.MethodName] = attribute.ParameterType;
+                    bindingPropertyMap[attribute.MethodName] = attribute.ParameterType;
                 }
             }
 
@@ -127,9 +127,9 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             var serializedBinder = this.serializedObject;
 
-            foreach (var (bindingName, bindingType) in bindingMap)
+            foreach (var (bindingName, bindingType) in bindingPropertyMap)
             {
-                DrawBinding(
+                DrawBindingProperty(
                       binder
                     , serializedBinder
                     , binderType
@@ -232,7 +232,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             return true;
         }
 
-        private static void DrawBinding(
+        private static void DrawBindingProperty(
               MonoBinder binder
             , SerializedObject serializedBinder
             , Type binderType

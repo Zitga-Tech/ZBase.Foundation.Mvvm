@@ -10,15 +10,15 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.SourceGen
     /// <br/>
     /// However, it can be used in other contexts, such as reflection.
     /// </remarks>
-    /// <seealso cref="BindingAttribute"/>
+    /// <seealso cref="BindingPropertyAttribute"/>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
-    public sealed class BindingMethodInfoAttribute : Attribute
+    public sealed class BindingPropertyMethodInfoAttribute : Attribute
     {
         public string MethodName { get; }
 
         public Type ParameterType { get; }
 
-        public BindingMethodInfoAttribute(string methodName, Type parameterType)
+        public BindingPropertyMethodInfoAttribute(string methodName, Type parameterType)
         {
             this.MethodName = methodName;
             this.ParameterType = parameterType;

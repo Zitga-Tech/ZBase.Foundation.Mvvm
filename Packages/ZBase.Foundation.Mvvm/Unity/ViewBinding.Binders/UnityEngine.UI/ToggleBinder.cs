@@ -25,9 +25,16 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             {
                 Debug.LogWarning($"The target list is empty.", this);
             }
+            else
+            {
+                //foreach (var target in _targets)
+                //{
+                //    target.onValueChanged.AddListener(OnValueChanged);
+                //}
+            }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Is On")]
         [field: HideInInspector]
         private void SetIsOn(bool value)
@@ -45,5 +52,8 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
                 }
             }
         }
+
+        //[BindingCommand]
+        //partial void OnValueChanged(bool value);
     }
 }

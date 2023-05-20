@@ -27,7 +27,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Color")]
         [field: HideInInspector]
         private void SetColor(Color value)
@@ -46,7 +46,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Sprite")]
         [field: HideInInspector]
         private void SetSprite(Sprite value)
@@ -65,7 +65,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Fill Method")]
         [field: HideInInspector]
         private void SetFillMethod(Image.FillMethod value)
@@ -84,7 +84,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Fill Origin")]
         [field: HideInInspector]
         private void SetFillOrigin(int value)
@@ -103,7 +103,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Fill Amount")]
         [field: HideInInspector]
         private void SetFillAmount(float value)

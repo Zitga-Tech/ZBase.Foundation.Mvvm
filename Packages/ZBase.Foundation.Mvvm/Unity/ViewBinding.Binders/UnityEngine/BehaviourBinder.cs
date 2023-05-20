@@ -43,7 +43,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Enabled")]
         [field: HideInInspector]
         private void SetEnabled(bool value)

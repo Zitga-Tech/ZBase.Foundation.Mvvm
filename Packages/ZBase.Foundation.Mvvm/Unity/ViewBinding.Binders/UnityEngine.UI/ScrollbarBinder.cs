@@ -27,7 +27,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Value")]
         [field: HideInInspector]
         private void SetValue(float value)
@@ -46,7 +46,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Size")]
         [field: HideInInspector]
         private void SetSize(float value)
@@ -65,7 +65,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Number Of Steps")]
         [field: HideInInspector]
         private void SetNumberOfSteps(int value)

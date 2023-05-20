@@ -11,11 +11,13 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
     public partial class BinderDeclaration
     {
         public const string IBINDER_INTERFACE = "global::ZBase.Foundation.Mvvm.ViewBinding.IBinder";
-        public const string BINDING_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ViewBinding.BindingAttribute";
+        public const string BINDING_PROPERTY_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ViewBinding.BindingPropertyAttribute";
+        public const string BINDING_COMMAND_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.ViewBinding.BindingCommandAttribute";
         public const string BINDING_PROPERTY = "global::ZBase.Foundation.Mvvm.ViewBinding.BindingProperty";
         public const string CONVERTER = "global::ZBase.Foundation.Mvvm.ViewBinding.Converter";
         public const string UNION_TYPE = "global::ZBase.Foundation.Mvvm.Unions.Union";
         public const string MONO_BEHAVIOUR_TYPE = "global::UnityEngine.MonoBehaviour";
+        private const string IRELAY_COMMAND = "global::ZBase.Foundation.Mvvm.Input.IRelayCommand";
 
         public ClassDeclarationSyntax Syntax { get; }
 
@@ -25,17 +27,18 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         public bool ReferenceUnityEngine { get; }
 
-        public ImmutableArray<MemberRef> MemberRefs { get; }
+        public ImmutableArray<BindingPropertyRef> BindingPropertyRefs { get; }
 
         public ImmutableArray<ITypeSymbol> NonUnionTypes { get; }
 
         public BinderDeclaration(ClassDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
         {
-            using var memberRefs = ImmutableArrayBuilder<MemberRef>.Rent();
+            using var bindingPropertyRefs = ImmutableArrayBuilder<BindingPropertyRef>.Rent();
             using var diagnosticBuilder = ImmutableArrayBuilder<DiagnosticInfo>.Rent();
 
             var bindingPropNames = new HashSet<string>();
             var converterNames = new HashSet<string>();
+            var relayCommandNames = new HashSet<string>();
 
             Syntax = candidate;
             Symbol = semanticModel.GetDeclaredSymbol(candidate, token);
@@ -73,7 +76,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                             continue;
                         }
 
-                        var attribute = method.GetAttribute(BINDING_ATTRIBUTE);
+                        var attribute = method.GetAttribute(BINDING_PROPERTY_ATTRIBUTE);
 
                         if (attribute == null)
                         {
@@ -83,8 +86,8 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                         var argumentType = parameter.Type;
                         var isNotUnion = argumentType.ToFullName() != UNION_TYPE;
 
-                        memberRefs.Add(new MemberRef {
-                            Member = method,
+                        bindingPropertyRefs.Add(new BindingPropertyRef {
+                            Symbol = method,
                             NonUnionArgumentType = isNotUnion ? argumentType : null,
                         });
 
@@ -116,23 +119,27 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     {
                         converterNames.Add(field.Name);
                     }
+                    else if (typeName.StartsWith(IRELAY_COMMAND))
+                    {
+                        relayCommandNames.Add(field.Name);
+                    }
                 }
             }
 
             using var nonUnionTypes = ImmutableArrayBuilder<ITypeSymbol>.Rent();
             nonUnionTypes.AddRange(filtered.Values);
 
-            MemberRefs = memberRefs.ToImmutable();
+            BindingPropertyRefs = bindingPropertyRefs.ToImmutable();
             NonUnionTypes = nonUnionTypes.ToImmutable();
 
-            foreach (var memberRef in MemberRefs)
+            foreach (var bindingPropRef in BindingPropertyRefs)
             {
-                var bindingPropName = BindingPropertyName(memberRef);
-                var converterName = ConverterName(memberRef);
-                memberRef.SkipBindingProperty = bindingPropNames.Contains(bindingPropName);
-                memberRef.SkipConverter = converterNames.Contains(converterName);
+                var bindingPropName = BindingPropertyName(bindingPropRef);
+                var converterName = ConverterName(bindingPropRef);
+                bindingPropRef.SkipBindingProperty = bindingPropNames.Contains(bindingPropName);
+                bindingPropRef.SkipConverter = converterNames.Contains(converterName);
 
-                memberRef.Member.GatherForwardedAttributes(
+                bindingPropRef.Symbol.GatherForwardedAttributes(
                       semanticModel
                     , token
                     , diagnosticBuilder
@@ -141,13 +148,26 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     , DiagnosticDescriptors.InvalidFieldTargetedAttributeOnBindingMethod
                 );
 
-                memberRef.ForwardedFieldAttributes = fieldAttributes;
+                bindingPropRef.ForwardedFieldAttributes = fieldAttributes;
             }
         }
 
-        public class MemberRef
+        public class BindingPropertyRef
         {
-            public IMethodSymbol Member { get; set; }
+            public IMethodSymbol Symbol { get; set; }
+
+            public ITypeSymbol NonUnionArgumentType { get; set; }
+
+            public bool SkipBindingProperty { get; set; }
+
+            public bool SkipConverter { get; set; }
+
+            public ImmutableArray<AttributeInfo> ForwardedFieldAttributes { get; set; }
+        }
+
+        public class BindingCommandRef
+        {
+            public IMethodSymbol Symbol { get; set; }
 
             public ITypeSymbol NonUnionArgumentType { get; set; }
 

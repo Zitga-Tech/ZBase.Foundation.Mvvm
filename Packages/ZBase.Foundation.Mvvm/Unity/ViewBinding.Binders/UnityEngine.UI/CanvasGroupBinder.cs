@@ -26,7 +26,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Alpha")]
         [field: HideInInspector]
         private void SetAlpha( float value)
@@ -45,7 +45,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Block Raycasts")]
         [field: HideInInspector]
         private void SetBlockRaycast(bool value)
@@ -64,7 +64,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Interactable")]
         [field: HideInInspector]
         private void SetInteractable(bool value)

@@ -62,7 +62,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                 string source;
 
-                if (declaration.MemberRefs.Length > 0)
+                if (declaration.BindingPropertyRefs.Length > 0)
                 {
                     source = declaration.WriteCode();
                 }

@@ -30,12 +30,21 @@ namespace ZBase.Foundation.Mvvm
         );
 
         /// <summary>
-        /// Gets a <see cref="SuppressionDescriptor"/> for a method using [Binding] with an attribute list targeting a field or property.
+        /// Gets a <see cref="SuppressionDescriptor"/> for a method using [BindingProperty] with an attribute list targeting a field or property.
         /// </summary>
-        public static readonly SuppressionDescriptor FieldAttributeListForBindingMethod = new(
+        public static readonly SuppressionDescriptor BindingPropertyAttributeListForBindingMethod = new(
               id: "MVVMTKSPR0003"
             , suppressedDiagnosticId: "CS0657"
-            , justification: "Methods using [Binding] can use [field:] attribute lists to forward attributes to the generated fields"
+            , justification: "Methods using [BindingProperty] can use [field:] attribute lists to forward attributes to the generated fields"
+        );
+
+        /// <summary>
+        /// Gets a <see cref="SuppressionDescriptor"/> for a method using [BindingCommand] with an attribute list targeting a field or property.
+        /// </summary>
+        public static readonly SuppressionDescriptor BindingCommandAttributeListForBindingMethod = new(
+              id: "MVVMTKSPR0004"
+            , suppressedDiagnosticId: "CS0657"
+            , justification: "Methods using [BindingCommand] can use [field:] attribute lists to forward attributes to the generated fields"
         );
     }
 }

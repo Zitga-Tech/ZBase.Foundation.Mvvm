@@ -18,7 +18,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Position")]
         [field: HideInInspector]
         private void SetPosition(in Vector3 value)
@@ -37,7 +37,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Rotation")]
         [field: HideInInspector]
         private void SetRotation(in Quaternion value)
@@ -56,7 +56,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Euler Angles")]
         [field: HideInInspector]
         private void SetEulerAngles(in Vector3 value)
@@ -75,7 +75,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Local Position")]
         [field: HideInInspector]
         private void SetLocalPosition(in Vector3 value)
@@ -94,7 +94,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Local Rotation")]
         [field: HideInInspector]
         private void SetLocalRotation(in Quaternion value)
@@ -113,7 +113,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Local Euler Angles")]
         [field: HideInInspector]
         private void SetLocalEulerAngles(in Vector3 value)
@@ -132,7 +132,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Local Scale")]
         [field: HideInInspector]
         private void SetLocalScale(in Vector3 value)

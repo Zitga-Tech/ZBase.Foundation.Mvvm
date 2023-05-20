@@ -120,7 +120,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
             p = p.IncreasedIndent();
 
-            WriteBindingMethodInfoAttributes(ref p);
+            WriteBindingPropertyMethodInfoAttributes(ref p);
 
             p.PrintBeginLine();
             p.Print("partial class ").Print(Syntax.Identifier.Text);
@@ -167,15 +167,15 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             return p.Result;
         }
 
-        private void WriteBindingMethodInfoAttributes(ref Printer p)
+        private void WriteBindingPropertyMethodInfoAttributes(ref Printer p)
         {
-            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ViewBinding.SourceGen.BindingMethodInfo({0}.{1}, typeof({2}))]";
+            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ViewBinding.SourceGen.BindingPropertyMethodInfo({0}.{1}, typeof({2}))]";
 
             var className = Symbol.ToFullName();
 
-            foreach (var member in MemberRefs)
+            foreach (var member in BindingPropertyRefs)
             {
-                p.PrintLine(string.Format(ATTRIBUTE, className, ConstName(member), member.Member.Parameters[0].Type.ToFullName()));
+                p.PrintLine(string.Format(ATTRIBUTE, className, ConstName(member), member.Symbol.Parameters[0].Type.ToFullName()));
             }
         }
 
@@ -183,9 +183,9 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         {
             var className = Syntax.Identifier.Text;
 
-            foreach (var member in MemberRefs)
+            foreach (var member in BindingPropertyRefs)
             {
-                var name = member.Member.Name;
+                var name = member.Symbol.Name;
 
                 p.PrintLine($"/// <summary>The name of <see cref=\"{name}\"/></summary>");
                 p.PrintLine(GENERATED_CODE);
@@ -198,7 +198,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteBindingProperties(ref Printer p)
         {
-            foreach (var member in MemberRefs)
+            foreach (var member in BindingPropertyRefs)
             {
                 if (member.SkipBindingProperty)
                 {
@@ -218,7 +218,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                 var typeName = member.NonUnionArgumentType.ToFullName();
 
-                p.PrintLine($"/// <summary>The binding property for <see cref=\"{member.Member.Name}\"/></summary>");
+                p.PrintLine($"/// <summary>The binding property for <see cref=\"{member.Symbol.Name}\"/></summary>");
                 p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
                 p.PrintLine("[global::UnityEngine.SerializeField]");
                 p.Print("#endif").PrintEndLine();
@@ -239,7 +239,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteConverters(ref Printer p)
         {
-            foreach (var member in MemberRefs)
+            foreach (var member in BindingPropertyRefs)
             {
                 if (member.SkipConverter)
                 {
@@ -259,7 +259,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                 var typeName = member.NonUnionArgumentType.ToFullName();
 
-                p.PrintLine($"/// <summary>The converter for the parameter of <see cref=\"{member.Member.Name}\"/></summary>");
+                p.PrintLine($"/// <summary>The converter for the parameter of <see cref=\"{member.Symbol.Name}\"/></summary>");
                 p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
                 p.PrintLine("[global::UnityEngine.SerializeField]");
                 p.Print("#endif").PrintEndLine();
@@ -282,10 +282,10 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         {
             var className = Syntax.Identifier.Text;
 
-            foreach (var member in MemberRefs)
+            foreach (var member in BindingPropertyRefs)
             {
                 p.PrintLine($"/// <summary>");
-                p.PrintLine($"/// The listener that binds <see cref=\"{member.Member.Name}\"/>");
+                p.PrintLine($"/// The listener that binds <see cref=\"{member.Symbol.Name}\"/>");
                 p.PrintLine($"/// to the property chosen by {BindingPropertyName(member)}.");
                 p.PrintLine($"/// </summary>");
                 p.PrintLine(GENERATED_CODE);
@@ -320,7 +320,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
             p.OpenScope();
             {
-                foreach (var member in MemberRefs)
+                foreach (var member in BindingPropertyRefs)
                 {
                     var methodName = MethodName(member);
 
@@ -367,7 +367,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 p.PrintLine($"this._isListening = true;");
                 p.PrintEndLine();
 
-                foreach (var member in MemberRefs)
+                foreach (var member in BindingPropertyRefs)
                 {
                     p.PrintLine($"inpc.PropertyChanged(this.{BindingPropertyName(member)}.TargetPropertyName, this.{ListenerName(member)});");
                 }
@@ -398,7 +398,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 p.PrintLine($"this._isListening = false;");
                 p.PrintEndLine();
 
-                foreach (var member in MemberRefs)
+                foreach (var member in BindingPropertyRefs)
                 {
                     p.PrintLine($"this.{ListenerName(member)}.Detach();");
                 }
@@ -426,7 +426,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 p.PrintLine("switch (bindingPropertyName)");
                 p.OpenScope();
                 {
-                    foreach (var member in MemberRefs)
+                    foreach (var member in BindingPropertyRefs)
                     {
                         p.PrintLine($"case {ConstName(member)}:");
                         p.OpenScope();
@@ -466,7 +466,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 p.PrintLine("switch (bindingPropertyName)");
                 p.OpenScope();
                 {
-                    foreach (var member in MemberRefs)
+                    foreach (var member in BindingPropertyRefs)
                     {
                         p.PrintLine($"case {ConstName(member)}:");
                         p.OpenScope();
@@ -490,14 +490,14 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteUnionOverloads(ref Printer p)
         {
-            foreach (var member in MemberRefs)
+            foreach (var member in BindingPropertyRefs)
             {
                 if (member.NonUnionArgumentType == null)
                 {
                     continue;
                 }
 
-                var origName = member.Member.Name;
+                var origName = member.Symbol.Name;
                 var typeName = member.NonUnionArgumentType.ToFullName();
                 var methodName = MethodName(member);
                 var converter = GeneratorHelpers.ToTitleCase(member.NonUnionArgumentType.ToValidIdentifier().AsSpan());
@@ -561,21 +561,21 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             p.PrintEndLine();
         }
 
-        private static string ConstName(MemberRef member)
-            => $"BindingProperty_{member.Member.Name}";
+        private static string ConstName(BindingPropertyRef member)
+            => $"BindingProperty_{member.Symbol.Name}";
 
-        private static string BindingPropertyName(MemberRef member)
-            => $"_bindingFieldFor{member.Member.Name}";
+        private static string BindingPropertyName(BindingPropertyRef member)
+            => $"_bindingFieldFor{member.Symbol.Name}";
 
-        private static string ConverterName(MemberRef member)
-            => $"_converterFor{member.Member.Name}";
+        private static string ConverterName(BindingPropertyRef member)
+            => $"_converterFor{member.Symbol.Name}";
 
-        private static string ListenerName(MemberRef member)
-            => $"_listenerFor{member.Member.Name}";
+        private static string ListenerName(BindingPropertyRef member)
+            => $"_listenerFor{member.Symbol.Name}";
 
-        private static string MethodName(MemberRef member)
+        private static string MethodName(BindingPropertyRef member)
         {
-            var name = member.Member.Name;
+            var name = member.Symbol.Name;
 
             if (member.NonUnionArgumentType != null)
             {

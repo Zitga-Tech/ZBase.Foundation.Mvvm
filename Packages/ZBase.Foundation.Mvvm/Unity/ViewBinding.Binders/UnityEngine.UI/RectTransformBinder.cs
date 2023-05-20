@@ -26,7 +26,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Anchor Min")]
         [field: HideInInspector]
         private void SetAnchorMin(in Vector2 value)
@@ -45,7 +45,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Anchor Max")]
         [field: HideInInspector]
         private void SetAnchorMax(in Vector2 value)
@@ -64,7 +64,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Offest Min")]
         [field: HideInInspector]
         private void SetOffsetMin(in Vector2 value)
@@ -83,7 +83,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Offest Max")]
         [field: HideInInspector]
         private void SetOffsetMax(in Vector2 value)
@@ -102,7 +102,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Anchored Position")]
         [field: HideInInspector]
         private void SetAnchoredPosition(in Vector2 value)
@@ -121,7 +121,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Anchored Position 3D")]
         [field: HideInInspector]
         private void SetAnchoredPosition3D(in Vector3 value)
@@ -140,7 +140,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Size Delta")]
         [field: HideInInspector]
         private void SetSizeDelta(in Vector2 value)
@@ -159,7 +159,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [Binding]
+        [BindingProperty]
         [field: Label("Pivot")]
         [field: HideInInspector]
         private void SetPivot(in Vector2 value)
