@@ -11,6 +11,7 @@ using ZBase.Foundation.Mvvm.ViewBinding.Adapters;
 using ZBase.Foundation.Mvvm.Unity.ViewBinding.Adapters;
 using ZBase.Foundation.Mvvm.ViewBinding.SourceGen;
 using ZBase.Foundation.Mvvm.ComponentModel.SourceGen;
+using ZBase.Foundation.Mvvm.Input;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
@@ -97,11 +98,22 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 }
             }
 
+            var bindingCommandAttributes = binderType.GetCustomAttributes<BindingCommandMethodInfoAttribute>();
+            var bindingCommandMap = new Dictionary<string, Type>();
+
+            foreach (var attribute in bindingCommandAttributes)
+            {
+                if (bindingCommandMap.ContainsKey(attribute.MethodName) == false)
+                {
+                    bindingCommandMap[attribute.MethodName] = attribute.ParameterType;
+                }
+            }
+
             var targetType = target.GetType();
-            var targetAttributes = targetType.GetCustomAttributes<NotifyPropertyChangedInfoAttribute>();
+            var targetNPCIAttributes = targetType.GetCustomAttributes<NotifyPropertyChangedInfoAttribute>();
             var targetPropertyMap = new Dictionary<string, Type>();
 
-            foreach (var attribute in targetAttributes)
+            foreach (var attribute in targetNPCIAttributes)
             {
                 if (targetPropertyMap.ContainsKey(attribute.PropertyName) == false)
                 {
@@ -109,19 +121,46 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 }
             }
 
-            var labelMap = new Dictionary<string, string>();
-            var fieldInfos = TypeCache.GetFieldsWithAttribute<GeneratedBindingPropertyAttribute>()
+            var targetRCIAttributes = targetType.GetCustomAttributes<RelayCommandInfoAttribute>();
+            var targetCommandMap = new Dictionary<string, Type>();
+
+            foreach (var attribute in targetRCIAttributes)
+            {
+                if (targetCommandMap.ContainsKey(attribute.CommandName) == false)
+                {
+                    targetCommandMap[attribute.CommandName] = attribute.ParameterType;
+                }
+            }
+
+            var bindingPropertyLabelMap = new Dictionary<string, string>();
+            var bindingPropertyFieldInfos = TypeCache.GetFieldsWithAttribute<GeneratedBindingPropertyAttribute>()
                 .Where(x => x.DeclaringType == binderType);
 
-            foreach (var fieldInfo in fieldInfos)
+            foreach (var fieldInfo in bindingPropertyFieldInfos)
             {
                 var propAttrib = fieldInfo.GetCustomAttribute<GeneratedBindingPropertyAttribute>();
                 var labelAttrib = fieldInfo.GetCustomAttribute<LabelAttribute>();
 
-                if (labelMap.ContainsKey(propAttrib.MethodName) == false)
+                if (bindingPropertyLabelMap.ContainsKey(propAttrib.MethodName) == false)
                 {
                     var name = ObjectNames.NicifyVariableName(propAttrib.MethodName);
-                    labelMap[propAttrib.MethodName] = labelAttrib?.Label ?? name;
+                    bindingPropertyLabelMap[propAttrib.MethodName] = labelAttrib?.Label ?? name;
+                }
+            }
+
+            var bindingCommandLabelMap = new Dictionary<string, string>();
+            var bindingCommandFieldInfos = TypeCache.GetFieldsWithAttribute<GeneratedBindingCommandAttribute>()
+                .Where(x => x.DeclaringType == binderType);
+
+            foreach (var fieldInfo in bindingCommandFieldInfos)
+            {
+                var propAttrib = fieldInfo.GetCustomAttribute<GeneratedBindingCommandAttribute>();
+                var labelAttrib = fieldInfo.GetCustomAttribute<LabelAttribute>();
+
+                if (bindingCommandLabelMap.ContainsKey(propAttrib.MethodName) == false)
+                {
+                    var name = ObjectNames.NicifyVariableName(propAttrib.MethodName);
+                    bindingCommandLabelMap[propAttrib.MethodName] = labelAttrib?.Label ?? name;
                 }
             }
 
@@ -137,8 +176,22 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                     , bindingType
                     , targetType
                     , targetPropertyMap
-                    , labelMap
+                    , bindingPropertyLabelMap
                     , _rolMap
+                );
+            }
+
+            foreach (var (bindingName, bindingType) in bindingCommandMap)
+            {
+                DrawBindingCommand(
+                      binder
+                    , serializedBinder
+                    , binderType
+                    , bindingName
+                    , bindingType
+                    , targetType
+                    , targetCommandMap
+                    , bindingCommandLabelMap
                 );
             }
         }
@@ -292,7 +345,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 EditorGUILayout.BeginVertical();
                 EditorGUILayout.BeginHorizontal();
                 {
-                    EditorGUILayout.PrefixLabel("Bind To");
+                    EditorGUILayout.PrefixLabel("Bind To Property");
 
                     if (GUILayout.Button(targetPropertyLabel))
                     {
@@ -553,17 +606,21 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 typeof(ScriptableAdapter)
             };
 
-            if (s_adapterMap.TryGetValue(bindingType, out var map)
-                && map.TryGetValue(targetPropertyType, out var types)
-            )
+            try
             {
-                var orderedTypes = types.OrderBy(x => {
-                    var attrib = x.GetCustomAttribute<AdapterAttribute>();
-                    return attrib?.Order ?? AdapterAttribute.DEFAULT_ORDER;
-                });
+                if (s_adapterMap.TryGetValue(bindingType, out var map)
+                    && map.TryGetValue(targetPropertyType, out var types)
+                )
+                {
+                    var orderedTypes = types.OrderBy(x => {
+                        var attrib = x.GetCustomAttribute<AdapterAttribute>();
+                        return attrib?.Order ?? AdapterAttribute.DEFAULT_ORDER;
+                    });
 
-                adapterTypes.AddRange(orderedTypes);
+                    adapterTypes.AddRange(orderedTypes);
+                }
             }
+            catch { }
 
             var menu = new GenericMenu();
 
@@ -1006,5 +1063,198 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             return null;
         }
+
+        private static void DrawBindingCommand(
+              MonoBinder binder
+            , SerializedObject serializedBinder
+            , Type binderType
+            , string bindingName
+            , Type bindingType
+            , Type targetType
+            , Dictionary<string, Type> targetCommandMap
+            , Dictionary<string, string> labelMap
+        )
+        {
+            var targetCommandNameSPPath = $"_bindingCommandFor{bindingName}.<TargetCommandName>k__BackingField";
+            var targetCommandNameSP = serializedBinder.FindProperty(targetCommandNameSPPath);
+
+            GetTargetCommandData(
+                  targetType
+                , targetCommandMap
+                , targetCommandNameSP
+                , out var targetCommandName
+                , out var targetCommandLabel
+            );
+
+            if (labelMap.TryGetValue(bindingName, out var bindingLabelText) == false)
+            {
+                bindingLabelText = ObjectNames.NicifyVariableName(bindingName);
+            }
+
+            var bindingTypeName = bindingType?.GetName() ?? string.Empty;
+            var bindingTypeLabel = new GUIContent(bindingTypeName, bindingType?.GetFullName() ?? string.Empty);
+            var bindingLabel = new GUIContent(
+                  bindingLabelText
+                , $"{binderType.Name}.{bindingName} ( {bindingTypeName} )"
+            );
+
+            EditorGUILayout.Space();
+            EditorGUILayout.BeginVertical(GUI.skin.box);
+            {
+                var color = GUI.color;
+                GUI.color = Color.green;
+                EditorGUILayout.BeginHorizontal(GUI.skin.box);
+                EditorGUILayout.LabelField(bindingLabel, bindingTypeLabel);
+                EditorGUILayout.EndHorizontal();
+                GUI.color = color;
+
+                EditorGUILayout.BeginVertical();
+                EditorGUILayout.BeginHorizontal();
+                {
+                    EditorGUILayout.PrefixLabel("Bind To Command");
+
+                    if (GUILayout.Button(targetCommandLabel))
+                    {
+                        DrawBindingCommandMenu(
+                              binder
+                            , serializedBinder
+                            , targetCommandNameSP
+                            , targetType
+                            , targetCommandName
+                            , targetCommandMap
+                        );
+                    }
+
+                }
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.EndVertical();
+            }
+            EditorGUILayout.EndVertical();
+        }
+
+        private static void GetTargetCommandData(
+              Type targetType
+            , Dictionary<string, Type> targetCommandMap
+            , SerializedProperty targetCommandNameSP
+            , out string targetCommandName
+            , out GUIContent targetCommandLabel
+        )
+        {
+            if (string.IsNullOrWhiteSpace(targetCommandNameSP.stringValue))
+            {
+                targetCommandName = "";
+                targetCommandLabel = new GUIContent("< undefined >");
+            }
+            else
+            {
+                var candidate = targetCommandNameSP.stringValue;
+
+                if (targetCommandMap.TryGetValue(candidate, out var commandType) == false)
+                {
+                    targetCommandName = "";
+                    targetCommandLabel = new GUIContent(
+                          $"< invalid > {candidate}"
+                        , $"{targetType.FullName} does not contain a command named {candidate}"
+                    );
+                }
+                else if (commandType == null)
+                {
+                    targetCommandName = candidate;
+                    targetCommandLabel = new GUIContent(
+                          $"{candidate}"
+                        , $"command {candidate}\nclass {targetType.Name}\nnamespace {targetType.Namespace}"
+                    );
+                }
+                else
+                {
+                    var returnTypeName = commandType.GetName();
+                    targetCommandName = candidate;
+                    targetCommandLabel = new GUIContent(
+                          $"{candidate} ( {returnTypeName} )"
+                        , $"command {candidate} : {returnTypeName}\nclass {targetType.Name}\nnamespace {targetType.Namespace}"
+                    );
+                }
+            }
+        }
+
+        private static void DrawBindingCommandMenu(
+              MonoBinder binder
+            , SerializedObject serializedBinder
+            , SerializedProperty targetCommandNameSP
+            , Type targetType
+            , string targetCommandName
+            , Dictionary<string, Type> targetCommandMap
+        )
+        {
+            var menu = new GenericMenu();
+
+            if (targetCommandMap.Count > 0)
+            {
+                menu.AddItem(
+                      new GUIContent("None")
+                    , false
+                    , RemoveBindingCommand
+                    , (binder, serializedBinder, targetCommandNameSP)
+                );
+            }
+
+            foreach (var (commandName, commandType) in targetCommandMap)
+            {
+                var label = commandType == null
+                    ? new GUIContent(commandName)
+                    : new GUIContent($"{commandName} ( {commandType.GetName()} )");
+
+                menu.AddItem(
+                      label
+                    , commandName == targetCommandName
+                    , SetBindingCommand
+                    , (binder, serializedBinder, targetCommandNameSP, commandName)
+                );
+            }
+
+            if (targetCommandMap.Count < 1)
+            {
+                menu.AddDisabledItem(new GUIContent($"{targetType.FullName} contains no [ObservableCommand]"));
+            }
+
+            menu.ShowAsContext();
+        }
+
+        private static void RemoveBindingCommand(object param)
+        {
+            if (param is not (
+                  MonoBinder binder
+                , SerializedObject serializedBinder
+                , SerializedProperty targetCommandNameSP
+            ))
+            {
+                return;
+            }
+
+            Undo.RecordObject(binder, $"Remove {targetCommandNameSP.propertyPath}");
+            targetCommandNameSP.stringValue = string.Empty;
+            serializedBinder.ApplyModifiedProperties();
+            serializedBinder.Update();
+        }
+
+        private static void SetBindingCommand(object param)
+        {
+            if (param is not (
+                  MonoBinder binder
+                , SerializedObject serializedBinder
+                , SerializedProperty targetCommandNameSP
+                , string selectedCommandName
+            ))
+            {
+                return;
+            }
+
+            Undo.RecordObject(binder, $"Set {targetCommandNameSP.propertyPath}");
+
+            targetCommandNameSP.stringValue = selectedCommandName;
+            serializedBinder.ApplyModifiedProperties();
+            serializedBinder.Update();
+        }
+
     }
 }

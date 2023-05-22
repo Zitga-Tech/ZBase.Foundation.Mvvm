@@ -159,12 +159,12 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
                     foreach (var member in MemberRefs)
                     {
                         var constName = ConstName(member);
-                        var fieldName = CommandFieldName(member);
+                        var propertyName = CommandPropertyName(member);
 
                         p.PrintLine($"case {constName}:");
                         p.OpenScope();
                         {
-                            p.PrintLine($"if (this.{fieldName} is TCommand commandT)");
+                            p.PrintLine($"if (this.{propertyName} is TCommand commandT)");
                             p.OpenScope();
                             {
                                 p.PrintLine("command = commandT;");

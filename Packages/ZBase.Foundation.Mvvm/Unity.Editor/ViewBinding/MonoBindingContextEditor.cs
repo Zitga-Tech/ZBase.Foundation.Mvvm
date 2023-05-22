@@ -155,7 +155,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         )
         {
             var target = EditorGUILayout.ObjectField(
-                "Target", context._targetUnityObject, typeof(UnityEngine.Object), true
+                  "Target"
+                , context._targetUnityObject
+                , typeof(UnityEngine.Object)
+                , true
             );
 
             if (target is not IObservableObject)

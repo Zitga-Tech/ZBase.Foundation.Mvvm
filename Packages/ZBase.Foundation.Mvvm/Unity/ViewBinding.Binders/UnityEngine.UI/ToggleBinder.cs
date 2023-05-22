@@ -44,11 +44,13 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].isOn = value;
+                targets[i].SetIsOnWithoutNotify(value);
             }
         }
 
         [BindingCommand]
+        [field: Label("On Value Changed")]
+        [field: HideInInspector]
         partial void OnValueChanged(bool value);
     }
 }

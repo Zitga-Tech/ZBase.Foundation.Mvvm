@@ -17,11 +17,14 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [SerializeField, HideInInspector]
         internal UnityEngine.Object _targetUnityObject;
 
+        public bool IsCreated { get; private set; }
+
         public IObservableObject Target { get; private set; }
 
         private void Awake()
         {
             Target = GetTarget();
+            IsCreated = true;
         }
 
         private IObservableObject GetTarget()

@@ -65,6 +65,8 @@ namespace MvvmTest
 
         public IObservableObject Target => this;
 
+        public bool IsCreated => true;
+
         [RelayCommand]
         private void UpdateNothing()
         {

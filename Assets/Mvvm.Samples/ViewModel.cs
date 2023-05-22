@@ -1,5 +1,6 @@
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ComponentModel;
+using ZBase.Foundation.Mvvm.Input;
 using ZBase.Foundation.Mvvm.Unions;
 using ZBase.Foundation.Mvvm.Unity.ViewBinding;
 using ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders;
@@ -32,6 +33,12 @@ namespace Mvvm.Samples
             {
                 Time = UnityEngine.Time.time;
             }
+        }
+
+        [RelayCommand]
+        private void OnToggleValueChanged(bool value)
+        {
+            Debug.Log(value);
         }
     }
 }

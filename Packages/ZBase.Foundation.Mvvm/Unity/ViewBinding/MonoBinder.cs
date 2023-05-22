@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
@@ -14,16 +15,18 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         protected void Awake()
         {
             Context = GetContext();
+            StartCoroutine(Initialize());    
+        }
 
+        private IEnumerator Initialize()
+        {
+            yield return new WaitUntil(() => Context.IsCreated);
+
+            StartListening();
             OnAwake();
         }
 
         protected virtual void OnAwake() { }
-
-        protected virtual void Start()
-        {
-            StartListening();
-        }
 
         protected virtual void OnDestroy()
         {
