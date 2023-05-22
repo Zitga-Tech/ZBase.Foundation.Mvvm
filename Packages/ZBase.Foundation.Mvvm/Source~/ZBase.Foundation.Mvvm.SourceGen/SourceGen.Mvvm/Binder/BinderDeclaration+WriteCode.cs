@@ -690,8 +690,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         {
             foreach (var member in BindingCommandRefs)
             {
-                p.PrintLine(OBSOLETE_METHOD).PrintLine(AGGRESSIVE_INLINING)
-                    .PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
 
                 if (member.Parameter == null)
                 {
