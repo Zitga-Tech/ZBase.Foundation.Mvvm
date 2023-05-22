@@ -28,12 +28,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.SetActive(value);
-                }
+                targets[i].SetActive(value);
             }
         }
     }

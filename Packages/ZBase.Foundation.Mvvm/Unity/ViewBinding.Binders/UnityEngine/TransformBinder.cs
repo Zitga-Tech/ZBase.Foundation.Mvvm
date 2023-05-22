@@ -28,12 +28,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.position = value;
-                }
+                targets[i].position = value;
             }
         }
 
@@ -47,12 +42,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.rotation = value;
-                }
+                targets[i].rotation = value;
             }
         }
 
@@ -66,12 +56,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.eulerAngles = value;
-                }
+                targets[i].eulerAngles = value;
             }
         }
 
@@ -85,12 +70,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.localPosition = value;
-                }
+                targets[i].localPosition = value;
             }
         }
 
@@ -104,12 +84,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.localRotation = value;
-                }
+                targets[i].localRotation = value;
             }
         }
 
@@ -123,12 +98,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.localEulerAngles = value;
-                }
+                targets[i].localEulerAngles = value;
             }
         }
 
@@ -142,12 +112,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.localScale = value;
-                }
+                targets[i].localScale = value;
             }
         }
     }

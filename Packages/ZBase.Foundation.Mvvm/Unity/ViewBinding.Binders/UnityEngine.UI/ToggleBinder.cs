@@ -27,10 +27,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
             else
             {
-                //foreach (var target in _targets)
-                //{
-                //    target.onValueChanged.AddListener(OnValueChanged);
-                //}
+                foreach (var target in _targets)
+                {
+                    target.onValueChanged.AddListener(OnValueChanged);
+                }
             }
         }
 
@@ -44,16 +44,11 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.isOn = value;
-                }
+                targets[i].isOn = value;
             }
         }
 
-        //[BindingCommand]
-        //partial void OnValueChanged(bool value);
+        [BindingCommand]
+        partial void OnValueChanged(bool value);
     }
 }

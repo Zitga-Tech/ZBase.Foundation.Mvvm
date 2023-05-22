@@ -53,12 +53,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.enabled = value;
-                }
+                targets[i].enabled = value;
             }
         }
     }

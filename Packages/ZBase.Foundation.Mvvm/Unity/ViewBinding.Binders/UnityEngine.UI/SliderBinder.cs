@@ -37,12 +37,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.minValue = value;
-                }
+                targets[i].minValue = value;
             }
         }
 
@@ -56,12 +51,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.maxValue = value;
-                }
+                targets[i].maxValue = value;
             }
         }
 
@@ -75,12 +65,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.wholeNumbers = value;
-                }
+                targets[i].wholeNumbers = value;
             }
         }
 
@@ -94,12 +79,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.value = value;
-                }
+                targets[i].value = value;
             }
         }
     }

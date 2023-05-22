@@ -39,12 +39,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.text = value;
-                }
+                targets[i].text = value;
             }
         }
     }

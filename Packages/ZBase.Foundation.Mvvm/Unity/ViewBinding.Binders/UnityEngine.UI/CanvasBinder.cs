@@ -36,12 +36,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.overrideSorting = value;
-                }
+                targets[i].overrideSorting = value;
             }
         }
 
@@ -55,12 +50,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.sortingLayerID = value;
-                }
+                targets[i].sortingLayerID = value;
             }
         }
 
@@ -74,12 +64,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.sortingLayerName = value;
-                }
+                targets[i].sortingLayerName = value;
             }
         }
 
@@ -93,12 +78,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.sortingOrder = value;
-                }
+                targets[i].sortingOrder = value;
             }
         }
     }

@@ -36,12 +36,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.anchorMin = value;
-                }
+                targets[i].anchorMin = value;
             }
         }
 
@@ -55,12 +50,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.anchorMax = value;
-                }
+                targets[i].anchorMax = value;
             }
         }
 
@@ -74,12 +64,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.offsetMin = value;
-                }
+                targets[i].offsetMin = value;
             }
         }
 
@@ -93,12 +78,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.offsetMax = value;
-                }
+                targets[i].offsetMax = value;
             }
         }
 
@@ -112,12 +92,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.anchoredPosition = value;
-                }
+                targets[i].anchoredPosition = value;
             }
         }
 
@@ -131,12 +106,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.anchoredPosition3D = value;
-                }
+                targets[i].anchoredPosition3D = value;
             }
         }
 
@@ -150,12 +120,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.sizeDelta = value;
-                }
+                targets[i].sizeDelta = value;
             }
         }
 
@@ -169,12 +134,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.pivot = value;
-                }
+                targets[i].pivot = value;
             }
         }
     }

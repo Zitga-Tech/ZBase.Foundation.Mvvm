@@ -37,12 +37,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.value = value;
-                }
+                targets[i].value = value;
             }
         }
 
@@ -56,12 +51,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.size = value;
-                }
+                targets[i].size = value;
             }
         }
 
@@ -75,12 +65,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                var target = targets[i];
-
-                if (target)
-                {
-                    target.numberOfSteps = value;
-                }
+                targets[i].numberOfSteps = value;
             }
         }
     }
