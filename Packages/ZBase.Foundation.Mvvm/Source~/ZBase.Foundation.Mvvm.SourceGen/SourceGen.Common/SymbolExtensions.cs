@@ -333,6 +333,7 @@ namespace ZBase.Foundation.SourceGen
               this IMethodSymbol methodSymbol
             , SemanticModel semanticModel
             , CancellationToken token
+            , bool includePartialImplementationPart
             , in ImmutableArrayBuilder<DiagnosticInfo> diagnostics
             , out ImmutableArray<AttributeInfo> fieldAttributes
             , out ImmutableArray<AttributeInfo> propertyAttributes
@@ -346,7 +347,6 @@ namespace ZBase.Foundation.SourceGen
             if (methodSymbol is { IsPartialDefinition: true } or { PartialDefinitionPart: not null })
             {
                 IMethodSymbol partialDefinition = methodSymbol.PartialDefinitionPart ?? methodSymbol;
-                IMethodSymbol partialImplementation = methodSymbol.PartialImplementationPart ?? methodSymbol;
 
                 // We always give priority to the partial definition, to ensure a predictable and testable ordering
                 GatherForwardedAttributes(
@@ -359,15 +359,20 @@ namespace ZBase.Foundation.SourceGen
                     , diagnostic
                 );
 
-                GatherForwardedAttributes(
-                      partialImplementation
-                    , semanticModel
-                    , token
-                    , in diagnostics
-                    , in fieldAttributesInfo
-                    , in propertyAttributesInfo
-                    , diagnostic
-                );
+                if (includePartialImplementationPart)
+                {
+                    IMethodSymbol partialImplementation = methodSymbol.PartialImplementationPart ?? methodSymbol;
+
+                    GatherForwardedAttributes(
+                          partialImplementation
+                        , semanticModel
+                        , token
+                        , in diagnostics
+                        , in fieldAttributesInfo
+                        , in propertyAttributesInfo
+                        , diagnostic
+                    );
+                }
             }
             else
             {

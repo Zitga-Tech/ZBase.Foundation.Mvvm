@@ -163,6 +163,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 bindingPropertyRef.Symbol.GatherForwardedAttributes(
                       semanticModel
                     , token
+                    , true
                     , diagnosticBuilder
                     , out var fieldAttributes
                     , out _
@@ -180,6 +181,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 bindingCommandRef.Symbol.GatherForwardedAttributes(
                       semanticModel
                     , token
+                    , false
                     , diagnosticBuilder
                     , out var fieldAttributes
                     , out _

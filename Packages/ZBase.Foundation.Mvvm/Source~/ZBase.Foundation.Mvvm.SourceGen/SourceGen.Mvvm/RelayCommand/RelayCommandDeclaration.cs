@@ -134,6 +134,7 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
                 memberRef.Member.GatherForwardedAttributes(
                       semanticModel
                     , token
+                    , true
                     , diagnosticBuilder
                     , out var fieldAttributes
                     , out var propertyAttributes
