@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "ZBase.Foundation.Mvvm",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -17,6 +18,11 @@
             "name": "com.unity.textmeshpro",
             "expression": "",
             "define": "UNITY_TEXT_MESH_PRO"
+        },
+        {
+            "name": "com.cysharp.unitask",
+            "expression": "",
+            "define": "CYSHARP_UNITASK"
         }
     ],
     "noEngineReferences": false

@@ -1,7 +1,12 @@
 using System;
-using System.Collections;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
+
+#if CYSHARP_UNITASK
+using Cysharp.Threading.Tasks;
+#else
+using System.Collections;
+#endif
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
@@ -12,6 +17,17 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
         public IBindingContext Context { get; private set; }
 
+#if CYSHARP_UNITASK
+        protected async void Awake()
+        {
+            Context = GetContext();
+
+            await UniTask.WaitUntil(() => Context.IsCreated);
+
+            StartListening();
+            OnAwake();
+        }
+#else
         protected void Awake()
         {
             Context = GetContext();
@@ -25,6 +41,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             StartListening();
             OnAwake();
         }
+#endif
 
         protected virtual void OnAwake() { }
 
