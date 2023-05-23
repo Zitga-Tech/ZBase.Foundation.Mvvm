@@ -25,6 +25,27 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             {
                 Debug.LogWarning($"The target list is empty.", this);
             }
+            else
+            {
+                foreach (var target in _targets)
+                {
+                    target.onValueChanged.AddListener(OnValueChanged);
+                }
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Value")]
+        [field: HideInInspector]
+        private void SetValue(float value)
+        {
+            var targets = _targets.AsSpan();
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].SetValueWithoutNotify(value);
+            }
         }
 
         [BindingProperty]
@@ -69,18 +90,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
         }
 
-        [BindingProperty]
-        [field: Label("Value")]
-        [field: HideInInspector]
-        private void SetValue(float value)
-        {
-            var targets = _targets.AsSpan();
-            var length = targets.Length;
-
-            for (var i = 0; i < length; i++)
-            {
-                targets[i].SetValueWithoutNotify(value);
-            }
-        }
+        [BindingCommand]
+        partial void OnValueChanged(float value);
     }
 }
