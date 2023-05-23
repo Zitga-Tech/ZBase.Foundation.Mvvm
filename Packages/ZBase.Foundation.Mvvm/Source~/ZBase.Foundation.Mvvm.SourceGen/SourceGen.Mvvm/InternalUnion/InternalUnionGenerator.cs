@@ -60,7 +60,8 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
             if (syntaxNode is MethodDeclarationSyntax method && method.ParameterList.Parameters.Count == 1)
             {
                 if (method.HasAttributeCandidate("ZBase.Foundation.Mvvm.Input", "RelayCommand")
-                    || method.HasAttributeCandidate("ZBase.Foundation.Mvvm.ViewBinding", "Binding")
+                    || method.HasAttributeCandidate("ZBase.Foundation.Mvvm.ViewBinding", "BindingProperty")
+                    || method.HasAttributeCandidate("ZBase.Foundation.Mvvm.ViewBinding", "BindingCommand")
                 )
                 {
                     return true;
