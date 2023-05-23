@@ -29,6 +29,17 @@
         public bool SetAdapter(string bindingPropertyName, IAdapter adapter) => false;
 
         /// <summary>
+        /// Sets target command name to a binding command.
+        /// </summary>
+        /// <param name="bindingCommandName">The binding command whose <see cref="BindingCommand.TargetCommandName"/> will be set.</param>
+        /// <param name="targetCommandName">
+        /// The command whose container class is an <see cref="ZBase.Foundation.Mvvm.ComponentModel.IObservableObject"/>.
+        /// <br/>
+        /// See <see cref="ZBase.Foundation.Mvvm.ViewBinding.BindingCommand.TargetCommandName"/>
+        /// </param>
+        public bool SetTargetCommandName(string bindingCommandName, string targetCommandName) => false;
+
+        /// <summary>
         /// Start listening to events from the <see cref="Context"/>.
         /// </summary>
         public void StartListening() { }

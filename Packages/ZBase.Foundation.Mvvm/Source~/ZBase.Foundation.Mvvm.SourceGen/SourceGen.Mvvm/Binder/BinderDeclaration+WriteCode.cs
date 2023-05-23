@@ -70,6 +70,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 }
 
                 WritePartialBindingCommandMethods(ref p);
+                WriteSetTargetCommandNameMethod(ref p);
             }
             p.CloseScope();
 
@@ -764,6 +765,64 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 
                 p.PrintEndLine();
             }
+
+            p.PrintEndLine();
+        }
+
+        private void WriteSetTargetCommandNameMethod(ref Printer p)
+        {
+            var keyword = HasBaseBinder ? "override " : Symbol.IsSealed ? "" : "virtual ";
+
+            if (BindingCommandRefs.Length < 1)
+            {
+                if (HasBaseBinder == false)
+                {
+                    p.PrintLine("/// <inheritdoc/>");
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine($"public {keyword}bool SetTargetCommandName(string bindingCommandName, string targetCommandName)");
+                    p.OpenScope();
+                    {
+                        p.PrintLine("return false;");
+                    }
+                    p.CloseScope();
+                    p.PrintEndLine();
+                }
+
+                return;
+            }
+
+            p.PrintLine("/// <inheritdoc/>");
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public {keyword}bool SetTargetCommandName(string bindingCommandName, string targetCommandName)");
+            p.OpenScope();
+            {
+                if (HasBaseBinder)
+                {
+                    p.PrintLine("if (base.SetTargetCommandName(bindingCommandName, targetCommandName)) return true;");
+                    p.PrintEndLine();
+                }
+
+                p.PrintLine("switch (bindingCommandName)");
+                p.OpenScope();
+                {
+                    foreach (var member in BindingCommandRefs)
+                    {
+                        p.PrintLine($"case {ConstName(member)}:");
+                        p.OpenScope();
+                        {
+                            p.PrintLine($"this.{BindingCommandName(member)}.TargetCommandName = targetCommandName;");
+                            p.PrintLine("return true;");
+                        }
+                        p.CloseScope();
+                        p.PrintEndLine();
+                    }
+                }
+                p.CloseScope();
+                p.PrintEndLine();
+
+                p.PrintLine("return false;");
+            }
+            p.CloseScope();
 
             p.PrintEndLine();
         }
