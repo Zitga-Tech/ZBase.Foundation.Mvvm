@@ -60,6 +60,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 WriteFlags(ref p);
                 WriteConstructor(ref p);
                 WriteStartListeningMethod(ref p);
+                WritePartialOnBindFailedMethods(ref p);
                 WriteStopListeningMethod(ref p);
                 WriteSetTargetPropertyNameMethod(ref p);
                 WriteSetAdapterMethod(ref p);
@@ -476,7 +477,13 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     {
                         foreach (var member in BindingPropertyRefs)
                         {
-                            p.PrintLine($"inpc.PropertyChanged(this.{BindingPropertyName(member)}.TargetPropertyName, this.{ListenerName(member)});");
+                            p.PrintLine($"if (inpc.PropertyChanged(this.{BindingPropertyName(member)}.TargetPropertyName, this.{ListenerName(member)}) == false)");
+                            p.OpenScope();
+                            {
+                                p.PrintLine($"OnBindPropertyFailed(this.{BindingPropertyName(member)});");
+                            }
+                            p.CloseScope();
+                            p.PrintEndLine();
                         }
                     }
                     p.CloseScope();
@@ -490,7 +497,13 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     {
                         foreach (var member in BindingCommandRefs)
                         {
-                            p.PrintLine($"cl.TryGetCommand(this.{BindingCommandName(member)}.TargetCommandName, out this.{RelayCommandName(member)});");
+                            p.PrintLine($"if (cl.TryGetCommand(this.{BindingCommandName(member)}.TargetCommandName, out this.{RelayCommandName(member)}) == false)");
+                            p.OpenScope();
+                            {
+                                p.PrintLine($"OnBindCommandFailed(this.{BindingCommandName(member)});");
+                            }
+                            p.CloseScope();
+                            p.PrintEndLine();
                         }
                     }
                     p.CloseScope();
@@ -499,6 +512,21 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             p.CloseScope();
 
             p.PrintEndLine();
+        }
+
+        private void WritePartialOnBindFailedMethods(ref Printer p)
+        {
+            if (BindingPropertyRefs.Length > 0 && HasOnBindPropertyFailedMethod == false)
+            {
+                p.PrintLine("partial void OnBindPropertyFailed(global::ZBase.Foundation.Mvvm.ViewBinding.BindingProperty bindingProperty);");
+                p.PrintEndLine();
+            }
+
+            if (BindingCommandRefs.Length > 0 && HasOnBindCommandFailedMethod == false)
+            {
+                p.PrintLine("partial void OnBindCommandFailed(global::ZBase.Foundation.Mvvm.ViewBinding.BindingCommand bindingCommand);");
+                p.PrintEndLine();
+            }
         }
 
         private void WriteStopListeningMethod(ref Printer p)

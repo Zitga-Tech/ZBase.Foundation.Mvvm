@@ -33,6 +33,10 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         public ImmutableArray<ITypeSymbol> NonUnionTypes { get; }
 
+        public bool HasOnBindPropertyFailedMethod { get; }
+
+        public bool HasOnBindCommandFailedMethod { get; }
+
         public BinderDeclaration(ClassDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
         {
             using var bindingPropertyRefs = ImmutableArrayBuilder<BindingPropertyRef>.Rent();
@@ -61,6 +65,45 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     ReferenceUnityEngine = true;
                     break;
                 }
+            }
+
+            var baseType = Symbol;
+            var isCurrentType = true;
+
+            while (baseType != null)
+            {
+                var onBindPropertyFaileds = baseType.GetMembers("OnBindPropertyFailed");
+
+                foreach (var member in onBindPropertyFaileds)
+                {
+                    if (member is IMethodSymbol method
+                        && (isCurrentType == false && method.DeclaredAccessibility is (Accessibility.Public or Accessibility.Protected))
+                        && method.Parameters.Length == 1
+                        && method.Parameters[0].Type.ToFullName() == BINDING_PROPERTY
+                    )
+                    {
+                        HasOnBindPropertyFailedMethod = true;
+                        break;
+                    }
+                }
+
+                var onBindCommandFaileds = baseType.GetMembers("OnBindCommandFailed");
+
+                foreach (var member in onBindCommandFaileds)
+                {
+                    if (member is IMethodSymbol method
+                        && (isCurrentType == false && method.DeclaredAccessibility is (Accessibility.Public or Accessibility.Protected))
+                        && method.Parameters.Length == 1
+                        && method.Parameters[0].Type.ToFullName() == BINDING_COMMAND
+                    )
+                    {
+                        HasOnBindCommandFailedMethod = true;
+                        break;
+                    }
+                }
+
+                isCurrentType = false;
+                baseType = baseType.BaseType;
             }
 
             var members = Symbol.GetMembers();

@@ -91,6 +91,8 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         [BindingCommand]
+        [field: Label("On Value Changed")]
+        [field: HideInInspector]
         partial void OnValueChanged(float value);
     }
 }
