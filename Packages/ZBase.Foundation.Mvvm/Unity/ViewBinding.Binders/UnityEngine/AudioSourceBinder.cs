@@ -1,23 +1,22 @@
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
-    [AddComponentMenu("MVVM/Binders/Scrollbar Binder")]
-    public partial class ScrollbarBinder : MonoBinder
+    [AddComponentMenu("MVVM/Binders/AudioSource Binder")]
+    public partial class AudioSourceBinder : MonoBinder
     {
         [SerializeField]
-        private Scrollbar[] _targets = new Scrollbar[0];
+        private AudioSource[] _targets = new AudioSource[0];
 
         protected override void OnAwake()
         {
             if (_targets.Length < 1)
             {
-                if (this.gameObject.TryGetComponent<Scrollbar>(out var target))
+                if (this.gameObject.TryGetComponent<AudioSource>(out var target))
                 {
-                    _targets = new Scrollbar[] { target };
+                    _targets = new AudioSource[] { target };
                 }
             }
 
@@ -25,60 +24,48 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             {
                 Debug.LogWarning($"The target list is empty.", this);
             }
-            else
-            {
-                foreach (var target in _targets)
-                {
-                    target.onValueChanged.AddListener(OnValueChanged);
-                }
-            }
         }
 
         [BindingProperty]
-        [field: Label("Value")]
+        [field: Label("Volume")]
         [field: HideInInspector]
-        private void SetValue(float value)
+        private void SetVolume(float value)
         {
             var targets = _targets.AsSpan();
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].SetValueWithoutNotify(value);
+                targets[i].volume = value;
             }
         }
 
         [BindingProperty]
-        [field: Label("Size")]
+        [field: Label("Mute")]
         [field: HideInInspector]
-        private void SetSize(float value)
+        private void SetMute(bool value)
         {
             var targets = _targets.AsSpan();
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].size = value;
+                targets[i].mute = value;
             }
         }
 
         [BindingProperty]
-        [field: Label("Number Of Steps")]
+        [field: Label("Loop")]
         [field: HideInInspector]
-        private void SetNumberOfSteps(int value)
+        private void SetLoop(bool value)
         {
             var targets = _targets.AsSpan();
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].numberOfSteps = value;
+                targets[i].loop = value;
             }
         }
-
-        [BindingCommand]
-        [field: Label("On Value Changed")]
-        [field: HideInInspector]
-        partial void OnValueChanged(float value);
     }
 }
