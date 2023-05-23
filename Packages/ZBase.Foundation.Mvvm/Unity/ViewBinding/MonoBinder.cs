@@ -14,7 +14,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
     public abstract partial class MonoBinder : MonoBehaviour, IBinder
     {
         [SerializeField]
-        internal InitializationKind _initialization;
+        internal BindingContextSetting _contextSetting;
 
         [SerializeField, HideInInspector]
         internal Component _context;
@@ -24,57 +24,76 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 #if CYSHARP_UNITASK
         protected async void Awake()
         {
-            if (_initialization == InitializationKind.AutomaticOnAwake)
+            if (_contextSetting == BindingContextSetting.FindWhenPlay)
             {
-                Context = GetContext();
-
-                if (Context != null)
-                {
-                    await UniTask.WaitUntil(() => Context.IsCreated);
-                }
-
-                OnAwake();
-
-                if (Context != null)
-                {
-                    StartListening();
-                }
+                FindNearestContext();
             }
-            else
+
+            Context = GetContext();
+
+            if (Context != null)
             {
-                OnAwake();
+                await UniTask.WaitUntil(() => Context.IsCreated);
             }
+
+            OnAwake();
+
+            if (Context == null)
+            {
+                return;
+            }
+
+            if (Context.Target == null)
+            {
+                LogWhenContextTargetIsNull();
+                return;
+            }
+            
+            StartListening();
         }
 #else
         protected void Awake()
         {
-            if (_initialization == InitializationKind.AutomaticOnAwake)
+            StartCoroutine(AwakeCoroutine(_contextSetting));
+        }
+
+        private IEnumerator AwakeCoroutine(BindingContextSetting bindingContextSetting)
+        {
+            if (bindingContextSetting == BindingContextSetting.FindWhenPlay)
             {
-                StartCoroutine(AwakeCoroutine());
+                FindNearestContext();
             }
-            else
+
+            Context = GetContext();
+
+            if (Context != null)
             {
-                OnAwake();
+                yield return new WaitUntil(() => Context.IsCreated);
             }
 
-            IEnumerator AwakeCoroutine()
+            OnAwake();
+
+            if (Context == null)
             {
-                Context = GetContext();
-
-                if (Context != null)
-                {
-                    yield return new WaitUntil(() => Context.IsCreated);
-                }
-
-                OnAwake();
-
-                if (Context != null)
-                {
-                    StartListening();
-                }
+                yield break;
             }
+
+            if (Context.Target == null)
+            {
+                LogWhenContextTargetIsNull();
+                yield break;
+            }
+
+            StartListening();
         }
 #endif
+
+        protected virtual void OnAwake() { }
+
+        protected virtual void OnDestroy()
+        {
+            StopListening();
+        }
 
         private IBindingContext GetContext()
         {
@@ -95,16 +114,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             return context;
         }
 
-        protected virtual void OnAwake() { }
-
-        protected virtual void OnDestroy()
-        {
-            StopListening();
-        }
-
         /// <summary>
-        /// Initialize this binder manually. The operation consists of 3 steps:
+        /// Initialize this binder manually. The operation consists of these steps:
         /// <list type="number">
+        /// <item>Invoke the <see cref="StopListening"/> method</item>
         /// <item>If the <paramref name="context"/> argument is not null, use it</item>
         /// <item>Otherwise, find the nearest <see cref="IBindingContext"/> on the GameObject hierarchy</item>
         /// <item>Invoke the <see cref="StartListening"/> method on this binder</item>
@@ -112,6 +125,8 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         /// </summary>
         public virtual void InitializeManually(IBindingContext context = null)
         {
+            StopListening();
+
             if (context == null || context.Target == null)
             {
                 FindNearestContext();
@@ -122,8 +137,14 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 this.Context = context;
             }
 
-            if (this.Context == null || this.Context.Target == null)
+            if (this.Context == null)
             {
+                return;
+            }
+
+            if (this.Context.Target == null)
+            {
+                LogWhenContextTargetIsNull();
                 return;
             }
 
@@ -183,10 +204,15 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             );
         }
 
-        internal enum InitializationKind
+        private void LogWhenContextTargetIsNull()
         {
-            AutomaticOnAwake = 0,
-            Manual = 1,
+            Debug.LogError("The target of the Context is null.", this);
+        }
+
+        internal enum BindingContextSetting
+        {
+            PresetOnEditor = 0,
+            FindWhenPlay = 1,
         }
     }
 }

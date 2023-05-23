@@ -63,13 +63,13 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             EditorGUILayout.Space();
 
-            if (binder._initialization == MonoBinder.InitializationKind.AutomaticOnAwake)
+            if (binder._contextSetting == MonoBinder.BindingContextSetting.FindWhenPlay)
             {
-                DrawInitializationAutomatic(binder);
+                DrawFindWhenPlay(binder);
             }
             else
             {
-                DrawInitializationManual(binder);
+                DrawPresetOnEditor(binder);
             }
         }
     }

@@ -17,15 +17,8 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     partial class MonoBinderEditor
     {
-        private void DrawInitializationAutomatic(MonoBinder binder)
+        private void DrawPresetOnEditor(MonoBinder binder)
         {
-            EditorGUILayout.HelpBox(
-                  "Automatic Initialization On Awake requires a reference to an existing Binding Context on the GameObject hierarchy beforehand."
-                , MessageType.Info
-            );
-
-            EditorGUILayout.Space();
-
             var contextProp = this.serializedObject.FindProperty(nameof(MonoBinder._context));
 
             DrawContextField(this.serializedObject, contextProp, binder);
@@ -190,6 +183,13 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             {
                 EditorGUILayout.HelpBox(
                     $"The component {serializedProperty.objectReferenceValue.GetType()} does not implement {typeof(IBindingContext)}."
+                    , MessageType.Error
+                );
+            }
+            else
+            {
+                EditorGUILayout.HelpBox(
+                    "Preset On Editor requires the Context to be not null."
                     , MessageType.Error
                 );
             }

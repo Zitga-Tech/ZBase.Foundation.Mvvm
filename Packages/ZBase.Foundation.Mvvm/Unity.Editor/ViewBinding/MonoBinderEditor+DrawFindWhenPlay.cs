@@ -14,11 +14,11 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     partial class MonoBinderEditor
     {
-        private void DrawInitializationManual(MonoBinder binder)
+        private void DrawFindWhenPlay(MonoBinder binder)
         {
             EditorGUILayout.HelpBox(
-                  "Manual Initialization does NOT require any Binding Context beforehand.\n" +
-                  $"However, the {nameof(MonoBinder.InitializeManually)}() method must be invoked at runtime for this binder to work."
+                  "Find When Play does NOT require the Context to be set up beforehand.\n" +
+                  "The actual Context will be retrieved on entering play mode or at runtime."
                 , MessageType.Info
             );
 
