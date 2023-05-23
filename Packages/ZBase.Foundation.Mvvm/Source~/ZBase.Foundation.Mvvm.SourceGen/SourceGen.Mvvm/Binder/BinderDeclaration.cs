@@ -23,7 +23,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         public INamedTypeSymbol Symbol { get; }
 
-        public bool IsBaseBinder { get; }
+        public bool HasBaseBinder { get; }
 
         public bool ReferenceUnityEngine { get; }
 
@@ -50,7 +50,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             {
                 if (Symbol.BaseType.ImplementsInterface(IBINDER_INTERFACE))
                 {
-                    IsBaseBinder = true;
+                    HasBaseBinder = true;
                 }
             }
 

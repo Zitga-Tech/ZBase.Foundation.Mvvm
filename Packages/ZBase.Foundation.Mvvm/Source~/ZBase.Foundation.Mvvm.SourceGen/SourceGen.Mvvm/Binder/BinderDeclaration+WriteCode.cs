@@ -16,104 +16,6 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         private const string IADAPTER = "global::ZBase.Foundation.Mvvm.ViewBinding.IAdapter";
         private const string CACHED_UNION_CONVERTER = "global::ZBase.Foundation.Mvvm.Unions.CachedUnionConverter";
 
-        public string WriteCodeWithoutMember()
-        {
-            var scopePrinter = new SyntaxNodeScopePrinter(Printer.DefaultLarge, Syntax.Parent);
-            var p = scopePrinter.printer;
-
-            p.PrintLine("#pragma warning disable");
-            p.PrintEndLine();
-
-            p = p.IncreasedIndent();
-
-            p.PrintBeginLine();
-            p.Print("partial class ").Print(Syntax.Identifier.Text);
-            p.PrintEndLine();
-
-            p = p.IncreasedIndent();
-
-            if (IsBaseBinder)
-            {
-                p.PrintLine(": global::ZBase.Foundation.Mvvm.ViewBinding.IBinder");
-            }
-
-            p = p.DecreasedIndent();
-
-            p.OpenScope();
-            {
-                if (IsBaseBinder == false)
-                {
-                    var keyword = Symbol.IsSealed ? "" : "virtual ";
-
-                    p.PrintLine("/// <inheritdoc/>");
-                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public {keyword}void StartListening()");
-                    p.OpenScope();
-                    {
-                        if (IsBaseBinder)
-                        {
-                            p.PrintLine("base.StartListening();");
-                        }
-                    }
-                    p.CloseScope();
-
-                    p.PrintEndLine();
-
-                    p.PrintLine("/// <inheritdoc/>");
-                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public {keyword}void StopListening()");
-                    p.OpenScope();
-                    {
-                        if (IsBaseBinder)
-                        {
-                            p.PrintLine("base.StopListening();");
-                        }
-                    }
-                    p.CloseScope();
-
-                    p.PrintEndLine();
-
-                    p.PrintLine("/// <inheritdoc/>");
-                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public {keyword}bool SetTargetPropertyName(string bindingPropertyName, string targetPropertyName)");
-                    p.OpenScope();
-                    {
-                        if (IsBaseBinder)
-                        {
-                            p.PrintLine("return base.SetTargetPropertyName(bindingPropertyName, targetPropertyName);");
-                        }
-                        else
-                        {
-                            p.PrintLine("return false;");
-                        }
-                    }
-                    p.CloseScope();
-
-                    p.PrintEndLine();
-
-                    p.PrintLine("/// <inheritdoc/>");
-                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public {keyword}bool SetAdapter(string bindingPropertyName, {IADAPTER} adapter)");
-                    p.OpenScope();
-                    {
-                        if (IsBaseBinder)
-                        {
-                            p.PrintLine("return base.SetAdapter(bindingPropertyName, adapter);");
-                        }
-                        else
-                        {
-                            p.PrintLine("return false;");
-                        }
-                    }
-                    p.CloseScope();
-                }
-            }
-            p.CloseScope();
-
-            p = p.DecreasedIndent();
-            return p.Result;
-        }
-
         public string WriteCode()
         {
             var scopePrinter = new SyntaxNodeScopePrinter(Printer.DefaultLarge, Syntax.Parent);
@@ -133,7 +35,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
             p = p.IncreasedIndent();
 
-            if (IsBaseBinder)
+            if (HasBaseBinder)
             {
                 p.PrintLine(": global::ZBase.Foundation.Mvvm.ViewBinding.IBinder");
             }
@@ -214,6 +116,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteConstantBindingProperties(ref Printer p)
         {
+            if (BindingPropertyRefs.Length < 1)
+            {
+                return;
+            }
+
             var className = Syntax.Identifier.Text;
 
             foreach (var member in BindingPropertyRefs)
@@ -231,6 +138,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteConstantBindingCommands(ref Printer p)
         {
+            if (BindingCommandRefs.Length < 1)
+            {
+                return;
+            }
+
             var className = Syntax.Identifier.Text;
 
             foreach (var member in BindingCommandRefs)
@@ -248,6 +160,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteBindingProperties(ref Printer p)
         {
+            if (BindingPropertyRefs.Length < 1)
+            {
+                return;
+            }
+
             foreach (var member in BindingPropertyRefs)
             {
                 if (member.SkipBindingProperty)
@@ -289,6 +206,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteConverters(ref Printer p)
         {
+            if (BindingPropertyRefs.Length < 1)
+            {
+                return;
+            }
+
             foreach (var member in BindingPropertyRefs)
             {
                 if (member.SkipConverter)
@@ -330,6 +252,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteBindingCommands(ref Printer p)
         {
+            if (BindingCommandRefs.Length < 1)
+            {
+                return;
+            }
+
             foreach (var member in BindingCommandRefs)
             {
                 if (member.SkipBindingCommand)
@@ -373,10 +300,17 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.BindingCommand {BindingCommandName(member)} =  new global::ZBase.Foundation.Mvvm.ViewBinding.BindingCommand();");
                 p.PrintEndLine();
             }
+
+            p.PrintEndLine();
         }
 
         private void WriteUnionConverters(ref Printer p)
         {
+            if (NonUnionTypes.Length < 1)
+            {
+                return;
+            }
+
             foreach (var type in NonUnionTypes)
             {
                 var typeName = type.ToFullName();
@@ -386,10 +320,17 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 p.PrintLine($"private readonly {CACHED_UNION_CONVERTER}<{typeName}> _unionConverter{propertyName} = new {CACHED_UNION_CONVERTER}<{typeName}>();");
                 p.PrintEndLine();
             }
+
+            p.PrintEndLine();
         }
 
         private void WriteListeners(ref Printer p)
         {
+            if (BindingPropertyRefs.Length < 1)
+            {
+                return;
+            }
+
             var className = Syntax.Identifier.Text;
 
             foreach (var member in BindingPropertyRefs)
@@ -408,6 +349,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteRelayCommands(ref Printer p)
         {
+            if (BindingCommandRefs.Length < 1)
+            {
+                return;
+            }
+
             foreach (var member in BindingCommandRefs)
             {
                 p.PrintLine($"/// <summary>");
@@ -427,10 +373,17 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                 p.PrintEndLine();
             }
+
+            p.PrintEndLine();
         }
 
         private void WriteFlags(ref Printer p)
         {
+            if (BindingPropertyRefs.Length < 1 && BindingCommandRefs.Length < 1)
+            {
+                return;
+            }
+
             p.PrintLine($"/// <summary>A flag indicates whether this binder is listening to events from <see cref=\"Context\"/>.</summary>");
             p.PrintLine(GENERATED_CODE);
             p.PrintLine($"private bool _isListening;");
@@ -439,12 +392,17 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteConstructor(ref Printer p)
         {
+            if (BindingPropertyRefs.Length < 1)
+            {
+                return;
+            }
+
             var className = Syntax.Identifier.Text;
 
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
             p.PrintBeginLine().Print($"public {className}()");
 
-            if (IsBaseBinder)
+            if (HasBaseBinder)
             {
                 p.Print(" : base()");
             }
@@ -478,14 +436,27 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteStartListeningMethod(ref Printer p)
         {
-            var keyword = IsBaseBinder ? "override " : Symbol.IsSealed ? "" : "virtual ";
+            var keyword = HasBaseBinder ? "override " : Symbol.IsSealed ? "" : "virtual ";
+
+            if (BindingPropertyRefs.Length < 1 && BindingCommandRefs.Length < 1)
+            {
+                if (HasBaseBinder == false)
+                {
+                    p.PrintLine("/// <inheritdoc/>");
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine($"public {keyword}void StartListening() {{ }}");
+                    p.PrintEndLine();
+                }
+
+                return;
+            }
 
             p.PrintLine("/// <inheritdoc/>");
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
             p.PrintLine($"public {keyword}void StartListening()");
             p.OpenScope();
             {
-                if (IsBaseBinder)
+                if (HasBaseBinder)
                 {
                     p.PrintLine("base.StartListening();");
                     p.PrintEndLine();
@@ -497,26 +468,32 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 p.PrintLine($"this._isListening = true;");
                 p.PrintEndLine();
 
-                p.PrintLine("if (this.Context.Target is global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged inpc)");
-                p.OpenScope();
+                if (BindingPropertyRefs.Length > 0)
                 {
-                    foreach (var member in BindingPropertyRefs)
+                    p.PrintLine("if (this.Context.Target is global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged inpc)");
+                    p.OpenScope();
                     {
-                        p.PrintLine($"inpc.PropertyChanged(this.{BindingPropertyName(member)}.TargetPropertyName, this.{ListenerName(member)});");
+                        foreach (var member in BindingPropertyRefs)
+                        {
+                            p.PrintLine($"inpc.PropertyChanged(this.{BindingPropertyName(member)}.TargetPropertyName, this.{ListenerName(member)});");
+                        }
                     }
+                    p.CloseScope();
+                    p.PrintEndLine();
                 }
-                p.CloseScope();
-                p.PrintEndLine();
 
-                p.PrintLine("if (this.Context.Target is global::ZBase.Foundation.Mvvm.Input.ICommandListener cl)");
-                p.OpenScope();
+                if (BindingCommandRefs.Length > 0)
                 {
-                    foreach (var member in BindingCommandRefs)
+                    p.PrintLine("if (this.Context.Target is global::ZBase.Foundation.Mvvm.Input.ICommandListener cl)");
+                    p.OpenScope();
                     {
-                        p.PrintLine($"cl.TryGetCommand(this.{BindingCommandName(member)}.TargetCommandName, out this.{RelayCommandName(member)});");
+                        foreach (var member in BindingCommandRefs)
+                        {
+                            p.PrintLine($"cl.TryGetCommand(this.{BindingCommandName(member)}.TargetCommandName, out this.{RelayCommandName(member)});");
+                        }
                     }
+                    p.CloseScope();
                 }
-                p.CloseScope();
             }
             p.CloseScope();
 
@@ -525,14 +502,27 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteStopListeningMethod(ref Printer p)
         {
-            var keyword = IsBaseBinder ? "override " : Symbol.IsSealed ? "" : "virtual ";
+            var keyword = HasBaseBinder ? "override " : Symbol.IsSealed ? "" : "virtual ";
+
+            if (BindingPropertyRefs.Length < 1 && BindingCommandRefs.Length < 1)
+            {
+                if (HasBaseBinder == false)
+                {
+                    p.PrintLine("/// <inheritdoc/>");
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine($"public {keyword}void StopListening() {{ }}");
+                    p.PrintEndLine();
+                }
+
+                return;
+            }
 
             p.PrintLine("/// <inheritdoc/>");
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
             p.PrintLine($"public {keyword}void StopListening()");
             p.OpenScope();
             {
-                if (IsBaseBinder)
+                if (HasBaseBinder)
                 {
                     p.PrintLine("base.StopListening();");
                     p.PrintEndLine();
@@ -544,16 +534,22 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 p.PrintLine($"this._isListening = false;");
                 p.PrintEndLine();
 
-                foreach (var member in BindingPropertyRefs)
+                if (BindingPropertyRefs.Length > 0)
                 {
-                    p.PrintLine($"this.{ListenerName(member)}.Detach();");
+                    foreach (var member in BindingPropertyRefs)
+                    {
+                        p.PrintLine($"this.{ListenerName(member)}.Detach();");
+                    }
+
+                    p.PrintEndLine();
                 }
 
-                p.PrintEndLine();
-
-                foreach (var member in BindingCommandRefs)
+                if (BindingCommandRefs.Length > 0)
                 {
-                    p.PrintLine($"this.{RelayCommandName(member)} = null;");
+                    foreach (var member in BindingCommandRefs)
+                    {
+                        p.PrintLine($"this.{RelayCommandName(member)} = null;");
+                    }
                 }
             }
             p.CloseScope();
@@ -563,14 +559,32 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteSetTargetPropertyNameMethod(ref Printer p)
         {
-            var keyword = IsBaseBinder ? "override " : Symbol.IsSealed ? "" : "virtual ";
+            var keyword = HasBaseBinder ? "override " : Symbol.IsSealed ? "" : "virtual ";
+
+            if (BindingPropertyRefs.Length < 1)
+            {
+                if (HasBaseBinder == false)
+                {
+                    p.PrintLine("/// <inheritdoc/>");
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine($"public {keyword}bool SetTargetPropertyName(string bindingPropertyName, string targetPropertyName)");
+                    p.OpenScope();
+                    {
+                        p.PrintLine("return false;");
+                    }
+                    p.CloseScope();
+                    p.PrintEndLine();
+                }
+
+                return;
+            }
 
             p.PrintLine("/// <inheritdoc/>");
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
             p.PrintLine($"public {keyword}bool SetTargetPropertyName(string bindingPropertyName, string targetPropertyName)");
             p.OpenScope();
             {
-                if (IsBaseBinder)
+                if (HasBaseBinder)
                 {
                     p.PrintLine("if (base.SetTargetPropertyName(bindingPropertyName, targetPropertyName)) return true;");
                     p.PrintEndLine();
@@ -603,14 +617,32 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteSetAdapterMethod(ref Printer p)
         {
-            var keyword = IsBaseBinder ? "override " : Symbol.IsSealed ? "" : "virtual ";
+            var keyword = HasBaseBinder ? "override " : Symbol.IsSealed ? "" : "virtual ";
+
+            if (BindingPropertyRefs.Length < 1)
+            {
+                if (HasBaseBinder == false)
+                {
+                    p.PrintLine("/// <inheritdoc/>");
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine($"public {keyword}bool SetAdapter(string bindingPropertyName, {IADAPTER} adapter)");
+                    p.OpenScope();
+                    {
+                        p.PrintLine("return false;");
+                    }
+                    p.CloseScope();
+                    p.PrintEndLine();
+                }
+
+                return;
+            }
 
             p.PrintLine("/// <inheritdoc/>");
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
             p.PrintLine($"public {keyword}bool SetAdapter(string bindingPropertyName, {IADAPTER} adapter)");
             p.OpenScope();
             {
-                if (IsBaseBinder)
+                if (HasBaseBinder)
                 {
                     p.PrintLine("if (base.SetAdapter(bindingPropertyName, adapter)) return true;");
                     p.PrintEndLine();
@@ -643,6 +675,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteUnionOverloads(ref Printer p)
         {
+            if (BindingPropertyRefs.Length < 1)
+            {
+                return;
+            }
+
             foreach (var member in BindingPropertyRefs)
             {
                 if (member.IsParameterTypeNotUnion == false)
@@ -688,6 +725,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WritePartialBindingCommandMethods(ref Printer p)
         {
+            if (BindingCommandRefs.Length < 1)
+            {
+                return;
+            }
+
             foreach (var member in BindingCommandRefs)
             {
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
@@ -722,6 +764,8 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 
                 p.PrintEndLine();
             }
+
+            p.PrintEndLine();
         }
 
         private static string ConstName(BindingPropertyRef member)

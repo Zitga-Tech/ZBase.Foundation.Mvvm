@@ -24,8 +24,9 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             await UniTask.WaitUntil(() => Context.IsCreated);
 
-            StartListening();
             OnAwake();
+
+            StartListening();
         }
 #else
         protected void Awake()

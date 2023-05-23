@@ -60,17 +60,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var declaration = new BinderDeclaration(candidate, semanticModel, context.CancellationToken);
 
-                string source;
-
-                if (declaration.BindingPropertyRefs.Length > 0)
-                {
-                    source = declaration.WriteCode();
-                }
-                else
-                {
-                    source = declaration.WriteCodeWithoutMember();
-                }
-
+                var source = declaration.WriteCode();
                 var sourceFilePath = syntaxTree.GetGeneratedSourceFilePath(compilation.Assembly.Name, GENERATOR_NAME);
                 var outputSource = TypeCreationHelpers.GenerateSourceTextForRootNodes(
                       sourceFilePath
