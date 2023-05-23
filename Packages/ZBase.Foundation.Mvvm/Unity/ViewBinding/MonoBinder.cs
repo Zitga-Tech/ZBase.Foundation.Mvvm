@@ -12,6 +12,9 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     public abstract partial class MonoBinder : MonoBehaviour, IBinder
     {
+        [SerializeField]
+        private OnAwakeActionType _onAwakeAction;
+
         [SerializeField, HideInInspector]
         internal Component _context;
 
@@ -26,7 +29,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             OnAwake();
 
-            StartListening();
+            if (_onAwakeAction == OnAwakeActionType.ListenToContext)
+            {
+                StartListening();
+            }
         }
 #else
         protected void Awake()
@@ -68,6 +74,12 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
 
             return context;
+        }
+
+        private enum OnAwakeActionType
+        {
+            ListenToContext = 0,
+            NotListenToContext = 1,
         }
     }
 }
