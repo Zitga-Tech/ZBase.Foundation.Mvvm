@@ -10,17 +10,8 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         private readonly object _syncRoot = new();
         private readonly HashSet<T> _collection;
 
-        private event CollectionChangedEventHandler<T> _onChangingByAdd;
-        private event CollectionChangedEventHandler<T> _onChangingByAddRange;
-        private event CollectionChangedEventHandler<T> _onChangingByRemove;
-        private event CollectionChangedEventHandler<T> _onChangingByRemoveRange;
-        private event CollectionChangedEventHandler<T> _onChangingByClear;
-
-        private event CollectionChangedEventHandler<T> _onChangedByAdd;
-        private event CollectionChangedEventHandler<T> _onChangedByAddRange;
-        private event CollectionChangedEventHandler<T> _onChangedByRemove;
-        private event CollectionChangedEventHandler<T> _onChangedByRemoveRange;
-        private event CollectionChangedEventHandler<T> _onChangedByClear;
+        private event CollectionChangedEventHandler<T> _onChanging;
+        private event CollectionChangedEventHandler<T> _onChanged;
 
         public ObservableHashSet()
         {
@@ -75,13 +66,13 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (_syncRoot)
             {
-                _onChangingByAdd?.Invoke(CollectionChangeEventArgs<T>.Add(this, item));
+                _onChanging?.Invoke(CollectionChangeEventArgs<T>.Add(this, item));
 
                 var result = _collection.Add(item);
 
                 if (result)
                 {
-                    _onChangedByAdd?.Invoke(CollectionChangeEventArgs<T>.Add(this, item));
+                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.Add(this, item));
                 }
 
                 return result;
@@ -97,7 +88,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
             lock (SyncRoot)
             {
-                _onChangingByAddRange?.Invoke(CollectionChangeEventArgs<T>.AddRange(this, items));
+                _onChanging?.Invoke(CollectionChangeEventArgs<T>.AddRange(this, items));
 
                 if (items.TryGetCountFast(out var itemsCount) == false)
                 {
@@ -115,7 +106,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChangedByAddRange?.Invoke(CollectionChangeEventArgs<T>.AddRange(this, items));
+                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.AddRange(this, items));
                 }
             }
         }
@@ -124,7 +115,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (_syncRoot)
             {
-                _onChangingByClear?.Invoke(CollectionChangeEventArgs<T>.Clear(this));
+                _onChanging?.Invoke(CollectionChangeEventArgs<T>.Clear(this));
 
                 var collection = _collection;
                 var count = collection.Count;
@@ -132,7 +123,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChangedByClear?.Invoke(CollectionChangeEventArgs<T>.Clear(this));
+                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.Clear(this));
                 }
             }
         }
@@ -141,13 +132,13 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (_syncRoot)
             {
-                _onChangingByRemove?.Invoke(CollectionChangeEventArgs<T>.Remove(this, item));
+                _onChanging?.Invoke(CollectionChangeEventArgs<T>.Remove(this, item));
 
                 var result = _collection.Remove(item);
 
                 if (result)
                 {
-                    _onChangedByRemove?.Invoke(CollectionChangeEventArgs<T>.Remove(this, item));
+                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.Remove(this, item));
                 }
 
                 return result;
@@ -158,7 +149,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (SyncRoot)
             {
-                _onChangingByRemoveRange?.Invoke(CollectionChangeEventArgs<T>.RemoveRange(this, items));
+                _onChanging?.Invoke(CollectionChangeEventArgs<T>.RemoveRange(this, items));
 
                 if (items.TryGetCountFast(out var itemsCount) == false)
                 {
@@ -175,7 +166,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChangedByRemoveRange?.Invoke(CollectionChangeEventArgs<T>.RemoveRange(this, items));
+                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.RemoveRange(this, items));
                 }
             }
         }
@@ -264,96 +255,22 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         IEnumerator IEnumerable.GetEnumerator()
             => GetEnumerator();
 
-        public bool CollectionChanging<TInstance>(CollectionAction action, CollectionChangeEventListener<T, TInstance> listener)
+        public void CollectionChanged<TInstance>(CollectionChangeEventListener<T, TInstance> listener)
             where TInstance : class
         {
             if (listener == null) throw new ArgumentNullException(nameof(listener));
 
-            switch (action)
-            {
-                case CollectionAction.Add:
-                {
-                    this._onChangingByAdd += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangingByAdd -= listener.OnEvent;
-                    return true;
-                }
-
-                case CollectionAction.AddRange:
-                {
-                    this._onChangingByAddRange += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangingByAddRange -= listener.OnEvent;
-                    return true;
-                }
-
-                case CollectionAction.Remove:
-                {
-                    this._onChangingByRemove += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangingByRemove -= listener.OnEvent;
-                    return true;
-                }
-
-                case CollectionAction.RemoveRange:
-                {
-                    this._onChangingByRemoveRange += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangingByRemoveRange -= listener.OnEvent;
-                    return true;
-                }
-
-                case CollectionAction.Clear:
-                {
-                    this._onChangingByClear += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangingByClear -= listener.OnEvent;
-                    return true;
-                }
-            }
-
-            return false;
+            this._onChanging += listener.OnEvent;
+            listener.OnDetachAction = (listener) => this._onChanging -= listener.OnEvent;
         }
 
-        public bool CollectionChanged<TInstance>(CollectionAction action, CollectionChangeEventListener<T, TInstance> listener)
+        public void CollectionChanging<TInstance>(CollectionChangeEventListener<T, TInstance> listener)
             where TInstance : class
         {
             if (listener == null) throw new ArgumentNullException(nameof(listener));
 
-            switch (action)
-            {
-                case CollectionAction.Add:
-                {
-                    this._onChangedByAdd += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangedByAdd -= listener.OnEvent;
-                    return true;
-                }
-
-                case CollectionAction.AddRange:
-                {
-                    this._onChangedByAddRange += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangedByAddRange -= listener.OnEvent;
-                    return true;
-                }
-
-                case CollectionAction.Remove:
-                {
-                    this._onChangedByRemove += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangedByRemove -= listener.OnEvent;
-                    return true;
-                }
-
-                case CollectionAction.RemoveRange:
-                {
-                    this._onChangedByRemoveRange += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangedByRemoveRange -= listener.OnEvent;
-                    return true;
-                }
-
-                case CollectionAction.Clear:
-                {
-                    this._onChangedByClear += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangedByClear -= listener.OnEvent;
-                    return true;
-                }
-            }
-
-            return false;
+            this._onChanged += listener.OnEvent;
+            listener.OnDetachAction = (listener) => this._onChanged -= listener.OnEvent;
         }
 
         void ISet<T>.ExceptWith(IEnumerable<T> other) => throw new NotSupportedException();

@@ -6,10 +6,10 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
     {
         object SyncRoot { get; }
 
-        bool CollectionChanging<TInstance>(CollectionAction action, CollectionChangeEventListener<T, TInstance> listener)
+        void CollectionChanging<TInstance>(CollectionChangeEventListener<T, TInstance> listener)
             where TInstance : class;
 
-        bool CollectionChanged<TInstance>(CollectionAction action, CollectionChangeEventListener<T, TInstance> listener)
+        void CollectionChanged<TInstance>(CollectionChangeEventListener<T, TInstance> listener)
             where TInstance : class;
     }
 }

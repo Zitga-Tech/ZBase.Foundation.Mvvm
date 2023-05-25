@@ -13,15 +13,8 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         private readonly object _syncRoot = new();
         private readonly Dictionary<TKey, TValue> _collection;
 
-        private event CollectionChangedEventHandler<KeyValuePair<TKey, TValue>> _onChangingByAdd;
-        private event CollectionChangedEventHandler<KeyValuePair<TKey, TValue>> _onChangingByReplace;
-        private event CollectionChangedEventHandler<KeyValuePair<TKey, TValue>> _onChangingByRemove;
-        private event CollectionChangedEventHandler<KeyValuePair<TKey, TValue>> _onChangingByClear;
-
-        private event CollectionChangedEventHandler<KeyValuePair<TKey, TValue>> _onChangedByAdd;
-        private event CollectionChangedEventHandler<KeyValuePair<TKey, TValue>> _onChangedByReplace;
-        private event CollectionChangedEventHandler<KeyValuePair<TKey, TValue>> _onChangedByRemove;
-        private event CollectionChangedEventHandler<KeyValuePair<TKey, TValue>> _onChangedByClear;
+        private event CollectionChangedEventHandler<KeyValuePair<TKey, TValue>> _onChanging;
+        private event CollectionChangedEventHandler<KeyValuePair<TKey, TValue>> _onChanged;
 
         public ObservableDictionary()
         {
@@ -100,11 +93,11 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
                 lock (_syncRoot)
                 {
                     var kv = new KeyValuePair<TKey, TValue>(key, value);
-                    _onChangingByReplace?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Replace(this, kv));
+                    _onChanging?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Replace(this, kv));
 
                     _collection[key] = value;
 
-                    _onChangedByReplace?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Replace(this, kv));
+                    _onChanged?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Replace(this, kv));
                 }
             }
         }
@@ -157,7 +150,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
             lock (SyncRoot)
             {
                 var kv = new KeyValuePair<TKey, TValue>(key, value);
-                _onChangingByAdd?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Add(this, kv));
+                _onChanging?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Add(this, kv));
 
                 var collection = _collection;
                 var count = collection.Count;
@@ -166,7 +159,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChangedByAdd?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Add(this, kv));
+                    _onChanged?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Add(this, kv));
                 }
             }
         }
@@ -175,7 +168,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (SyncRoot)
             {
-                _onChangingByAdd?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Add(this, kv));
+                _onChanging?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Add(this, kv));
 
                 var collection = _collection;
                 var count = collection.Count;
@@ -184,7 +177,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChangedByAdd?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Add(this, kv));
+                    _onChanged?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Add(this, kv));
                 }
             }
         }
@@ -201,13 +194,13 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
                 }
 
                 var kv = new KeyValuePair<TKey, TValue>(key, value);
-                _onChangingByRemove?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Remove(this, kv));
+                _onChanging?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Remove(this, kv));
 
                 var result = _collection.Remove(key);
 
                 if (result)
                 {
-                    _onChangedByRemove?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Remove(this, kv));
+                    _onChanged?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Remove(this, kv));
                 }
 
                 return result;
@@ -231,13 +224,13 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
                 }
 
                 var kv = new KeyValuePair<TKey, TValue>(item.Key, value);
-                _onChangingByRemove?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Remove(this, kv));
+                _onChanging?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Remove(this, kv));
 
                 var result = collection.Remove(item.Key);
 
                 if (result)
                 {
-                    _onChangedByRemove?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Remove(this, kv));
+                    _onChanged?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Remove(this, kv));
                 }
 
                 return result;
@@ -248,7 +241,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (_syncRoot)
             {
-                _onChangingByClear?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Clear(this));
+                _onChanging?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Clear(this));
 
                 var collection = _collection;
                 var count = collection.Count;
@@ -256,7 +249,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChangedByClear?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Clear(this));
+                    _onChanged?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Clear(this));
                 }
             }
         }
@@ -309,82 +302,22 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         IEnumerator IEnumerable.GetEnumerator()
             => GetEnumerator();
 
-        public bool CollectionChanged<TInstance>(CollectionAction action, CollectionChangeEventListener<KeyValuePair<TKey, TValue>, TInstance> listener)
+        public void CollectionChanged<TInstance>(CollectionChangeEventListener<KeyValuePair<TKey, TValue>, TInstance> listener)
             where TInstance : class
         {
             if (listener == null) throw new ArgumentNullException(nameof(listener));
 
-            switch (action)
-            {
-                case CollectionAction.Add:
-                {
-                    this._onChangingByAdd += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangingByAdd -= listener.OnEvent;
-                    return true;
-                }
-
-                case CollectionAction.Replace:
-                {
-                    this._onChangingByReplace += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangingByReplace -= listener.OnEvent;
-                    return true;
-                }
-                
-                case CollectionAction.Remove:
-                {
-                    this._onChangingByRemove += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangingByRemove -= listener.OnEvent;
-                    return true;
-                }
-
-                case CollectionAction.Clear:
-                {
-                    this._onChangingByClear += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangingByClear -= listener.OnEvent;
-                    return true;
-                }
-            }
-
-            return false;
+            this._onChanging += listener.OnEvent;
+            listener.OnDetachAction = (listener) => this._onChanging -= listener.OnEvent;
         }
 
-        public bool CollectionChanging<TInstance>(CollectionAction action, CollectionChangeEventListener<KeyValuePair<TKey, TValue>, TInstance> listener)
+        public void CollectionChanging<TInstance>(CollectionChangeEventListener<KeyValuePair<TKey, TValue>, TInstance> listener)
             where TInstance : class
         {
             if (listener == null) throw new ArgumentNullException(nameof(listener));
 
-            switch (action)
-            {
-                case CollectionAction.Add:
-                {
-                    this._onChangedByAdd += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangedByAdd -= listener.OnEvent;
-                    return true;
-                }
-
-                case CollectionAction.Replace:
-                {
-                    this._onChangedByReplace += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangedByReplace -= listener.OnEvent;
-                    return true;
-                }
-                
-                case CollectionAction.Remove:
-                {
-                    this._onChangedByRemove += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangedByRemove -= listener.OnEvent;
-                    return true;
-                }
-
-                case CollectionAction.Clear:
-                {
-                    this._onChangedByClear += listener.OnEvent;
-                    listener.OnDetachAction = (listener) => this._onChangedByClear -= listener.OnEvent;
-                    return true;
-                }
-            }
-
-            return false;
+            this._onChanged += listener.OnEvent;
+            listener.OnDetachAction = (listener) => this._onChanged -= listener.OnEvent;
         }
     }
 }
