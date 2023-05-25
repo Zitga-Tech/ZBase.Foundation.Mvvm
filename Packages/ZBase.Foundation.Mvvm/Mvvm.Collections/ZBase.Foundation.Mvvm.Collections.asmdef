@@ -1,0 +1,16 @@
+{
+    "name": "ZBase.Foundation.Mvvm.Collections",
+    "rootNamespace": "ZBase.Foundation.Mvvm.Collections",
+    "references": [
+        "ZBase.Foundation.Mvvm"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
