@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace ZBase.Foundation.Mvvm.Collections
+namespace ZBase.Foundation.Mvvm.ObservableCollections
 {
     public readonly struct Enumerable<T>
     {
@@ -20,5 +20,13 @@ namespace ZBase.Foundation.Mvvm.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Enumerable<T>(in RefTypeHandle value)
             => new(value.Value.Target as IEnumerable<T>);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator RefTypeHandleUnion(in Enumerable<T> value)
+            => new((RefTypeHandle)value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Enumerable<T>(in RefTypeHandleUnion value)
+            => value.Value;
     }
 }

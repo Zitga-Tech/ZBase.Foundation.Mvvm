@@ -1,6 +1,6 @@
 {
-    "name": "ZBase.Foundation.Mvvm.Collections",
-    "rootNamespace": "ZBase.Foundation.Mvvm.Collections",
+    "name": "ZBase.Foundation.Mvvm.ObservableCollections",
+    "rootNamespace": "ZBase.Foundation.Mvvm.ObservableCollections",
     "references": [
         "ZBase.Foundation.Mvvm"
     ],

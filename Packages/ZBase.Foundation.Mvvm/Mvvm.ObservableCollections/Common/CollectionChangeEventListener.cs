@@ -6,7 +6,7 @@ using System;
 using System.Runtime.CompilerServices;
 using ZBase.Foundation.Mvvm.Event;
 
-namespace ZBase.Foundation.Mvvm.Collections
+namespace ZBase.Foundation.Mvvm.ObservableCollections
 {
     /// <summary>
     /// Implements a weak event listener that allows the owner to be garbage
@@ -14,7 +14,7 @@ namespace ZBase.Foundation.Mvvm.Collections
     /// </summary>
     /// <typeparam name="TInstance">Type of instance listening for the event.</typeparam>
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-    public sealed class CollectionChangedEventListener<T, TInstance> : IEventListener
+    public sealed class CollectionChangeEventListener<T, TInstance> : IEventListener
         where TInstance : class
     {
         /// <summary>
@@ -23,10 +23,10 @@ namespace ZBase.Foundation.Mvvm.Collections
         private readonly WeakReference<TInstance> _weakInstance;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CollectionChangedEventListener{T, TInstance}"/> class.
+        /// Initializes a new instance of the <see cref="CollectionChangeEventListener{T, TInstance}"/> class.
         /// </summary>
         /// <param name="instance">Instance subscribing to the event.</param>
-        public CollectionChangedEventListener(TInstance instance)
+        public CollectionChangeEventListener(TInstance instance)
         {
             if (instance == null)
             {
@@ -43,18 +43,18 @@ namespace ZBase.Foundation.Mvvm.Collections
         /// <summary>
         /// Gets or sets the method to call when the event fires.
         /// </summary>
-        public Action<TInstance, CollectionChangedEventArgs<T>> OnEventAction { get; set; }
+        public Action<TInstance, CollectionChangeEventArgs<T>> OnEventAction { get; set; }
 
         /// <summary>
         /// Gets or sets the method to call when detaching from the event.
         /// </summary>
-        public Action<CollectionChangedEventListener<T, TInstance>> OnDetachAction { get; set; }
+        public Action<CollectionChangeEventListener<T, TInstance>> OnDetachAction { get; set; }
 
         /// <summary>
         /// Handler for the subscribed event calls OnEventAction to handle it.
         /// </summary>
         /// <param name="eventArgs">Event arguments.</param>
-        public void OnEvent(in CollectionChangedEventArgs<T> eventArgs)
+        public void OnEvent(in CollectionChangeEventArgs<T> eventArgs)
         {
             if (_weakInstance.TryGetTarget(out var target))
             {
