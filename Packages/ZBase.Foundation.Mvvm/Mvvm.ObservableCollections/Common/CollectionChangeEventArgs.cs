@@ -30,6 +30,134 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
             Sender = sender;
         }
 
+        public bool TryGetFromAdd(out T item)
+        {
+            if (this.Action == CollectionAction.Add)
+            {
+                item = this.Item;
+                return true;
+            }
+
+            item = default;
+            return false;
+        }
+
+        public bool TryGetFromInsert(out int index, out T item)
+        {
+            if (this.Action == CollectionAction.Insert)
+            {
+                index = this.Index;
+                item = this.Item;
+                return true;
+            }
+
+            index = default;
+            item = default;
+            return false;
+        }
+
+        public bool TryGetFromInsertRange(out int index, out IEnumerable<T> items)
+        {
+            if (this.Action == CollectionAction.InsertRange)
+            {
+                index = this.Index;
+                items = this.Items;
+                return true;
+            }
+
+            index = default;
+            items = default;
+            return false;
+        }
+
+        public bool TryGetFromAddRange(out IEnumerable<T> items)
+        {
+            if (this.Action == CollectionAction.AddRange)
+            {
+                items = this.Items;
+                return true;
+            }
+
+            items = default;
+            return false;
+        }
+
+        public bool TryGetFromRemove(out T item)
+        {
+            if (this.Action == CollectionAction.Remove)
+            {
+                item = this.Item;
+                return true;
+            }
+
+            item = default;
+            return false;
+        }
+
+        public bool TryGetFromRemoveRange(out IEnumerable<T> items)
+        {
+            if (this.Action == CollectionAction.RemoveRange)
+            {
+                items = this.Items;
+                return true;
+            }
+
+            items = default;
+            return false;
+        }
+
+        public bool TryGetFromRemoveAt(out int index)
+        {
+            if (this.Action == CollectionAction.RemoveAt)
+            {
+                index = this.Index;
+                return true;
+            }
+
+            index = default;
+            return false;
+        }
+
+        public bool TryGetFromRemoveRangeAt(out int index, out int count)
+        {
+            if (this.Action == CollectionAction.RemoveRangeAt)
+            {
+                index = this.Index;
+                count = this.Count;
+                return true;
+            }
+
+            index = default;
+            count = default;
+            return false;
+        }
+
+        public bool TryGetFromReplace(out T item)
+        {
+            if (this.Action == CollectionAction.Replace)
+            {
+                item = this.Item;
+                return true;
+            }
+
+            item = default;
+            return false;
+        }
+
+        public bool TryGetFromReplaceAt(out int index, out T item)
+        {
+            if (this.Action == CollectionAction.ReplaceAt)
+            {
+                index = this.Index;
+                item = this.Item;
+                return true;
+            }
+
+            index = default;
+            item = default;
+            return false;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static CollectionChangeEventArgs<T> Add(IObservableCollection<T> sender, T item)
         {
