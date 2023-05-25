@@ -72,6 +72,10 @@ namespace ZBase.Foundation.Mvvm.Unions
             => GetConverter<T>().ToUnionT(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T GetValue<T>(in Union union)
+            => GetConverter<T>().GetValue(union);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryGetValue<T>(in Union union, out T result)
             => GetConverter<T>().TryGetValue(union, out result);
 

@@ -216,6 +216,24 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
                     p.PrintEndLine();
 
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine($"public {typeName} GetValue(in {UNION_TYPE} union)");
+                    p.OpenScope();
+                    {
+                        p.PrintLine($"if (union.TypeId != {unionName}.TypeId)");
+                        p.OpenScope();
+                        {
+                            p.PrintLine("ThrowIfInvalidCast();");
+                        }
+                        p.CloseScope();
+                        p.PrintEndLine();
+
+                        p.PrintLine($"var temp = new {structName}(union);");
+                        p.PrintLine("return temp.Value;");
+                    }
+                    p.CloseScope();
+                    p.PrintEndLine();
+
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine($"public bool TryGetValue(in {UNION_TYPE} union, out {typeName} result)");
                     p.OpenScope();
                     {
@@ -224,7 +242,7 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
                         {
                             p.PrintLine($"var temp = new {structName}(union);");
                             p.PrintLine("result = temp.Value;");
-                            p.PrintLine("return result != null;");
+                            p.PrintLine("return true;");
                         }
                         p.CloseScope();
                         p.PrintEndLine();
@@ -244,7 +262,7 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
                         {
                             p.PrintLine($"var temp = new {structName}(union);");
                             p.PrintLine("result = temp.Value;");
-                            p.PrintLine("return result != null;");
+                            p.PrintLine("return true;");
                         }
                         p.CloseScope();
                         p.PrintEndLine();
@@ -268,6 +286,16 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
                         p.PrintEndLine();
 
                         p.PrintLine("return union.TypeId.AsType()?.ToString() ?? string.Empty;");
+                    }
+                    p.CloseScope();
+                    p.PrintEndLine();
+
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine("[global::System.Diagnostics.CodeAnalysis.DoesNotReturn]");
+                    p.PrintLine("private static void ThrowIfInvalidCast()");
+                    p.OpenScope();
+                    {
+                        p.PrintLine($"throw new global::System.InvalidCastException($\"Cannot get value of {{typeof({typeName})}} from the input union.\");");
                     }
                     p.CloseScope();
                     p.PrintEndLine();

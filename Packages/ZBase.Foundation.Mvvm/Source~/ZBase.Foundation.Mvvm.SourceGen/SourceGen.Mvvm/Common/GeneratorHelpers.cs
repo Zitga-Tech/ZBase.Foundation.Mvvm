@@ -97,25 +97,28 @@ namespace ZBase.Foundation.Mvvm
             , CancellationToken token
         )
         {
-            foreach (var baseType in classSyntax.BaseList.Types)
+            if (classSyntax.BaseList != null)
             {
-                var typeInfo = semanticModel.GetTypeInfo(baseType.Type, token);
-
-                if (typeInfo.Type.ToFullName() == interfaceName)
+                foreach (var baseType in classSyntax.BaseList.Types)
                 {
-                    return true;
-                }
+                    var typeInfo = semanticModel.GetTypeInfo(baseType.Type, token);
 
-                if (typeInfo.Type.ImplementsInterface(interfaceName))
-                {
-                    return true;
-                }
+                    if (typeInfo.Type.ToFullName() == interfaceName)
+                    {
+                        return true;
+                    }
 
-                if (IsMatch(typeInfo.Type.Interfaces, interfaceName)
-                    || IsMatch(typeInfo.Type.AllInterfaces, interfaceName)
-                )
-                {
-                    return true;
+                    if (typeInfo.Type.ImplementsInterface(interfaceName))
+                    {
+                        return true;
+                    }
+
+                    if (IsMatch(typeInfo.Type.Interfaces, interfaceName)
+                        || IsMatch(typeInfo.Type.AllInterfaces, interfaceName)
+                    )
+                    {
+                        return true;
+                    }
                 }
             }
 

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 using ZBase.Foundation.Mvvm.ComponentModel;
 using ZBase.Foundation.Mvvm.Input;
+using ZBase.Foundation.Mvvm.Unions;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace MvvmTest
@@ -61,6 +63,9 @@ namespace MvvmTest
         [NotifyCanExecuteChangedFor(nameof(UpdateIntCommand))]
         private int _intField;
 
+        [ObservableProperty]
+        private Color _colorValue;
+
         public TypeCode Type { get; }
 
         public IObservableObject Target => this;
@@ -101,4 +106,6 @@ namespace MvvmTest
         [BindingCommand]
         partial void OnBoolValueChanged(ref bool value);
     }
+
+    public readonly partial struct Vector3Union : IUnion<Vector3> { }
 }

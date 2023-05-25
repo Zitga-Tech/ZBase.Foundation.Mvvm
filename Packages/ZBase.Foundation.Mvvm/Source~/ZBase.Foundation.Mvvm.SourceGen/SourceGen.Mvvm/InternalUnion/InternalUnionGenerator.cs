@@ -11,6 +11,9 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
     [Generator]
     public class InternalUnionGenerator : IIncrementalGenerator
     {
+        private const string COMPONENT_MODEL_NS = "global::ZBase.Foundation.Mvvm.ComponentModel";
+        private const string VIEW_BINDING_NS = "ZBase.Foundation.Mvvm.ViewBinding";
+        private const string INPUT_NS = "ZBase.Foundation.Mvvm.Input";
         private const string IOBSERVABLE_OBJECT = "global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject";
         private const string IUNION_T = "global::ZBase.Foundation.Mvvm.Unions.IUnion<";
 
@@ -51,7 +54,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
             
             if (syntaxNode is FieldDeclarationSyntax field)
             {
-                if (field.HasAttributeCandidate("ZBase.Foundation.Mvvm.ComponentModel", "ObservableProperty"))
+                if (field.HasAttributeCandidate(COMPONENT_MODEL_NS, "ObservableProperty"))
                 {
                     return true;
                 }
@@ -59,9 +62,9 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
 
             if (syntaxNode is MethodDeclarationSyntax method && method.ParameterList.Parameters.Count == 1)
             {
-                if (method.HasAttributeCandidate("ZBase.Foundation.Mvvm.Input", "RelayCommand")
-                    || method.HasAttributeCandidate("ZBase.Foundation.Mvvm.ViewBinding", "BindingProperty")
-                    || method.HasAttributeCandidate("ZBase.Foundation.Mvvm.ViewBinding", "BindingCommand")
+                if (method.HasAttributeCandidate(INPUT_NS, "RelayCommand")
+                    || method.HasAttributeCandidate(VIEW_BINDING_NS, "BindingProperty")
+                    || method.HasAttributeCandidate(VIEW_BINDING_NS, "BindingCommand")
                 )
                 {
                     return true;
@@ -70,6 +73,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
 
             if (syntaxNode is PropertyDeclarationSyntax property
                 && property.Parent is ClassDeclarationSyntax classSyntax
+                && classSyntax.BaseList != null
                 && classSyntax.BaseList.Types.Count > 0
             )
             {
@@ -116,10 +120,28 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
                 && classSyntax.DoesSemanticMatch(IOBSERVABLE_OBJECT, context.SemanticModel, token)
             )
             {
-                return new TypeRef {
-                    Syntax = property.Type,
-                    Symbol = semanticModel.GetTypeInfo(property.Type).Type,
-                };
+                var attributes = classSyntax.Members
+                    .OfType<FieldDeclarationSyntax>()
+                    .Select(static x => x.GetAttribute(COMPONENT_MODEL_NS, "NotifyPropertyChangedFor"))
+                    .Where(x => {
+                         return x is { } attrib
+                            && attrib.ArgumentList is { } argumentList
+                            && argumentList.Arguments.Count == 1
+                            && argumentList.Arguments[0].Expression is InvocationExpressionSyntax invocation
+                            && invocation.ArgumentList is { } invocationArgumentList
+                            && invocationArgumentList.Arguments.Count == 1
+                            && invocationArgumentList.Arguments[0].Expression is IdentifierNameSyntax identifierName
+                            && identifierName.Identifier.ValueText == property.Identifier.ValueText
+                            ;
+                     });
+
+                if (attributes.Any())
+                {
+                    return new TypeRef {
+                        Syntax = property.Type,
+                        Symbol = semanticModel.GetTypeInfo(property.Type).Type,
+                    };
+                }
             }
 
             return null;

@@ -6,6 +6,8 @@
 
         Union<T> ToUnionT(T value);
 
+        T GetValue(in Union union);
+
         bool TryGetValue(in Union union, out T result);
 
         bool TrySetValueTo(in Union union, ref T dest);

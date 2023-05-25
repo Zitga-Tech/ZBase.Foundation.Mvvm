@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace ZBase.Foundation.Mvvm.Unions.Converters
 {
@@ -15,6 +17,19 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<T> ToUnionT(T value)
             => new Union(UnionTypeId.Of<T>(), (object)value);
+
+        public T GetValue(in Union union)
+        {
+            if (union.TryGetValue(out object candidate)
+                && candidate is T value
+            )
+            {
+                return value;
+            }
+
+            ThrowIfInvalidCast();
+            return default;
+        }
 
         public bool TryGetValue(in Union union, out T result)
         {
@@ -47,6 +62,12 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
             }
 
             return union.TypeId.AsType()?.ToString() ?? string.Empty;
+        }
+
+        [DoesNotReturn]
+        private static void ThrowIfInvalidCast()
+        {
+            throw new InvalidCastException($"Cannot get value of {typeof(T)} from the input union.");
         }
     }
 }

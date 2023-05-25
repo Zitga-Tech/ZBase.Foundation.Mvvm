@@ -6,7 +6,7 @@ namespace ZBase.Foundation.Mvvm.Unions
     {
         private IUnionConverter<T> _converter;
 
-        private IUnionConverter<T> Converter
+        public IUnionConverter<T> Converter
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => _converter ??= UnionConverter.GetConverter<T>();
@@ -23,6 +23,10 @@ namespace ZBase.Foundation.Mvvm.Unions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<T> ToUnionT(T value)
             => this.Converter.ToUnionT(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T GetValue(in Union union)
+            => this.Converter.GetValue(union);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out T result)

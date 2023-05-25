@@ -214,6 +214,24 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
                     p.PrintEndLine();
 
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
+                    p.PrintLine($"public {typeName} GetValue(in {UNION_TYPE} union)");
+                    p.OpenScope();
+                    {
+                        p.PrintLine($"if (union.TypeId != {unionName}.TypeId)");
+                        p.OpenScope();
+                        {
+                            p.PrintLine("ThrowIfInvalidCast();");
+                        }
+                        p.CloseScope();
+                        p.PrintEndLine();
+
+                        p.PrintLine($"var temp = new {internalUnionName}(union);");
+                        p.PrintLine("return temp.Value;");
+                    }
+                    p.CloseScope();
+                    p.PrintEndLine();
+
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
                     p.PrintLine($"public bool TryGetValue(in {UNION_TYPE} union, out {typeName} result)");
                     p.OpenScope();
                     {
@@ -266,6 +284,16 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
                         p.PrintEndLine();
 
                         p.PrintLine("return union.TypeId.AsType()?.ToString() ?? string.Empty;");
+                    }
+                    p.CloseScope();
+                    p.PrintEndLine();
+
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
+                    p.PrintLine("[global::System.Diagnostics.CodeAnalysis.DoesNotReturn]");
+                    p.PrintLine("private static void ThrowIfInvalidCast()");
+                    p.OpenScope();
+                    {
+                        p.PrintLine($"throw new global::System.InvalidCastException($\"Cannot get value of {{typeof({typeName})}} from the input union.\");");
                     }
                     p.CloseScope();
                     p.PrintEndLine();

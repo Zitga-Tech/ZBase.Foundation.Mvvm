@@ -471,16 +471,56 @@ namespace ZBase.Foundation.SourceGen
         /// <returns></returns>
         public static bool HasAttributeCandidate(this SyntaxNode syntaxNode, string attributeNameSpace, string attributeName)
         {
-            if (syntaxNode.TryGetFirstChildByKind(SyntaxKind.AttributeList, out var fieldAttributeList)
-                && fieldAttributeList.TryGetFirstChildByKind(SyntaxKind.Attribute, out var fieldAttribute))
+            if (syntaxNode.TryGetFirstChildByKind(SyntaxKind.AttributeList, out var attribList)
+                && attribList.TryGetFirstChildByKind(SyntaxKind.Attribute, out var attrib)
+                && attrib is AttributeSyntax attribute
+                && attribute.Name.IsTypeNameCandidate(attributeNameSpace, attributeName)
+            )
             {
-                var attribute = fieldAttribute as AttributeSyntax;
-                if (attribute.Name.IsTypeNameCandidate(attributeNameSpace, attributeName))
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool HasAttribute(
+              this MemberDeclarationSyntax syntaxNode
+            , string attributeNameSpace
+            , string attributeName
+        )
+        {
+            foreach (var attribList in syntaxNode.AttributeLists)
+            {
+                foreach (var attrib in attribList.Attributes)
                 {
-                    return true;
+                    if (attrib.Name.IsTypeNameCandidate(attributeNameSpace, attributeName))
+                    {
+                        return true;
+                    }
                 }
             }
+
             return false;
+        }
+
+        public static AttributeSyntax GetAttribute(
+              this MemberDeclarationSyntax syntaxNode
+            , string attributeNameSpace
+            , string attributeName
+        )
+        {
+            foreach (var attribList in syntaxNode.AttributeLists)
+            {
+                foreach (var attrib in attribList.Attributes)
+                {
+                    if (attrib.Name.IsTypeNameCandidate(attributeNameSpace, attributeName))
+                    {
+                        return attrib;
+                    }
+                }
+            }
+
+            return null;
         }
 
         /// <summary>

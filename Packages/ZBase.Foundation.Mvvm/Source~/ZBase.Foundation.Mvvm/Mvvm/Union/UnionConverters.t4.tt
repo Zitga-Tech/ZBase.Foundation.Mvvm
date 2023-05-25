@@ -42,6 +42,8 @@
 ///                                                 ///
 ///*************************************************///
 
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace ZBase.Foundation.Mvvm.Unions.Converters
@@ -63,6 +65,16 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<<#= type #>> ToUnionT(<#= type #> value) => new Union(value);
         
+        public <#= type #> GetValue(in Union union)
+        {
+            if (union.TryGetValue(out <#= type #> result) == false)
+            {
+                ThrowIfInvalidCast();
+            }
+
+            return result;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out <#= type #> result) => union.TryGetValue(out result);
         
@@ -71,6 +83,12 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.<#= typeName #>.ToString();
+
+        [DoesNotReturn]
+        private static void ThrowIfInvalidCast()
+        {
+            throw new InvalidCastException($"Cannot get value of {typeof(<#= type #>)} from the input union.");
+        }
     }
 <# } #>
 

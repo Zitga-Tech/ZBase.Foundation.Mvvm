@@ -5,6 +5,7 @@ namespace ZBase.Foundation.Mvvm.Unions
     public readonly struct Union<T> : IUnion<T>
     {
         public static readonly UnionTypeId TypeId = UnionTypeId.Of<T>();
+        private static readonly CachedUnionConverter<T> s_cachedUnionConverter = new();
 
         public readonly Union Value;
 
@@ -12,6 +13,24 @@ namespace ZBase.Foundation.Mvvm.Unions
         {
             Value = new Union(union.Base, union.TypeKind, TypeId);
         }
+
+        public IUnionConverter<T> Converter
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => s_cachedUnionConverter.Converter;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T GetValue() => Converter.GetValue(Value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryGetValue(out T result) => Converter.TryGetValue(Value, out result);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TrySetValueTo(ref T dest) => Converter.TrySetValueTo(Value, ref dest);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString() => Converter.ToString(Value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Union<T>(in Union union)
@@ -23,6 +42,14 @@ namespace ZBase.Foundation.Mvvm.Unions
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IUnionConverter<T> GetConverter()
-            => UnionConverter.GetConverter<T>();
+            => s_cachedUnionConverter.Converter;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Union ToUnion(T value)
+            => GetConverter().ToUnion(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Union<T> ToUnionT(T value)
+            => GetConverter().ToUnionT(value);
     }
 }

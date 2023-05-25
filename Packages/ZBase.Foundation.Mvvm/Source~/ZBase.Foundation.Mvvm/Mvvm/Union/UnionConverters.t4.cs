@@ -12,6 +12,8 @@
 ///                                                 ///
 ///*************************************************///
 
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace ZBase.Foundation.Mvvm.Unions.Converters
@@ -29,6 +31,16 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<bool> ToUnionT(bool value) => new Union(value);
         
+        public bool GetValue(in Union union)
+        {
+            if (union.TryGetValue(out bool result) == false)
+            {
+                ThrowIfInvalidCast();
+            }
+
+            return result;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out bool result) => union.TryGetValue(out result);
         
@@ -37,6 +49,12 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.Bool.ToString();
+
+        [DoesNotReturn]
+        private static void ThrowIfInvalidCast()
+        {
+            throw new InvalidCastException($"Cannot get value of {typeof(bool)} from the input union.");
+        }
     }
 
     internal sealed class UnionConverterByte : IUnionConverter<byte>
@@ -51,6 +69,16 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<byte> ToUnionT(byte value) => new Union(value);
         
+        public byte GetValue(in Union union)
+        {
+            if (union.TryGetValue(out byte result) == false)
+            {
+                ThrowIfInvalidCast();
+            }
+
+            return result;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out byte result) => union.TryGetValue(out result);
         
@@ -59,6 +87,12 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.Byte.ToString();
+
+        [DoesNotReturn]
+        private static void ThrowIfInvalidCast()
+        {
+            throw new InvalidCastException($"Cannot get value of {typeof(byte)} from the input union.");
+        }
     }
 
     internal sealed class UnionConverterSByte : IUnionConverter<sbyte>
@@ -73,6 +107,16 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<sbyte> ToUnionT(sbyte value) => new Union(value);
         
+        public sbyte GetValue(in Union union)
+        {
+            if (union.TryGetValue(out sbyte result) == false)
+            {
+                ThrowIfInvalidCast();
+            }
+
+            return result;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out sbyte result) => union.TryGetValue(out result);
         
@@ -81,6 +125,12 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.SByte.ToString();
+
+        [DoesNotReturn]
+        private static void ThrowIfInvalidCast()
+        {
+            throw new InvalidCastException($"Cannot get value of {typeof(sbyte)} from the input union.");
+        }
     }
 
     internal sealed class UnionConverterChar : IUnionConverter<char>
@@ -95,6 +145,16 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<char> ToUnionT(char value) => new Union(value);
         
+        public char GetValue(in Union union)
+        {
+            if (union.TryGetValue(out char result) == false)
+            {
+                ThrowIfInvalidCast();
+            }
+
+            return result;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out char result) => union.TryGetValue(out result);
         
@@ -103,6 +163,12 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.Char.ToString();
+
+        [DoesNotReturn]
+        private static void ThrowIfInvalidCast()
+        {
+            throw new InvalidCastException($"Cannot get value of {typeof(char)} from the input union.");
+        }
     }
 
     internal sealed class UnionConverterDouble : IUnionConverter<double>
@@ -117,6 +183,16 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<double> ToUnionT(double value) => new Union(value);
         
+        public double GetValue(in Union union)
+        {
+            if (union.TryGetValue(out double result) == false)
+            {
+                ThrowIfInvalidCast();
+            }
+
+            return result;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out double result) => union.TryGetValue(out result);
         
@@ -125,6 +201,12 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.Double.ToString();
+
+        [DoesNotReturn]
+        private static void ThrowIfInvalidCast()
+        {
+            throw new InvalidCastException($"Cannot get value of {typeof(double)} from the input union.");
+        }
     }
 
     internal sealed class UnionConverterFloat : IUnionConverter<float>
@@ -139,6 +221,16 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<float> ToUnionT(float value) => new Union(value);
         
+        public float GetValue(in Union union)
+        {
+            if (union.TryGetValue(out float result) == false)
+            {
+                ThrowIfInvalidCast();
+            }
+
+            return result;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out float result) => union.TryGetValue(out result);
         
@@ -147,6 +239,12 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.Float.ToString();
+
+        [DoesNotReturn]
+        private static void ThrowIfInvalidCast()
+        {
+            throw new InvalidCastException($"Cannot get value of {typeof(float)} from the input union.");
+        }
     }
 
     internal sealed class UnionConverterInt : IUnionConverter<int>
@@ -161,6 +259,16 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<int> ToUnionT(int value) => new Union(value);
         
+        public int GetValue(in Union union)
+        {
+            if (union.TryGetValue(out int result) == false)
+            {
+                ThrowIfInvalidCast();
+            }
+
+            return result;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out int result) => union.TryGetValue(out result);
         
@@ -169,6 +277,12 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.Int.ToString();
+
+        [DoesNotReturn]
+        private static void ThrowIfInvalidCast()
+        {
+            throw new InvalidCastException($"Cannot get value of {typeof(int)} from the input union.");
+        }
     }
 
     internal sealed class UnionConverterUInt : IUnionConverter<uint>
@@ -183,6 +297,16 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<uint> ToUnionT(uint value) => new Union(value);
         
+        public uint GetValue(in Union union)
+        {
+            if (union.TryGetValue(out uint result) == false)
+            {
+                ThrowIfInvalidCast();
+            }
+
+            return result;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out uint result) => union.TryGetValue(out result);
         
@@ -191,6 +315,12 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.UInt.ToString();
+
+        [DoesNotReturn]
+        private static void ThrowIfInvalidCast()
+        {
+            throw new InvalidCastException($"Cannot get value of {typeof(uint)} from the input union.");
+        }
     }
 
     internal sealed class UnionConverterLong : IUnionConverter<long>
@@ -205,6 +335,16 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<long> ToUnionT(long value) => new Union(value);
         
+        public long GetValue(in Union union)
+        {
+            if (union.TryGetValue(out long result) == false)
+            {
+                ThrowIfInvalidCast();
+            }
+
+            return result;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out long result) => union.TryGetValue(out result);
         
@@ -213,6 +353,12 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.Long.ToString();
+
+        [DoesNotReturn]
+        private static void ThrowIfInvalidCast()
+        {
+            throw new InvalidCastException($"Cannot get value of {typeof(long)} from the input union.");
+        }
     }
 
     internal sealed class UnionConverterULong : IUnionConverter<ulong>
@@ -227,6 +373,16 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<ulong> ToUnionT(ulong value) => new Union(value);
         
+        public ulong GetValue(in Union union)
+        {
+            if (union.TryGetValue(out ulong result) == false)
+            {
+                ThrowIfInvalidCast();
+            }
+
+            return result;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out ulong result) => union.TryGetValue(out result);
         
@@ -235,6 +391,12 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.ULong.ToString();
+
+        [DoesNotReturn]
+        private static void ThrowIfInvalidCast()
+        {
+            throw new InvalidCastException($"Cannot get value of {typeof(ulong)} from the input union.");
+        }
     }
 
     internal sealed class UnionConverterShort : IUnionConverter<short>
@@ -249,6 +411,16 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<short> ToUnionT(short value) => new Union(value);
         
+        public short GetValue(in Union union)
+        {
+            if (union.TryGetValue(out short result) == false)
+            {
+                ThrowIfInvalidCast();
+            }
+
+            return result;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out short result) => union.TryGetValue(out result);
         
@@ -257,6 +429,12 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.Short.ToString();
+
+        [DoesNotReturn]
+        private static void ThrowIfInvalidCast()
+        {
+            throw new InvalidCastException($"Cannot get value of {typeof(short)} from the input union.");
+        }
     }
 
     internal sealed class UnionConverterUShort : IUnionConverter<ushort>
@@ -271,6 +449,16 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union<ushort> ToUnionT(ushort value) => new Union(value);
         
+        public ushort GetValue(in Union union)
+        {
+            if (union.TryGetValue(out ushort result) == false)
+            {
+                ThrowIfInvalidCast();
+            }
+
+            return result;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(in Union union, out ushort result) => union.TryGetValue(out result);
         
@@ -279,6 +467,12 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.UShort.ToString();
+
+        [DoesNotReturn]
+        private static void ThrowIfInvalidCast()
+        {
+            throw new InvalidCastException($"Cannot get value of {typeof(ushort)} from the input union.");
+        }
     }
 
 
