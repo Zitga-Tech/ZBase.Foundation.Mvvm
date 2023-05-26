@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
     /// <summary>
     /// Read-only temporary collection.
     /// </summary>
-    internal struct TempCollection<T> : IReadOnlyCollection<T>, IDisposable
+    public struct TempCollection<T> : IReadOnlyCollection<T>, IDisposable
     {
         private static readonly bool s_canClearOnReturnToPool = RuntimeHelpers.IsReferenceOrContainsReferences<T>();
         private static readonly T[] s_emptyArray = Array.Empty<T>();
@@ -71,17 +71,23 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
             }
         }
 
-        public readonly ReadOnlySpan<T> Span
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly ReadOnlyMemory<T> AsMemory()
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _array.AsSpan(0, _count);
+            return _array.AsMemory(0, _count);
         }
 
-        public readonly int Count => _count;
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly Enumerable AsEnumerable()
-            => new(_array, _count);
+        public readonly ReadOnlySpan<T> AsSpan()
+        {
+            return _array.AsSpan(0, _count);
+        }
+
+        public readonly int Count
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _count;
+        }
 
         public void Dispose()
         {
@@ -114,6 +120,10 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         readonly IEnumerator IEnumerable.GetEnumerator()
             => GetEnumerator();
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly Enumerable AsEnumerable()
+            => new(_array, _count);
+
         public class Enumerable : ICollection<T>
         {
             private readonly T[] _array;
@@ -133,7 +143,11 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
                 }
             }
 
-            public int Count => _count;
+            public int Count
+            {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                get => _count;
+            }
 
             public bool IsReadOnly => true;
 

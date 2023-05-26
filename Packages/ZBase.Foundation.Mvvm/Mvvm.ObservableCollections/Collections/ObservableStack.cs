@@ -181,7 +181,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         IEnumerator IEnumerable.GetEnumerator()
             => GetEnumerator();
 
-        public void CollectionChanged<TInstance>(CollectionEventListener<T, TInstance> listener)
+        public void AttachCollectionChangingListener<TInstance>(CollectionEventListener<T, TInstance> listener)
             where TInstance : class
         {
             if (listener == null) throw new ArgumentNullException(nameof(listener));
@@ -190,13 +190,26 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
             listener.OnDetachAction = (listener) => this._onChanging -= listener.OnEvent;
         }
 
-        public void CollectionChanging<TInstance>(CollectionEventListener<T, TInstance> listener)
+        public void AttachCollectionChangedListener<TInstance>(CollectionEventListener<T, TInstance> listener)
             where TInstance : class
         {
             if (listener == null) throw new ArgumentNullException(nameof(listener));
 
             this._onChanged += listener.OnEvent;
             listener.OnDetachAction = (listener) => this._onChanged -= listener.OnEvent;
+        }
+
+        public void NotifyCollectionChanged<TInstance>(CollectionEventListener<T, TInstance> listener)
+            where TInstance : class
+        {
+            if (listener == null) throw new ArgumentNullException(nameof(listener));
+
+            listener.OnEvent(CollectionEventArgs<T>.Undefined(this));
+        }
+
+        public void NotifyCollectionChanged()
+        {
+            this._onChanged?.Invoke(CollectionEventArgs<T>.Undefined(this));
         }
     }
 }

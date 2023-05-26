@@ -302,7 +302,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         IEnumerator IEnumerable.GetEnumerator()
             => GetEnumerator();
 
-        public void CollectionChanged<TInstance>(CollectionEventListener<KeyValuePair<TKey, TValue>, TInstance> listener)
+        public void AttachCollectionChangingListener<TInstance>(CollectionEventListener<KeyValuePair<TKey, TValue>, TInstance> listener)
             where TInstance : class
         {
             if (listener == null) throw new ArgumentNullException(nameof(listener));
@@ -311,13 +311,26 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
             listener.OnDetachAction = (listener) => this._onChanging -= listener.OnEvent;
         }
 
-        public void CollectionChanging<TInstance>(CollectionEventListener<KeyValuePair<TKey, TValue>, TInstance> listener)
+        public void AttachCollectionChangedListener<TInstance>(CollectionEventListener<KeyValuePair<TKey, TValue>, TInstance> listener)
             where TInstance : class
         {
             if (listener == null) throw new ArgumentNullException(nameof(listener));
 
             this._onChanged += listener.OnEvent;
             listener.OnDetachAction = (listener) => this._onChanged -= listener.OnEvent;
+        }
+
+        public void NotifyCollectionChanged<TInstance>(CollectionEventListener<KeyValuePair<TKey, TValue>, TInstance> listener)
+            where TInstance : class
+        {
+            if (listener == null) throw new ArgumentNullException(nameof(listener));
+
+            listener.OnEvent(CollectionEventArgs<KeyValuePair<TKey, TValue>>.Undefined(this));
+        }
+
+        public void NotifyCollectionChanged()
+        {
+            this._onChanged?.Invoke(CollectionEventArgs<KeyValuePair<TKey, TValue>>.Undefined(this));
         }
     }
 }

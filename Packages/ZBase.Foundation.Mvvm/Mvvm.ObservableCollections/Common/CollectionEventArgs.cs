@@ -159,6 +159,12 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static CollectionEventArgs<T> Undefined(IObservableCollection<T> sender)
+        {
+            return new CollectionEventArgs<T>(sender, CollectionAction.Undefined);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static CollectionEventArgs<T> Add(IObservableCollection<T> sender, T item)
         {
             return new CollectionEventArgs<T>(sender, CollectionAction.Add, item);
