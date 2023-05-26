@@ -50,6 +50,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
             
             StartListening();
+            RefreshContext();
         }
 #else
         protected void Awake()
@@ -85,6 +86,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
 
             StartListening();
+            RefreshContext();
         }
 #endif
 
