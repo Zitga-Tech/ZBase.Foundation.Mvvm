@@ -72,6 +72,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
                 WritePartialBindingCommandMethods(ref p);
                 WriteSetTargetCommandNameMethod(ref p);
+                WriteRefreshContextMethod(ref p);
             }
             p.CloseScope();
 
@@ -477,7 +478,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     {
                         foreach (var member in BindingPropertyRefs)
                         {
-                            p.PrintLine($"if (inpc.PropertyChanged(this.{BindingPropertyName(member)}.TargetPropertyName, this.{ListenerName(member)}) == false)");
+                            p.PrintLine($"if (inpc.AttachPropertyChangedListener(this.{BindingPropertyName(member)}.TargetPropertyName, this.{ListenerName(member)}) == false)");
                             p.OpenScope();
                             {
                                 p.PrintLine($"OnBindPropertyFailed(this.{BindingPropertyName(member)});");
@@ -849,6 +850,59 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 p.PrintEndLine();
 
                 p.PrintLine("return false;");
+            }
+            p.CloseScope();
+
+            p.PrintEndLine();
+        }
+
+        private void WriteRefreshContextMethod(ref Printer p)
+        {
+            var keyword = HasBaseBinder ? "override " : Symbol.IsSealed ? "" : "virtual ";
+
+            if (BindingPropertyRefs.Length < 1 && BindingCommandRefs.Length < 1)
+            {
+                if (HasBaseBinder == false)
+                {
+                    p.PrintLine("/// <inheritdoc/>");
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine($"public {keyword}void RefreshContext() {{ }}");
+                    p.PrintEndLine();
+                }
+
+                return;
+            }
+
+            p.PrintLine("/// <inheritdoc/>");
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public {keyword}void RefreshContext()");
+            p.OpenScope();
+            {
+                if (HasBaseBinder)
+                {
+                    p.PrintLine("base.RefreshContext();");
+                    p.PrintEndLine();
+                }
+
+                if (BindingPropertyRefs.Length > 0)
+                {
+                    p.PrintLine("if (this.Context.Target is global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged inpc)");
+                    p.OpenScope();
+                    {
+                        foreach (var member in BindingPropertyRefs)
+                        {
+                            p.PrintLine($"if (inpc.NotifyPropertyChanged(this.{BindingPropertyName(member)}.TargetPropertyName, this.{ListenerName(member)}) == false)");
+                            p.OpenScope();
+                            {
+                                p.PrintLine($"OnBindPropertyFailed(this.{BindingPropertyName(member)});");
+                            }
+                            p.CloseScope();
+                            p.PrintEndLine();
+                        }
+                    }
+                    p.CloseScope();
+                    p.PrintEndLine();
+                }
             }
             p.CloseScope();
 

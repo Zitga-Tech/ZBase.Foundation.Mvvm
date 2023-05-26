@@ -60,6 +60,7 @@ namespace MvvmTest
     public partial class Model : IObservableObject, IBindingContext
     {
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsCreated))]
         [NotifyCanExecuteChangedFor(nameof(UpdateIntCommand))]
         private int _intField;
 

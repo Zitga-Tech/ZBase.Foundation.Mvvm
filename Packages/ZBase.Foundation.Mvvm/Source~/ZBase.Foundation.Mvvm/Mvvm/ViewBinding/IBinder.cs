@@ -48,5 +48,10 @@
         /// Stop listening to events from the <see cref="Context"/>.
         /// </summary>
         public void StopListening() { }
+
+        /// <summary>
+        /// Force the <see cref="Context"/> to send property changed notifications to the attached listeners.
+        /// </summary>
+        public void RefreshContext() { }
     }
 }
