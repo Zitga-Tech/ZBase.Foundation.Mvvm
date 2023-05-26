@@ -93,11 +93,11 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
                 lock (_syncRoot)
                 {
                     var kv = new KeyValuePair<TKey, TValue>(key, value);
-                    _onChanging?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Replace(this, kv));
+                    _onChanging?.Invoke(CollectionEventArgs<KeyValuePair<TKey, TValue>>.Replace(this, kv));
 
                     _collection[key] = value;
 
-                    _onChanged?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Replace(this, kv));
+                    _onChanged?.Invoke(CollectionEventArgs<KeyValuePair<TKey, TValue>>.Replace(this, kv));
                 }
             }
         }
@@ -150,7 +150,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
             lock (SyncRoot)
             {
                 var kv = new KeyValuePair<TKey, TValue>(key, value);
-                _onChanging?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Add(this, kv));
+                _onChanging?.Invoke(CollectionEventArgs<KeyValuePair<TKey, TValue>>.Add(this, kv));
 
                 var collection = _collection;
                 var count = collection.Count;
@@ -159,7 +159,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Add(this, kv));
+                    _onChanged?.Invoke(CollectionEventArgs<KeyValuePair<TKey, TValue>>.Add(this, kv));
                 }
             }
         }
@@ -168,7 +168,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (SyncRoot)
             {
-                _onChanging?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Add(this, kv));
+                _onChanging?.Invoke(CollectionEventArgs<KeyValuePair<TKey, TValue>>.Add(this, kv));
 
                 var collection = _collection;
                 var count = collection.Count;
@@ -177,7 +177,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Add(this, kv));
+                    _onChanged?.Invoke(CollectionEventArgs<KeyValuePair<TKey, TValue>>.Add(this, kv));
                 }
             }
         }
@@ -194,13 +194,13 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
                 }
 
                 var kv = new KeyValuePair<TKey, TValue>(key, value);
-                _onChanging?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Remove(this, kv));
+                _onChanging?.Invoke(CollectionEventArgs<KeyValuePair<TKey, TValue>>.Remove(this, kv));
 
                 var result = _collection.Remove(key);
 
                 if (result)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Remove(this, kv));
+                    _onChanged?.Invoke(CollectionEventArgs<KeyValuePair<TKey, TValue>>.Remove(this, kv));
                 }
 
                 return result;
@@ -224,13 +224,13 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
                 }
 
                 var kv = new KeyValuePair<TKey, TValue>(item.Key, value);
-                _onChanging?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Remove(this, kv));
+                _onChanging?.Invoke(CollectionEventArgs<KeyValuePair<TKey, TValue>>.Remove(this, kv));
 
                 var result = collection.Remove(item.Key);
 
                 if (result)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Remove(this, kv));
+                    _onChanged?.Invoke(CollectionEventArgs<KeyValuePair<TKey, TValue>>.Remove(this, kv));
                 }
 
                 return result;
@@ -241,7 +241,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (_syncRoot)
             {
-                _onChanging?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Clear(this));
+                _onChanging?.Invoke(CollectionEventArgs<KeyValuePair<TKey, TValue>>.Clear(this));
 
                 var collection = _collection;
                 var count = collection.Count;
@@ -249,7 +249,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<KeyValuePair<TKey, TValue>>.Clear(this));
+                    _onChanged?.Invoke(CollectionEventArgs<KeyValuePair<TKey, TValue>>.Clear(this));
                 }
             }
         }
@@ -302,7 +302,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         IEnumerator IEnumerable.GetEnumerator()
             => GetEnumerator();
 
-        public void CollectionChanged<TInstance>(CollectionChangeEventListener<KeyValuePair<TKey, TValue>, TInstance> listener)
+        public void CollectionChanged<TInstance>(CollectionEventListener<KeyValuePair<TKey, TValue>, TInstance> listener)
             where TInstance : class
         {
             if (listener == null) throw new ArgumentNullException(nameof(listener));
@@ -311,7 +311,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
             listener.OnDetachAction = (listener) => this._onChanging -= listener.OnEvent;
         }
 
-        public void CollectionChanging<TInstance>(CollectionChangeEventListener<KeyValuePair<TKey, TValue>, TInstance> listener)
+        public void CollectionChanging<TInstance>(CollectionEventListener<KeyValuePair<TKey, TValue>, TInstance> listener)
             where TInstance : class
         {
             if (listener == null) throw new ArgumentNullException(nameof(listener));

@@ -48,11 +48,11 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
             {
                 lock (_syncRoot)
                 {
-                    _onChanging?.Invoke(CollectionChangeEventArgs<T>.ReplaceAt(this, index, value));
+                    _onChanging?.Invoke(CollectionEventArgs<T>.ReplaceAt(this, index, value));
 
                     _collection[index] = value;
 
-                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.ReplaceAt(this, index, value));
+                    _onChanged?.Invoke(CollectionEventArgs<T>.ReplaceAt(this, index, value));
                 }
             }
         }
@@ -74,7 +74,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (_syncRoot)
             {
-                _onChanging?.Invoke(CollectionChangeEventArgs<T>.Add(this, item));
+                _onChanging?.Invoke(CollectionEventArgs<T>.Add(this, item));
 
                 var collection = _collection;
                 var count = collection.Count;
@@ -82,7 +82,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.Add(this, item));
+                    _onChanged?.Invoke(CollectionEventArgs<T>.Add(this, item));
                 }
             }
         }
@@ -91,7 +91,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (_syncRoot)
             {
-                _onChanging?.Invoke(CollectionChangeEventArgs<T>.AddRange(this, items));
+                _onChanging?.Invoke(CollectionEventArgs<T>.AddRange(this, items));
 
                 if (items.TryGetCountFast(out var itemsCount) == false)
                 {
@@ -106,7 +106,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.AddRange(this, items));
+                    _onChanged?.Invoke(CollectionEventArgs<T>.AddRange(this, items));
                 }
             }
         }
@@ -115,7 +115,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (_syncRoot)
             {
-                _onChanging?.Invoke(CollectionChangeEventArgs<T>.Clear(this));
+                _onChanging?.Invoke(CollectionEventArgs<T>.Clear(this));
 
                 var collection = _collection;
                 var count = collection.Count;
@@ -123,7 +123,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.Clear(this));
+                    _onChanged?.Invoke(CollectionEventArgs<T>.Clear(this));
                 }
             }
         }
@@ -132,7 +132,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (_syncRoot)
             {
-                _onChanging?.Invoke(CollectionChangeEventArgs<T>.Insert(this, index, item));
+                _onChanging?.Invoke(CollectionEventArgs<T>.Insert(this, index, item));
 
                 var collection = _collection;
                 var count = collection.Count;
@@ -140,7 +140,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.Insert(this, index, item));
+                    _onChanged?.Invoke(CollectionEventArgs<T>.Insert(this, index, item));
                 }
             }
         }
@@ -149,7 +149,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (_syncRoot)
             {
-                _onChanging?.Invoke(CollectionChangeEventArgs<T>.InsertRange(this, index, items));
+                _onChanging?.Invoke(CollectionEventArgs<T>.InsertRange(this, index, items));
 
                 if (items.TryGetCountFast(out var itemsCount) == false)
                 {
@@ -164,7 +164,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.InsertRange(this, index, items));
+                    _onChanged?.Invoke(CollectionEventArgs<T>.InsertRange(this, index, items));
                 }
             }
         }
@@ -181,7 +181,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
                     return false;
                 }
 
-                _onChanging?.Invoke(CollectionChangeEventArgs<T>.RemoveAt(this, index));
+                _onChanging?.Invoke(CollectionEventArgs<T>.RemoveAt(this, index));
 
                 var count = collection.Count;
                 collection.RemoveAt(index);
@@ -190,7 +190,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (result)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.RemoveAt(this, index));
+                    _onChanged?.Invoke(CollectionEventArgs<T>.RemoveAt(this, index));
                 }
 
                 return result;
@@ -201,7 +201,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (_syncRoot)
             {
-                _onChanging?.Invoke(CollectionChangeEventArgs<T>.RemoveAt(this, index));
+                _onChanging?.Invoke(CollectionEventArgs<T>.RemoveAt(this, index));
 
                 var collection = _collection;
                 var count = collection.Count;
@@ -209,7 +209,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.RemoveAt(this, index));
+                    _onChanged?.Invoke(CollectionEventArgs<T>.RemoveAt(this, index));
                 }
             }
         }
@@ -218,7 +218,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (SyncRoot)
             {
-                _onChanging?.Invoke(CollectionChangeEventArgs<T>.RemoveRangeAt(this, index, count));
+                _onChanging?.Invoke(CollectionEventArgs<T>.RemoveRangeAt(this, index, count));
 
                 var collection = _collection;
                 var collectionCount = collection.Count;
@@ -226,7 +226,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.RemoveRangeAt(this, index, count));
+                    _onChanged?.Invoke(CollectionEventArgs<T>.RemoveRangeAt(this, index, count));
                 }
             }
         }
@@ -271,7 +271,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         IEnumerator IEnumerable.GetEnumerator()
             => GetEnumerator();
 
-        public void CollectionChanged<TInstance>(CollectionChangeEventListener<T, TInstance> listener)
+        public void CollectionChanged<TInstance>(CollectionEventListener<T, TInstance> listener)
             where TInstance : class
         {
             if (listener == null) throw new ArgumentNullException(nameof(listener));
@@ -280,7 +280,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
             listener.OnDetachAction = (listener) => this._onChanging -= listener.OnEvent;
         }
 
-        public void CollectionChanging<TInstance>(CollectionChangeEventListener<T, TInstance> listener)
+        public void CollectionChanging<TInstance>(CollectionEventListener<T, TInstance> listener)
             where TInstance : class
         {
             if (listener == null) throw new ArgumentNullException(nameof(listener));

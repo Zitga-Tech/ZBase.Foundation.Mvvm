@@ -66,13 +66,13 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (_syncRoot)
             {
-                _onChanging?.Invoke(CollectionChangeEventArgs<T>.Add(this, item));
+                _onChanging?.Invoke(CollectionEventArgs<T>.Add(this, item));
 
                 var result = _collection.Add(item);
 
                 if (result)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.Add(this, item));
+                    _onChanged?.Invoke(CollectionEventArgs<T>.Add(this, item));
                 }
 
                 return result;
@@ -88,7 +88,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
             lock (SyncRoot)
             {
-                _onChanging?.Invoke(CollectionChangeEventArgs<T>.AddRange(this, items));
+                _onChanging?.Invoke(CollectionEventArgs<T>.AddRange(this, items));
 
                 if (items.TryGetCountFast(out var itemsCount) == false)
                 {
@@ -106,7 +106,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.AddRange(this, items));
+                    _onChanged?.Invoke(CollectionEventArgs<T>.AddRange(this, items));
                 }
             }
         }
@@ -115,7 +115,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (_syncRoot)
             {
-                _onChanging?.Invoke(CollectionChangeEventArgs<T>.Clear(this));
+                _onChanging?.Invoke(CollectionEventArgs<T>.Clear(this));
 
                 var collection = _collection;
                 var count = collection.Count;
@@ -123,7 +123,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.Clear(this));
+                    _onChanged?.Invoke(CollectionEventArgs<T>.Clear(this));
                 }
             }
         }
@@ -132,13 +132,13 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (_syncRoot)
             {
-                _onChanging?.Invoke(CollectionChangeEventArgs<T>.Remove(this, item));
+                _onChanging?.Invoke(CollectionEventArgs<T>.Remove(this, item));
 
                 var result = _collection.Remove(item);
 
                 if (result)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.Remove(this, item));
+                    _onChanged?.Invoke(CollectionEventArgs<T>.Remove(this, item));
                 }
 
                 return result;
@@ -149,7 +149,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         {
             lock (SyncRoot)
             {
-                _onChanging?.Invoke(CollectionChangeEventArgs<T>.RemoveRange(this, items));
+                _onChanging?.Invoke(CollectionEventArgs<T>.RemoveRange(this, items));
 
                 if (items.TryGetCountFast(out var itemsCount) == false)
                 {
@@ -166,7 +166,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
 
                 if (count != collection.Count)
                 {
-                    _onChanged?.Invoke(CollectionChangeEventArgs<T>.RemoveRange(this, items));
+                    _onChanged?.Invoke(CollectionEventArgs<T>.RemoveRange(this, items));
                 }
             }
         }
@@ -255,7 +255,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
         IEnumerator IEnumerable.GetEnumerator()
             => GetEnumerator();
 
-        public void CollectionChanged<TInstance>(CollectionChangeEventListener<T, TInstance> listener)
+        public void CollectionChanged<TInstance>(CollectionEventListener<T, TInstance> listener)
             where TInstance : class
         {
             if (listener == null) throw new ArgumentNullException(nameof(listener));
@@ -264,7 +264,7 @@ namespace ZBase.Foundation.Mvvm.ObservableCollections
             listener.OnDetachAction = (listener) => this._onChanging -= listener.OnEvent;
         }
 
-        public void CollectionChanging<TInstance>(CollectionChangeEventListener<T, TInstance> listener)
+        public void CollectionChanging<TInstance>(CollectionEventListener<T, TInstance> listener)
             where TInstance : class
         {
             if (listener == null) throw new ArgumentNullException(nameof(listener));
