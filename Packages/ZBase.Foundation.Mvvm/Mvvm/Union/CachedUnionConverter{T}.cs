@@ -14,7 +14,14 @@ namespace ZBase.Foundation.Mvvm.Unions
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union)
-            => this.Converter.ToString(union);
+        {
+            if (((Union<T>)union).TryGetValue(out var value))
+            {
+                return value.ToString();
+            }
+
+            return this.Converter.ToString(union);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Union ToUnion(T value)
