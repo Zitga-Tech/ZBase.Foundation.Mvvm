@@ -117,14 +117,12 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
                     p.CloseScope();
                     p.PrintEndLine();
 
-                    p.Print("#if !UNITY_5_3_OR_NEWER").PrintEndLine();
                     p.PrintLine("/// <summary>");
                     p.PrintLine("/// Register all unions inside this class");
                     p.PrintLine("/// to <see cref=\"ZBase.Foundation.Mvvm.Unions.UnionConverter\"/>");
                     p.PrintLine("/// </summary>");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine("[Preserve]");
-                    p.PrintLine("public static void Register() { }");
-                    p.Print("#endif").PrintEndLine();
+                    p.PrintLine("public static void Register() => Init();");
                     p.PrintEndLine();
 
                     p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
