@@ -4,6 +4,7 @@ using UnityEngine;
 using ZBase.Foundation.Mvvm.ComponentModel;
 using ZBase.Foundation.Mvvm.Input;
 using ZBase.Foundation.Mvvm.Unions;
+using ZBase.Foundation.Mvvm.Unions.__Internal.MvvmTest;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace MvvmTest
@@ -17,6 +18,8 @@ namespace MvvmTest
 
         public static void Main()
         {
+            InternalUnions.Register();
+
             var model = new Model();
             var binder = new Binder();
 
@@ -66,6 +69,9 @@ namespace MvvmTest
 
         [ObservableProperty]
         private Color _colorValue;
+
+        [ObservableProperty]
+        private TimeSpan _time;
 
         public TypeCode Type { get; }
 

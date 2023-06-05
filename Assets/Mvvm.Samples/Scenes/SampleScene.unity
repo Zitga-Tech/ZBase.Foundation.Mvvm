@@ -676,6 +676,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 171388d3ee8bde446bbb138e15adc5c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _contextSetting: 0
   _context: {fileID: 606846926}
   _targets: []
   _bindingFieldForSetText:
@@ -1109,6 +1110,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7546bc2d858da04c962ecd917706169, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _contextSetting: 0
   _context: {fileID: 606846926}
   _targets: []
   _bindingFieldForSetValue:
@@ -1821,6 +1823,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 171388d3ee8bde446bbb138e15adc5c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _contextSetting: 0
   _context: {fileID: 606846926}
   _targets: []
   _bindingFieldForSetText:
@@ -1839,7 +1842,7 @@ MonoBehaviour:
     <TargetPropertyName>k__BackingField: 
   _converterForSetText:
     <Adapter>k__BackingField:
-      rid: -2
+      rid: 1437863364711940096
   _converterForSetColor:
     <Adapter>k__BackingField:
       rid: -2
@@ -1863,6 +1866,8 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 1437863364711940096
+      type: {class: System_TimeSpanToStringAdapter, ns: ZBase.Foundation.Mvvm.ViewBinding.__InternalStringAdapters.Assembly__CSharp, asm: Assembly-CSharp}
 --- !u!1 &1843079247
 GameObject:
   m_ObjectHideFlags: 0
@@ -1916,6 +1921,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94602cb7b2721714180cb3a1ceed8e1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _contextSetting: 0
   _context: {fileID: 606846926}
   _targets: []
   _bindingFieldForSetIsOn:
@@ -2278,6 +2284,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8d7001fa6800a44eb44a8354a697042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _contextSetting: 0
   _context: {fileID: 606846926}
   _targets: []
   _bindingCommandForOnClick:

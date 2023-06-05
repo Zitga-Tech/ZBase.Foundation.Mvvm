@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ComponentModel;
 using ZBase.Foundation.Mvvm.Input;
@@ -8,7 +9,7 @@ namespace Mvvm.Samples
     {
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(TimeText))]
-        private float _time;
+        private TimeSpan _time;
 
         [ObservableProperty]
         private Color _textColor;
@@ -22,7 +23,7 @@ namespace Mvvm.Samples
 
         private void Start()
         {
-            this.Time = 0f;
+            this.Time = TimeSpan.Zero;
             this.TextColor = Color.white;
             this.Progress = 0f;
         }
@@ -36,7 +37,7 @@ namespace Mvvm.Samples
 
             if (_updating)
             {
-                Time = UnityEngine.Time.time;
+                Time = TimeSpan.FromSeconds(UnityEngine.Time.time);
             }
         }
 
