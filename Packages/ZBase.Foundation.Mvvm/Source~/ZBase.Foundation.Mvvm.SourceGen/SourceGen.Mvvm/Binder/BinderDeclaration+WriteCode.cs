@@ -748,6 +748,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     p.CloseScope();
                 }
                 p.CloseScope();
+                p.PrintEndLine();
             }
 
             p.PrintEndLine();
