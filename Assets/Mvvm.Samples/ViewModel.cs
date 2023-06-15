@@ -17,6 +17,7 @@ namespace Mvvm.Samples
         [ObservableProperty]
         private float _progress;
 
+        [ObservableProperty]
         private bool _updating;
 
         public string TimeText => $"Time: {Time}";
@@ -32,10 +33,10 @@ namespace Mvvm.Samples
         {
             if (Input.GetKeyUp(KeyCode.Space))
             {
-                _updating = !_updating;
+                Updating = !Updating;
             }
 
-            if (_updating)
+            if (Updating)
             {
                 Time = TimeSpan.FromSeconds(UnityEngine.Time.time);
             }
@@ -50,7 +51,7 @@ namespace Mvvm.Samples
         [RelayCommand]
         private void OnStartClick()
         {
-            _updating = !_updating;
+            Updating = !Updating;
         }
 
         [RelayCommand]

@@ -16,6 +16,10 @@
         <Generator>TextTemplatingFileGenerator</Generator>
         <LastGenOutput>UnionConverters.t4.cs</LastGenOutput>
       </None>
+      <None Update="Mvvm\ViewBinding\Adapters\AnyToNotBoolAdapters.t4.tt">
+        <LastGenOutput>AnyToNotBoolAdapters.t4.cs</LastGenOutput>
+        <Generator>TextTemplatingFileGenerator</Generator>
+      </None>
       <None Update="Mvvm\ViewBinding\Adapters\AnyToBoolAdapters.t4.tt">
         <Generator>TextTemplatingFileGenerator</Generator>
         <LastGenOutput>AnyToBoolAdapters.t4.cs</LastGenOutput>
@@ -43,6 +47,11 @@
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
         <DependentUpon>UnionConverters.t4.tt</DependentUpon>
+      </Compile>
+      <Compile Update="Mvvm\ViewBinding\Adapters\AnyToNotBoolAdapters.t4.cs">
+        <DependentUpon>AnyToNotBoolAdapters.t4.tt</DependentUpon>
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
       </Compile>
       <Compile Update="Mvvm\ViewBinding\Adapters\AnyToBoolAdapters.t4.cs">
         <DesignTime>True</DesignTime>
