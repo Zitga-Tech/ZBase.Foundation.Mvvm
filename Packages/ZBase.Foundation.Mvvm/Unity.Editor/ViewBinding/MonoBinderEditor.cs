@@ -41,7 +41,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                     s_adapterMap[attrib.ToType] = map = new Dictionary<Type, HashSet<Type>>();
                 }
 
-                if (map.TryGetValue(attrib.ToType, out var types) == false)
+                if (map.TryGetValue(attrib.FromType, out var types) == false)
                 {
                     map[attrib.FromType] = types = new HashSet<Type>();
                 }
