@@ -13,6 +13,7 @@ namespace ZBase.Foundation.Mvvm
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.InternalUnionGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
         private const string DISABLE_ATTRIBUTE = "global::ZBase.Foundation.Mvvm.SkipGeneratorForAssemblyAttribute";
+        private const string COMPONENT_MODEL_NS = "global::ZBase.Foundation.Mvvm.ComponentModel";
 
         public const string FIELD_PREFIX_UNDERSCORE = "_";
         public const string FIELD_PREFIX_M_UNDERSCORE = "m_";
@@ -136,6 +137,37 @@ namespace ZBase.Foundation.Mvvm
 
                 return false;
             }
+        }
+
+        public static bool AnyFieldHasNotifyPropertyChangedForAttribute(
+              this ClassDeclarationSyntax classSyntax
+            , PropertyDeclarationSyntax property
+        )
+        {
+            foreach (var member in classSyntax.Members)
+            {
+                if (member is not FieldDeclarationSyntax fds)
+                {
+                    continue;
+                }
+
+                var attrib = fds.GetAttribute(COMPONENT_MODEL_NS, "NotifyPropertyChangedFor");
+
+                if (attrib != null
+                    && attrib.ArgumentList is { } argumentList
+                    && argumentList.Arguments.Count == 1
+                    && argumentList.Arguments[0].Expression is InvocationExpressionSyntax invocation
+                    && invocation.ArgumentList is { } invocationArgumentList
+                    && invocationArgumentList.Arguments.Count == 1
+                    && invocationArgumentList.Arguments[0].Expression is IdentifierNameSyntax identifierName
+                    && identifierName.Identifier.ValueText == property.Identifier.ValueText
+                )
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public static string ToPropertyName(this IFieldSymbol field)

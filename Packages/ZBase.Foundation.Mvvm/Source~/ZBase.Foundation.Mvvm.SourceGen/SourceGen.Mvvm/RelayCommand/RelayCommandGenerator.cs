@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
-using System.Linq;
 using ZBase.Foundation.SourceGen;
 
 namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen

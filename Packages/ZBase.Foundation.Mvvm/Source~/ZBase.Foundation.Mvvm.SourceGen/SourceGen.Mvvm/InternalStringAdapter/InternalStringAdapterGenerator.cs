@@ -3,7 +3,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Threading;
 using ZBase.Foundation.SourceGen;
 
@@ -102,7 +101,7 @@ namespace ZBase.Foundation.Mvvm.InternalStringAdapterSourceGen
             {
                 return new TypeRef {
                     Syntax = field.Declaration.Type,
-                    Symbol = semanticModel.GetTypeInfo(field.Declaration.Type).Type,
+                    Symbol = semanticModel.GetTypeInfo(field.Declaration.Type, token).Type,
                 };
             }
 
@@ -112,37 +111,20 @@ namespace ZBase.Foundation.Mvvm.InternalStringAdapterSourceGen
 
                 return new TypeRef {
                     Syntax = typeSyntax,
-                    Symbol = semanticModel.GetTypeInfo(typeSyntax).Type,
+                    Symbol = semanticModel.GetTypeInfo(typeSyntax, token).Type,
                 };
             }
 
             if (context.Node is PropertyDeclarationSyntax property
                 && property.Parent is ClassDeclarationSyntax classSyntax
                 && classSyntax.DoesSemanticMatch(IOBSERVABLE_OBJECT, context.SemanticModel, token)
+                && classSyntax.AnyFieldHasNotifyPropertyChangedForAttribute(property)
             )
             {
-                var attributes = classSyntax.Members
-                    .OfType<FieldDeclarationSyntax>()
-                    .Select(static x => x.GetAttribute(COMPONENT_MODEL_NS, "NotifyPropertyChangedFor"))
-                    .Where(x => {
-                        return x is { } attrib
-                            && attrib.ArgumentList is { } argumentList
-                            && argumentList.Arguments.Count == 1
-                            && argumentList.Arguments[0].Expression is InvocationExpressionSyntax invocation
-                            && invocation.ArgumentList is { } invocationArgumentList
-                            && invocationArgumentList.Arguments.Count == 1
-                            && invocationArgumentList.Arguments[0].Expression is IdentifierNameSyntax identifierName
-                            && identifierName.Identifier.ValueText == property.Identifier.ValueText
-                            ;
-                    });
-
-                if (attributes.Any())
-                {
-                    return new TypeRef {
-                        Syntax = property.Type,
-                        Symbol = semanticModel.GetTypeInfo(property.Type).Type,
-                    };
-                }
+                return new TypeRef {
+                    Syntax = property.Type,
+                    Symbol = semanticModel.GetTypeInfo(property.Type, token).Type,
+                };
             }
 
             return null;

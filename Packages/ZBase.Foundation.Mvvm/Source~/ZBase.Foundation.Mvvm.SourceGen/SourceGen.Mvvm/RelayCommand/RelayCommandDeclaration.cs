@@ -22,7 +22,11 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
 
         public ImmutableArray<MemberRef> MemberRefs { get; }
 
-        public RelayCommandDeclaration(ClassDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
+        public RelayCommandDeclaration(
+              ClassDeclarationSyntax candidate
+            , SemanticModel semanticModel
+            , CancellationToken token
+        )
         {
             using var memberRefs = ImmutableArrayBuilder<MemberRef>.Rent();
             using var diagnosticBuilder = ImmutableArrayBuilder<DiagnosticInfo>.Rent();

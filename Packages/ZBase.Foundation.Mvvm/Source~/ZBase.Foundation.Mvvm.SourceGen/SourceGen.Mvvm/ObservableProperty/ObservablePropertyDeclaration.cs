@@ -36,7 +36,11 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
         /// </summary>
         public HashSet<string> NotifyCanExecuteChangedForSet { get; }
 
-        public ObservablePropertyDeclaration(ClassDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
+        public ObservablePropertyDeclaration(
+              ClassDeclarationSyntax candidate
+            , SemanticModel semanticModel
+            , CancellationToken token
+        )
         {
             using var memberRefs = ImmutableArrayBuilder<MemberRef>.Rent();
             using var diagnosticBuilder = ImmutableArrayBuilder<DiagnosticInfo>.Rent();
