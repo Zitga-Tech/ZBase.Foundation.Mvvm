@@ -1,8 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ComponentModel;
+using ZBase.Foundation.Mvvm.ComponentModel.SourceGen;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
@@ -20,6 +24,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             var targetKindProp = this.serializedObject.FindProperty(nameof(MonoBindingContext._targetKind));
             var systemObjectProp = this.serializedObject.FindProperty(nameof(MonoBindingContext._targetSystemObject));
             var unityObjectProp = this.serializedObject.FindProperty(nameof(MonoBindingContext._targetUnityObject));
+            var targetPropertyPath = this.serializedObject.FindProperty(nameof(MonoBindingContext._targetPropertyPath));
 
             EditorGUI.BeginChangeCheck();
 
@@ -56,14 +61,186 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 case MonoBindingContext.ContextTargetKind.SystemObject:
                 {
                     DrawTargetSystemObject(context, this.serializedObject, systemObjectProp);
+                    DrawTargetPropertyPath(
+                          this.serializedObject
+                        , targetPropertyPath
+                        , context._targetSystemObject
+                    );
                     break;
                 }
 
                 case MonoBindingContext.ContextTargetKind.UnityObject:
                 {
                     DrawTargetUnityObject(this.serializedObject, unityObjectProp, context);
+                    DrawTargetPropertyPath(
+                          this.serializedObject
+                        , targetPropertyPath
+                        , context._targetUnityObject as IObservableObject
+                    );
                     break;
                 }
+            }
+        }
+
+        private static void DrawTargetPropertyPath(
+              SerializedObject serializedObject
+            , SerializedProperty targetPropertyPathSP
+            , IObservableObject rootTarget
+        )
+        {
+            if (rootTarget == null)
+            {
+                return;
+            }
+
+            var rootType = rootTarget.GetType();
+            var fields = TypeCache.GetFieldsWithAttribute<IsObservableObjectAttribute>()
+                .Where(x => x.IsPublic && x.IsStatic
+                    && x.IsLiteral && x.IsInitOnly == false
+                    && x.DeclaringType == rootType
+                );
+
+            if (fields.Any() == false)
+            {
+                return;
+            }
+
+            var rol = new ReorderableList(serializedObject, targetPropertyPathSP, true, true, true, true) {
+                elementHeight = 25f,
+                drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Target Property Path"),
+                onAddDropdownCallback = (rect, list) => OnAddDropdown(rect, list, rootTarget),
+                onRemoveCallback = OnRemove,
+            };
+
+            rol.drawElementCallback = (rect, index, isActive, isFocused)
+                => DrawElement(rect, index, isActive, isFocused, rol);
+
+            EditorGUILayout.Space();
+
+            rol.DoLayoutList();
+
+            static void OnAddDropdown(Rect rect, ReorderableList rol, IObservableObject rootTarget)
+            {
+                var type = rootTarget.GetType();
+                var serializedProperty = rol.serializedProperty;
+                var length = serializedProperty.arraySize;
+
+                for (var i = 0; i < length; i++)
+                {
+                    var propertyName = serializedProperty.GetArrayElementAtIndex(i).stringValue;
+
+                    if (string.IsNullOrWhiteSpace(propertyName))
+                    {
+                        break;
+                    }
+
+                    var attribs = TypeCache.GetFieldsWithAttribute<IsObservableObjectAttribute>()
+                        .Where(x => x.IsPublic && x.IsStatic
+                            && x.IsLiteral && x.IsInitOnly == false
+                            && x.DeclaringType == type
+                            && string.Equals(x.GetValue(null), propertyName)
+                        )
+                        .Select(x => x.GetCustomAttribute<IsObservableObjectAttribute>())
+                        .Where(x => x is { });
+
+                    type = attribs.FirstOrDefault()?.Type;
+
+                    if (type == null)
+                    {
+                        break;
+                    }
+                }
+
+                if (type == null)
+                {
+                    EditorUtility.DisplayDialog(
+                          "Cannot Find More IObservableObject"
+                        , "There is no property that is IObservableObject inside the last target in the property path."
+                        , "I understand"
+                    );
+
+                    return;
+                }
+
+                var fields = TypeCache.GetFieldsWithAttribute<IsObservableObjectAttribute>()
+                    .Where(x => x.IsPublic && x.IsStatic
+                        && x.IsLiteral && x.IsInitOnly == false
+                        && x.DeclaringType == type
+                    );
+
+                var menu = new GenericMenu();
+                
+                foreach (var field in fields)
+                {
+                    var value = field.GetValue(null);
+
+                    if (value is not string propertyName)
+                    {
+                        continue;
+                    }
+
+                    var label = new GUIContent(propertyName);
+
+                    menu.AddItem(label, false, AddPropertyPath, (rol, propertyName));
+                }
+
+                menu.ShowAsContext();
+            }
+
+            static void AddPropertyPath(object param)
+            {
+                if (param is not (ReorderableList rol, string propertyPath))
+                {
+                    return;
+                }
+
+                var serializedObject = rol.serializedProperty.serializedObject;
+                var target = serializedObject.targetObject;
+
+                try
+                {
+                    var index = rol.serializedProperty.arraySize;
+
+                    Undo.RecordObject(target, $"Set {rol.serializedProperty.propertyPath}.Array.data[{index}]");
+
+                    rol.serializedProperty.arraySize++;
+                    rol.index = index;
+
+                    var elementSP = rol.serializedProperty.GetArrayElementAtIndex(index);
+                    elementSP.stringValue = propertyPath;
+                    serializedObject.ApplyModifiedProperties();
+                    serializedObject.Update();
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex, target);
+                }
+            }
+
+            static void OnRemove(ReorderableList rol)
+            {
+                var serializedObject = rol.serializedProperty.serializedObject;
+                var target = serializedObject.targetObject;
+
+                Undo.RecordObject(target, $"Remove {rol.selectedIndices.Count} items at {rol.serializedProperty.propertyPath}");
+
+                var index = rol.serializedProperty.arraySize - 1;
+                rol.serializedProperty.DeleteArrayElementAtIndex(index);
+
+                serializedObject.ApplyModifiedProperties();
+                serializedObject.Update();
+            }
+
+            static void DrawElement(
+                  Rect rect
+                , int index
+                , bool isActive
+                , bool isFocused
+                , ReorderableList rol
+            )
+            {
+                var elementSP = rol.serializedProperty.GetArrayElementAtIndex(index);
+                EditorGUI.LabelField(rect, elementSP.stringValue);
             }
         }
 

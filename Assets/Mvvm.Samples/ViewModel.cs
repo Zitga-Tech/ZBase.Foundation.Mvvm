@@ -5,6 +5,18 @@ using ZBase.Foundation.Mvvm.Input;
 
 namespace Mvvm.Samples
 {
+    public partial class A : IObservableObject
+    {
+        [ObservableProperty]
+        private float _x;
+    }
+
+    public partial class B : IObservableObject
+    {
+        [ObservableProperty]
+        private A _a;
+    }
+
     public partial class ViewModel : MonoBehaviour, IObservableObject
     {
         [ObservableProperty]
@@ -19,6 +31,9 @@ namespace Mvvm.Samples
 
         [ObservableProperty]
         private bool _updating;
+
+        [ObservableProperty]
+        private B _b;
 
         public string TimeText => $"Time: {Time}";
 

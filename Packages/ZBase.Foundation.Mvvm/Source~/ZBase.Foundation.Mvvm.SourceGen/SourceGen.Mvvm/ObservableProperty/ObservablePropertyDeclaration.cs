@@ -26,6 +26,8 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
         public ImmutableArray<MemberRef> MemberRefs { get; }
 
+        public bool HasMemberObservableObject { get; }
+
         /// <summary>
         /// Key is <c>Field.Name</c>
         /// </summary>
@@ -74,7 +76,13 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                         var memberRef = new MemberRef {
                             Member = field,
                             PropertyName = field.ToPropertyName(),
+                            IsObservableObject = field.Type.ImplementsInterface(IOBSERVABLE_OBJECT_INTERFACE),
                         };
+
+                        if (memberRef.IsObservableObject)
+                        {
+                            HasMemberObservableObject = true;
+                        }
 
                         var uniqueCommandNames = new HashSet<string>();
                         var notifyPropChangedFors = field.GetAttributes(NOTIFY_PROPERTY_CHANGED_FOR_ATTRIBUTE);
@@ -181,6 +189,8 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             public IFieldSymbol Member { get; set; }
 
             public string PropertyName { get; set; }
+
+            public bool IsObservableObject { get; set; }
 
             public ImmutableArray<string> CommandNames { get; set; }
 

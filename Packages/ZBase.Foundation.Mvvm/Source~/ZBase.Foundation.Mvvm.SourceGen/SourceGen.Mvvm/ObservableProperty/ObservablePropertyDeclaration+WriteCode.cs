@@ -13,6 +13,8 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
         private const string GENERATED_OBSERVABLE_PROPERTY = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.GeneratedObservableProperty]";
         private const string GENERATED_PROPERTY_CHANGING_HANDLER = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.GeneratedPropertyChangingEventHandler]";
         private const string GENERATED_PROPERTY_CHANGED_HANDLER = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.GeneratedPropertyChangedEventHandler]";
+        private const string GENERATED_PROPERTY_NAME_CONSTANT = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.GeneratedPropertyNameConstant]";
+        private const string IS_OBSERVABLE_OBJECT = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.IsObservableObject(typeof({0}))]";
         private const string UNION = "global::ZBase.Foundation.Mvvm.Unions.Union";
         private const string CACHED_UNION_CONVERTER = "global::ZBase.Foundation.Mvvm.Unions.CachedUnionConverter";
         private const string INOTIFY_PROPERTY_CHANGING_INTERFACE = "global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging";
@@ -89,7 +91,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                     }
                     p.CloseScope();
                     p.PrintEndLine();
-                    
+
                     p.PrintLine($"/// <inheritdoc cref=\"{INOTIFY_PROPERTY_CHANGED_INTERFACE}.NotifyPropertyChanged{{TInstance}}(string, {PROPERTY_CHANGE_EVENT_LISTENER}{{TInstance}})\" />");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine($"public {keyword}bool NotifyPropertyChanged<TInstance>(string propertyName, {PROPERTY_CHANGE_EVENT_LISTENER}<TInstance> listener) where TInstance : class");
@@ -135,6 +137,9 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                         }
                     }
                     p.CloseScope();
+                    p.PrintEndLine();
+
+                    WriteTryGetMemberObservableObject_Empty(ref p);
                 }
             }
             p.CloseScope();
@@ -187,6 +192,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 WriteNotifyPropertyChangedWithTwoArgumentsMethod(ref p);
                 WriteNotifyPropertyChangedWithOneArgumentMethod(ref p);
                 WriteNotifyPropertyChangedNoArgumentMethod(ref p);
+                WriteTryGetMemberObservableObject(ref p);
             }
             p.CloseScope();
 
@@ -202,9 +208,17 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             foreach (var member in MemberRefs)
             {
                 var fieldName = member.Member.Name;
+                var typeName = member.Member.Type.ToFullName();
                 var name = member.PropertyName;
 
                 p.PrintLine($"/// <summary>The name of <see cref=\"{name}\"/></summary>");
+                p.PrintLine(GENERATED_PROPERTY_NAME_CONSTANT);
+
+                if (member.IsObservableObject)
+                {
+                    p.PrintLine(string.Format(IS_OBSERVABLE_OBJECT, typeName));
+                }
+
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine($"public const string {ConstName(member)} = nameof({className}.{name});");
                 p.PrintEndLine();
@@ -316,6 +330,11 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 foreach (var attribute in member.ForwardedPropertyAttributes)
                 {
                     p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
+                }
+
+                if (member.IsObservableObject)
+                {
+                    p.PrintLine(string.Format(IS_OBSERVABLE_OBJECT, typeName));
                 }
 
                 p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(GENERATED_OBSERVABLE_PROPERTY);
@@ -834,6 +853,102 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             {
                 p.PrintLine(string.Format(ATTRIBUTE, className, ConstName(property), property.Type.ToFullName()));
             }
+        }
+
+        private static void WriteTryGetMemberObservableObject_Empty(ref Printer p)
+        {
+            p.PrintLine($"/// <inheritdoc cref=\"{IOBSERVABLE_OBJECT_INTERFACE}.TryGetMemberObservableObject(global::System.Collections.Generic.Queue{{string}}, out {IOBSERVABLE_OBJECT_INTERFACE})\"/>");
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public bool TryGetMemberObservableObject(global::System.Collections.Generic.Queue<string> propertyNames, out {IOBSERVABLE_OBJECT_INTERFACE} result)");
+            p.OpenScope();
+            {
+                p.PrintLine("result = default;");
+                p.PrintLine("return false;");
+            }
+            p.CloseScope();
+            p.PrintEndLine();
+        }
+
+        private void WriteTryGetMemberObservableObject(ref Printer p)
+        {
+            if (HasMemberObservableObject == false)
+            {
+                WriteTryGetMemberObservableObject_Empty(ref p);
+                return;
+            }
+
+            p.PrintLine($"/// <inheritdoc cref=\"{IOBSERVABLE_OBJECT_INTERFACE}.TryGetMemberObservableObject(global::System.Collections.Generic.Queue{{string}}, out {IOBSERVABLE_OBJECT_INTERFACE})\"/>");
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public bool TryGetMemberObservableObject(global::System.Collections.Generic.Queue<string> propertyNames, out {IOBSERVABLE_OBJECT_INTERFACE} result)");
+            p.OpenScope();
+            {
+                p.PrintLine("if (propertyNames.Count > 0)");
+                p.OpenScope();
+                {
+                    p.PrintLine("var propertyName = propertyNames.Dequeue();");
+                    p.PrintEndLine();
+
+                    p.PrintLine("switch (propertyName)");
+                    p.OpenScope();
+                    {
+                        foreach (var member in MemberRefs)
+                        {
+                            if (member.IsObservableObject == false)
+                            {
+                                continue;
+                            }
+
+                            var fieldName = member.Member.Name;
+                            var typeName = member.Member.Type.ToFullName();
+                            var constName = ConstName(member);
+
+                            p.PrintLine($"case {constName}:");
+                            p.OpenScope();
+                            {
+                                p.PrintLine($"if (this.{fieldName} is not {typeName} candidate)");
+                                p.OpenScope();
+                                {
+                                    p.PrintLine("goto INVALID;");
+                                }
+                                p.CloseScope();
+                                p.PrintEndLine();
+
+                                p.PrintLine("if (propertyNames.Count > 0)");
+                                p.OpenScope();
+                                {
+                                    p.PrintLine("if (candidate.TryGetMemberObservableObject(propertyNames, out result))");
+                                    p.OpenScope();
+                                    {
+                                        p.PrintLine("return true;");
+                                    }
+                                    p.CloseScope();
+                                    p.PrintEndLine();
+
+                                    p.PrintLine("goto INVALID;");
+                                }
+                                p.CloseScope();
+                                p.PrintLine("else");
+                                p.OpenScope();
+                                {
+                                    p.PrintLine("result = candidate;");
+                                    p.PrintLine("return true;");
+                                }
+                                p.CloseScope();
+                            }
+                            p.CloseScope();
+                        }
+                    }
+                    p.CloseScope();
+                }
+                p.CloseScope();
+                p.PrintEndLine();
+
+                p.PrintLine("INVALID:");
+                p.PrintLine("result = default;");
+                p.PrintLine("return false;");
+            }
+            p.CloseScope();
+            p.PrintEndLine();
         }
 
         private static string ConstName(MemberRef member)

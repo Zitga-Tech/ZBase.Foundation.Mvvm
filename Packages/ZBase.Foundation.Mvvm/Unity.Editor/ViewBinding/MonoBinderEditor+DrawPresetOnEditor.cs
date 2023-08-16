@@ -5,7 +5,6 @@ using System.Reflection;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
-using ZBase.Foundation.Mvvm.ComponentModel;
 using ZBase.Foundation.Mvvm.ViewBinding;
 using ZBase.Foundation.Mvvm.ViewBinding.Adapters;
 using ZBase.Foundation.Mvvm.Unity.ViewBinding.Adapters;
@@ -30,9 +29,9 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
 
             var serializedContext = new SerializedObject(contextProp.objectReferenceValue);
-            var contextTarget = GetContextTarget(serializedContext);
+            var contextTargetType = GetContextTargetType(serializedContext);
 
-            if (DrawContextTarget(contextTarget) == false)
+            if (DrawContextTarget(contextProp.objectReferenceValue, contextTargetType) == false)
             {
                 return;
             }
@@ -60,8 +59,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 }
             }
 
-            var targetType = contextTarget.GetType();
-            var targetNPCIAttributes = targetType.GetCustomAttributes<NotifyPropertyChangedInfoAttribute>();
+            var targetNPCIAttributes = contextTargetType.GetCustomAttributes<NotifyPropertyChangedInfoAttribute>();
             var targetPropertyMap = new Dictionary<string, Type>();
 
             foreach (var attribute in targetNPCIAttributes)
@@ -72,7 +70,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 }
             }
 
-            var targetRCIAttributes = targetType.GetCustomAttributes<RelayCommandInfoAttribute>();
+            var targetRCIAttributes = contextTargetType.GetCustomAttributes<RelayCommandInfoAttribute>();
             var targetCommandMap = new Dictionary<string, Type>();
 
             foreach (var attribute in targetRCIAttributes)
@@ -125,7 +123,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                     , binderType
                     , bindingName
                     , bindingType
-                    , targetType
+                    , contextTargetType
                     , targetPropertyMap
                     , bindingPropertyLabelMap
                     , _rolMap
@@ -140,7 +138,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                     , binderType
                     , bindingName
                     , bindingType
-                    , targetType
+                    , contextTargetType
                     , targetCommandMap
                     , bindingCommandLabelMap
                 );
@@ -209,34 +207,73 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             serializedObject.Update();
         }
 
-        private static IObservableObject GetContextTarget(SerializedObject serializedContext)
+        private static Type GetContextTargetType(SerializedObject serializedContext)
         {
             var targetKindProp = serializedContext.FindProperty(nameof(MonoBindingContext._targetKind));
             var systemObjectProp = serializedContext.FindProperty(nameof(MonoBindingContext._targetSystemObject));
             var unityObjectProp = serializedContext.FindProperty(nameof(MonoBindingContext._targetUnityObject));
+            var propertyPath = serializedContext.FindProperty(nameof(MonoBindingContext._targetPropertyPath));
             var targetKind = (MonoBindingContext.ContextTargetKind)targetKindProp.enumValueIndex;
 
-            return targetKind switch {
-                MonoBindingContext.ContextTargetKind.SystemObject => systemObjectProp.managedReferenceValue as IObservableObject,
-                MonoBindingContext.ContextTargetKind.UnityObject => unityObjectProp.objectReferenceValue as IObservableObject,
+            var type = targetKind switch {
+                MonoBindingContext.ContextTargetKind.SystemObject => systemObjectProp.managedReferenceValue.GetType(),
+                MonoBindingContext.ContextTargetKind.UnityObject => unityObjectProp.objectReferenceValue.GetType(),
                 _ => null,
             };
+
+            if (type != null && propertyPath.arraySize > 0)
+            {
+                for (var i = 0; i < propertyPath.arraySize; i++)
+                {
+                    var propertyName = propertyPath.GetArrayElementAtIndex(i).stringValue;
+                    var attribs = TypeCache.GetFieldsWithAttribute<IsObservableObjectAttribute>()
+                        .Where(x => x.IsPublic && x.IsStatic
+                            && x.IsLiteral && x.IsInitOnly == false
+                            && x.DeclaringType == type
+                            && string.Equals(x.GetValue(null), propertyName)
+                        )
+                        .Select(x => x.GetCustomAttribute<IsObservableObjectAttribute>())
+                        .Where(x => x is { });
+
+                    type = attribs.FirstOrDefault()?.Type;
+
+                    if (type == null)
+                    {
+                        return null;
+                    }
+                }
+            }
+
+            return type;
         }
 
-        private static bool DrawContextTarget(IObservableObject target)
+        private static bool DrawContextTarget(UnityEngine.Object obj, Type targetType)
         {
-            if (target is null)
+            if (targetType is null)
             {
                 EditorGUILayout.HelpBox(
                     "The context target is currently undefined. Binding mechanism will not work."
                     , MessageType.Error
                 );
 
+                if (obj)
+                {
+                    var color = GUI.color;
+                    GUI.color = Color.yellow;
+
+                    if (GUILayout.Button("Find context to fix"))
+                    {
+                        Selection.activeObject = obj;
+                    }
+
+                    GUI.color = color;
+                }
+
                 return false;
             }
 
             EditorGUILayout.HelpBox(
-                $"This binder can now listen and react to Property Changed events published by {target.GetType()}."
+                $"This binder can now listen and react to Property Changed events published by {targetType.GetType()}."
                 , MessageType.Info
             );
 
@@ -797,7 +834,8 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                     elementHeight = 25f,
                     onAddDropdownCallback = OnAddDropdown,
                     onRemoveCallback = OnRemove,
-                    drawElementCallback = (rect, index, isActive, isFocused) => DrawElement(rect, index, isActive, isFocused, rol),
+                    drawElementCallback = (rect, index, isActive, isFocused)
+                        => DrawElement(rect, index, isActive, isFocused, rol),
                 };
             }
 

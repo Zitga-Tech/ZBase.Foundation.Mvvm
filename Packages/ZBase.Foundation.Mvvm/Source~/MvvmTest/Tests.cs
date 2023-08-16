@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ComponentModel;
@@ -58,7 +59,11 @@ namespace MvvmTest
         }
     }
 
-    public class A { }
+    public partial class A : IObservableObject
+    {
+        [ObservableProperty]
+        private int _value;
+    }
 
     public partial class Model : IObservableObject, IBindingContext
     {
@@ -74,6 +79,9 @@ namespace MvvmTest
 
         [ObservableProperty]
         private TimeSpan _time;
+
+        [ObservableProperty]
+        private A _a;
 
         public TypeCode Type { get; }
 

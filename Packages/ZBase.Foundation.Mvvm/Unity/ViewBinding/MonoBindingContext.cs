@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ComponentModel;
 using ZBase.Foundation.Mvvm.ViewBinding;
@@ -10,12 +11,14 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [SerializeField, HideInInspector]
         internal ContextTargetKind _targetKind;
 
-        [SerializeField, HideInInspector]
-        [SerializeReference]
+        [SerializeField, SerializeReference, HideInInspector]
         internal IObservableObject _targetSystemObject;
 
         [SerializeField, HideInInspector]
         internal UnityEngine.Object _targetUnityObject;
+
+        [SerializeField, HideInInspector]
+        internal string[] _targetPropertyPath;
 
         public bool IsCreated { get; private set; }
 
@@ -27,7 +30,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             IsCreated = true;
         }
 
-        private IObservableObject GetTarget()
+        internal IObservableObject GetTarget()
         {
             switch (_targetKind)
             {
@@ -35,9 +38,8 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 {
                     if (_targetSystemObject == null)
                     {
-                        throw new NullReferenceException(
-                            $"The target kind is {_targetKind} but reference on the `Target System Object` field is null."
-                        );
+                        ThrowIfTargetSystemObjectIsNull(_targetKind);
+                        return null;
                     }
 
                     return _targetSystemObject;
@@ -47,23 +49,52 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 {
                     if (_targetUnityObject == false)
                     {
-                        throw new NullReferenceException(
-                            $"The target kind is {_targetKind} but reference on the `Target Unity Object` field is null."
-                        );
+                        ThrowIfTargetUnityObjectIsNull(_targetKind);
+                        return null;
                     }
 
                     if (_targetUnityObject is not IObservableObject target)
                     {
-                        throw new InvalidCastException(
-                            $"Reference on the `Target Unity Object` field does not implement {typeof(IObservableObject)}."
-                        );
+                        ThrowIfTargetUnityObjectIsNotObservableObject();
+                        return null;
                     }
 
                     return target;
                 }
             }
 
-            throw new InvalidOperationException($"{_targetKind} is not a valid target kind.");
+            ThrowIfTargetKindIsInvalid(_targetKind);
+            return null;
+        }
+
+        [DoesNotReturn]
+        private static void ThrowIfTargetSystemObjectIsNull(ContextTargetKind targetKind)
+        {
+            throw new NullReferenceException(
+                $"The target kind is {targetKind} but reference on the `Target System Object` field is null."
+            );
+        }
+
+        [DoesNotReturn]
+        private static void ThrowIfTargetUnityObjectIsNull(ContextTargetKind targetKind)
+        {
+            throw new NullReferenceException(
+                $"The target kind is {targetKind} but reference on the `Target Unity Object` field is null."
+            );
+        }
+
+        [DoesNotReturn]
+        private static void ThrowIfTargetUnityObjectIsNotObservableObject()
+        {
+            throw new InvalidCastException(
+                $"Reference on the `Target Unity Object` field does not implement {typeof(IObservableObject)}."
+            );
+        }
+
+        [DoesNotReturn]
+        private static void ThrowIfTargetKindIsInvalid(ContextTargetKind targetKind)
+        {
+            throw new InvalidOperationException($"{targetKind} is not a valid target kind.");
         }
 
         [Serializable]

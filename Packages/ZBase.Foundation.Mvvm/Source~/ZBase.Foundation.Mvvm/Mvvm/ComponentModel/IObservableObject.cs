@@ -1,4 +1,6 @@
-﻿namespace ZBase.Foundation.Mvvm.ComponentModel
+﻿using System.Collections.Generic;
+
+namespace ZBase.Foundation.Mvvm.ComponentModel
 {
     /// <summary>
     /// Any class implements this interface will be an eligible
@@ -6,5 +8,8 @@
     /// </summary>
     /// <seealso cref="ZBase.Foundation.Mvvm.ComponentModel.ObservablePropertyAttribute"/>
     /// <seealso cref="ZBase.Foundation.Mvvm.Input.RelayCommandAttribute"/>
-    public interface IObservableObject { }
+    public interface IObservableObject
+    {
+        bool TryGetMemberObservableObject(Queue<string> names, out IObservableObject result);
+    }
 }
