@@ -29,19 +29,14 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             WriteBindingPropertyMethodInfoAttributes(ref p);
             WriteBindingCommandMethodInfoAttributes(ref p);
 
-            p.PrintBeginLine();
-            p.Print("partial class ").Print(Syntax.Identifier.Text);
-            p.PrintEndLine();
-
-            p = p.IncreasedIndent();
-
+            p.PrintBeginLine("partial class ").Print(Syntax.Identifier.Text);
+            
             if (HasBaseBinder)
             {
-                p.PrintLine(": global::ZBase.Foundation.Mvvm.ViewBinding.IBinder");
+                p.Print(" : global::ZBase.Foundation.Mvvm.ViewBinding.IBinder");
             }
 
-            p = p.DecreasedIndent();
-
+            p.PrintEndLine();
             p.OpenScope();
             {
                 WriteConstantBindingProperties(ref p);

@@ -77,36 +77,43 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                         };
 
                         var uniqueCommandNames = new HashSet<string>();
-                        var notifyPropChangedFor = field.GetAttribute(NOTIFY_PROPERTY_CHANGED_FOR_ATTRIBUTE);
+                        var notifyPropChangedFors = field.GetAttributes(NOTIFY_PROPERTY_CHANGED_FOR_ATTRIBUTE);
 
-                        if (notifyPropChangedFor != null
-                            && notifyPropChangedFor.ConstructorArguments.Length > 0
-                            && notifyPropChangedFor.ConstructorArguments[0].Value is string propName
-                        )
+                        foreach (var notifyPropChangedFor in notifyPropChangedFors)
                         {
-                            fieldToPropertyChanged[field.Name] = propName;
-                        }
-
-                        var notifyCanExecuteChangedFor = field.GetAttribute(NOTIFY_CAN_EXECUTE_CHANGED_FOR_ATTRIBUTE);
-
-                        if (notifyCanExecuteChangedFor != null
-                            && notifyCanExecuteChangedFor.ConstructorArguments.Length > 0
-                        )
-                        {
-                            var args = notifyCanExecuteChangedFor.ConstructorArguments;
-
-                            foreach (var arg in args)
+                            if (notifyPropChangedFor != null
+                                && notifyPropChangedFor.ConstructorArguments.Length > 0
+                                && notifyPropChangedFor.ConstructorArguments[0].Value is string propName
+                            )
                             {
-                                if (arg.Value is string commandName)
-                                {
-                                    uniqueCommandNames.Add(commandName);
-                                    commandSet.Add(commandName);
-                                }
+                                fieldToPropertyChanged[field.Name] = propName;
                             }
                         }
 
+                        var notifyCanExecuteChangedFors = field.GetAttributes(NOTIFY_CAN_EXECUTE_CHANGED_FOR_ATTRIBUTE);
+
                         using var commandNames = ImmutableArrayBuilder<string>.Rent();
-                        commandNames.AddRange(uniqueCommandNames);
+
+                        foreach (var notifyCanExecuteChangedFor in notifyCanExecuteChangedFors)
+                        {
+                            if (notifyCanExecuteChangedFor != null
+                                && notifyCanExecuteChangedFor.ConstructorArguments.Length > 0
+                            )
+                            {
+                                var args = notifyCanExecuteChangedFor.ConstructorArguments;
+
+                                foreach (var arg in args)
+                                {
+                                    if (arg.Value is string commandName)
+                                    {
+                                        uniqueCommandNames.Add(commandName);
+                                        commandSet.Add(commandName);
+                                    }
+                                }
+                            }
+
+                            commandNames.AddRange(uniqueCommandNames);
+                        }
 
                         memberRef.CommandNames = commandNames.ToImmutable();
                         memberRefs.Add(memberRef);

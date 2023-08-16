@@ -26,22 +26,23 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
             p = p.IncreasedIndent();
 
-            p.PrintBeginLine();
-            p.Print($"partial class {Syntax.Identifier.Text}");
-
-            p = p.IncreasedIndent();
+            p.PrintBeginLine("partial class ").Print(Syntax.Identifier.Text);
 
             if (IsBaseObservableObject)
             {
-                p.Print(": global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject");
+                p.PrintEndLine(" : global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject");
+
+                p = p.IncreasedIndent();
                 p.Print(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
             }
             else
             {
-                p.Print(": global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
+                p.PrintEndLine(" : global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
+
+                p = p.IncreasedIndent();
             }
 
-            p.Print(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged");
+            p.PrintBeginLine(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged");
             p.PrintEndLine();
             p = p.DecreasedIndent();
 
@@ -150,22 +151,23 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             WriteNotifyPropertyChangingInfoAttributes(ref p);
             WriteNotifyPropertyChangedInfoAttributes(ref p);
 
-            p.PrintBeginLine();
-            p.Print($"partial class {Syntax.Identifier.Text}");
-
-            p = p.IncreasedIndent();
+            p.PrintBeginLine("partial class ").Print(Syntax.Identifier.Text);
 
             if (IsBaseObservableObject)
             {
-                p.Print(": global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject");
+                p.PrintEndLine(" : global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject");
+
+                p = p.IncreasedIndent();
                 p.Print(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
             }
             else
             {
-                p.Print(": global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
+                p.PrintEndLine(" : global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanging");
+
+                p = p.IncreasedIndent();
             }
 
-            p.Print(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged");
+            p.PrintBeginLine(", global::ZBase.Foundation.Mvvm.ComponentModel.INotifyPropertyChanged");
             p.PrintEndLine();
             p = p.DecreasedIndent();
 

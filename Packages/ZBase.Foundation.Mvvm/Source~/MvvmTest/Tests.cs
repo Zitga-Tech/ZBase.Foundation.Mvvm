@@ -64,7 +64,9 @@ namespace MvvmTest
     {
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsCreated))]
+        [NotifyPropertyChangedFor(nameof(IsCreatedNew))]
         [NotifyCanExecuteChangedFor(nameof(UpdateIntCommand))]
+        [NotifyCanExecuteChangedFor(nameof(UpdateNothingCommand))]
         private int _intField;
 
         [ObservableProperty]
@@ -78,6 +80,8 @@ namespace MvvmTest
         public IObservableObject Target => this;
 
         public bool IsCreated => true;
+
+        public bool IsCreatedNew => false;
 
         [RelayCommand]
         private void UpdateNothing()
