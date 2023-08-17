@@ -14,7 +14,7 @@ namespace Mvvm.Samples
     public partial class B : IObservableObject
     {
         [ObservableProperty]
-        private A _a;
+        private A _a = new();
     }
 
     public partial class ViewModel : MonoBehaviour, IObservableObject
@@ -33,7 +33,7 @@ namespace Mvvm.Samples
         private bool _updating;
 
         [ObservableProperty]
-        private B _b;
+        private B _b = new();
 
         public string TimeText => $"Time: {Time}";
 

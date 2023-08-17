@@ -6,8 +6,6 @@ using System.Diagnostics.CodeAnalysis;
 
 #if CYSHARP_UNITASK
 using Cysharp.Threading.Tasks;
-#else
-using System.Collections;
 #endif
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
@@ -59,7 +57,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             StartCoroutine(AwakeCoroutine(_contextSetting));
         }
 
-        private IEnumerator AwakeCoroutine(BindingContextSetting bindingContextSetting)
+        private System.Collections.IEnumerator AwakeCoroutine(BindingContextSetting bindingContextSetting)
         {
             if (bindingContextSetting == BindingContextSetting.FindWhenPlay)
             {
@@ -82,7 +80,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             if (Context.Target == null)
             {
-                LogWhenContextTargetIsNull();
+                LogWhenContextTargetIsNull(this);
                 yield break;
             }
 
@@ -226,9 +224,11 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             , UnityEngine.Object context
         )
         {
+            var type = bindingContext?.Target?.GetType();
+
             Debug.LogError(
-                  $"Cannot bind to any property named `{bindingProperty.TargetPropertyName}` on {bindingContext?.Target?.GetType()}. " +
-                  $"Please verify if the property is declared for the type."
+                  $"Cannot bind to any property named `{bindingProperty.TargetPropertyName}` on {type}. " +
+                  $"Please verify if {type} contains this property."
                 , context
             );
         }
@@ -240,9 +240,11 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             , UnityEngine.Object context
         )
         {
+            var type = bindingContext?.Target?.GetType();
+
             Debug.LogError(
-                  $"Cannot bind to any command named `{bindingCommand.TargetCommandName}` on {bindingContext?.Target?.GetType()}. " +
-                  $"Please verify if the command is declared for the type."
+                  $"Cannot bind to any command named `{bindingCommand.TargetCommandName}` on {type}. " +
+                  $"Please verify if {type} contains this command."
                 , context
             );
         }

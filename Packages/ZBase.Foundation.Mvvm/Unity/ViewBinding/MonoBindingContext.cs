@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ComponentModel;
@@ -30,7 +31,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             IsCreated = true;
         }
 
-        internal IObservableObject GetTarget()
+        private IObservableObject GetTarget()
         {
             switch (_targetKind)
             {
@@ -42,7 +43,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                         return null;
                     }
 
-                    return _targetSystemObject;
+                    return ResolvePropertyPath(_targetSystemObject, _targetPropertyPath);
                 }
 
                 case ContextTargetKind.UnityObject:
@@ -59,11 +60,43 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                         return null;
                     }
 
-                    return target;
+                    return ResolvePropertyPath(target, _targetPropertyPath);
                 }
             }
 
             ThrowIfTargetKindIsInvalid(_targetKind);
+            return null;
+        }
+
+        private static IObservableObject ResolvePropertyPath(
+              IObservableObject target
+            , ReadOnlySpan<string> propertyPath
+        )
+        {
+            if (propertyPath.Length < 1)
+            {
+                return target;
+            }
+
+            var queue = new Queue<string>(propertyPath.Length);
+
+            foreach (var propertyName in propertyPath)
+            {
+                if (string.IsNullOrEmpty(propertyName))
+                {
+                    ThrowIfCannotResolvePropertyPath();
+                    return null;
+                }
+
+                queue.Enqueue(propertyName);
+            }
+
+            if (target.TryGetMemberObservableObject(queue, out var member))
+            {
+                return member;
+            }
+
+            ThrowIfCannotResolvePropertyPath();
             return null;
         }
 
@@ -95,6 +128,14 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         private static void ThrowIfTargetKindIsInvalid(ContextTargetKind targetKind)
         {
             throw new InvalidOperationException($"{targetKind} is not a valid target kind.");
+        }
+
+        [DoesNotReturn, HideInCallstack]
+        private static void ThrowIfCannotResolvePropertyPath()
+        {
+            throw new InvalidOperationException(
+                $"The target {nameof(IObservableObject)} cannot be retrieved by values on the `Target Property Path` field."
+            );
         }
 
         [Serializable]
