@@ -67,7 +67,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             return null;
         }
 
-        [DoesNotReturn]
+        [DoesNotReturn, HideInCallstack]
         private static void ThrowIfTargetSystemObjectIsNull(ContextTargetKind targetKind)
         {
             throw new NullReferenceException(
@@ -75,7 +75,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             );
         }
 
-        [DoesNotReturn]
+        [DoesNotReturn, HideInCallstack]
         private static void ThrowIfTargetUnityObjectIsNull(ContextTargetKind targetKind)
         {
             throw new NullReferenceException(
@@ -83,7 +83,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             );
         }
 
-        [DoesNotReturn]
+        [DoesNotReturn, HideInCallstack]
         private static void ThrowIfTargetUnityObjectIsNotObservableObject()
         {
             throw new InvalidCastException(
@@ -91,7 +91,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             );
         }
 
-        [DoesNotReturn]
+        [DoesNotReturn, HideInCallstack]
         private static void ThrowIfTargetKindIsInvalid(ContextTargetKind targetKind)
         {
             throw new InvalidOperationException($"{targetKind} is not a valid target kind.");

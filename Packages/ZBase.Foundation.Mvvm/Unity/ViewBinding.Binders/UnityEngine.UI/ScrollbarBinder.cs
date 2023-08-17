@@ -23,14 +23,13 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             if (_targets.Length < 1)
             {
-                Debug.LogWarning($"The target list is empty.", this);
+                Logger.WarnIfTargetListIsEmpty(this);
+                return;
             }
-            else
+
+            foreach (var target in _targets)
             {
-                foreach (var target in _targets)
-                {
-                    target.onValueChanged.AddListener(OnValueChanged);
-                }
+                target.onValueChanged.AddListener(OnValueChanged);
             }
         }
 

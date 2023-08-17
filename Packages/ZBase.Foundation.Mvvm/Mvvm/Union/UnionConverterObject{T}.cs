@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 
 namespace ZBase.Foundation.Mvvm.Unions.Converters
 {
@@ -64,7 +65,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
             return union.TypeId.AsType()?.ToString() ?? string.Empty;
         }
 
-        [DoesNotReturn]
+        [DoesNotReturn, HideInCallstack]
         private static void ThrowIfInvalidCast()
         {
             throw new InvalidCastException($"Cannot get value of {typeof(T)} from the input union.");

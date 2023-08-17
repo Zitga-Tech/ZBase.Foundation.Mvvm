@@ -45,6 +45,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 
 namespace ZBase.Foundation.Mvvm.Unions.Converters
 {
@@ -84,7 +85,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.<#= typeName #>.ToString();
 
-        [DoesNotReturn]
+        [DoesNotReturn, HideInCallstack]
         private static void ThrowIfInvalidCast()
         {
             throw new InvalidCastException($"Cannot get value of {typeof(<#= type #>)} from the input union.");

@@ -273,7 +273,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
 
             EditorGUILayout.HelpBox(
-                $"This binder can now listen and react to Property Changed events published by {targetType.GetType()}."
+                $"This binder can now listen and react to Property Changed events published by {targetType}."
                 , MessageType.Info
             );
 

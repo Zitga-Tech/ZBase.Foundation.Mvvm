@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 #if CYSHARP_UNITASK
 using Cysharp.Threading.Tasks;
@@ -45,7 +46,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             if (Context.Target == null)
             {
-                LogWhenContextTargetIsNull();
+                LogWhenContextTargetIsNull(this);
                 return;
             }
             
@@ -101,16 +102,14 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         {
             if (_context == false)
             {
-                throw new NullReferenceException(
-                    $"Reference on the `Context` field is null."
-                );
+                ThrowIfContextIsNull();
+                return null;
             }
 
             if (_context is not IBindingContext context)
             {
-                throw new InvalidCastException(
-                    $"Reference on the `Context` field does not implement {typeof(IBindingContext)}."
-                );
+                ThrowIfContextIsInvalid();
+                return null;
             }
 
             return context;
@@ -146,7 +145,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             if (this.Context.Target == null)
             {
-                LogWhenContextTargetIsNull();
+                LogWhenContextTargetIsNull(this);
                 return;
             }
 
@@ -185,30 +184,67 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 return;
             }
 
-            Debug.LogError(
-                $"Cannot bind to any property named `{bindingProperty.TargetPropertyName}` on {this.Context?.Target?.GetType()}. " +
-                $"Please verify if the property is declared for the type."
-                , this
-            );
+            LogIfPropertyBindingFailed(bindingProperty, this.Context, this);
         }
 
-        protected virtual void OnBindCommandFailed(BindingCommand bindingProperty)
+        protected virtual void OnBindCommandFailed(BindingCommand bindingCommand)
         {
-            if (string.IsNullOrWhiteSpace(bindingProperty.TargetCommandName))
+            if (string.IsNullOrWhiteSpace(bindingCommand.TargetCommandName))
             {
                 return;
             }
 
-            Debug.LogError(
-                $"Cannot bind to any command named `{bindingProperty.TargetCommandName}` on {this.Context?.Target?.GetType()}. " +
-                $"Please verify if the command is declared for the type."
-                , this
+            LogIfPropertyCommandFailed(bindingCommand, this.Context, this);
+        }
+
+        [DoesNotReturn, HideInCallstack]
+        private static void ThrowIfContextIsNull()
+        {
+            throw new NullReferenceException(
+                $"Reference on the `Context` field is null."
             );
         }
 
-        private void LogWhenContextTargetIsNull()
+        [DoesNotReturn, HideInCallstack]
+        private static void ThrowIfContextIsInvalid()
         {
-            Debug.LogError("The target of the Context is null.", this);
+            throw new InvalidCastException(
+                $"Reference on the `Context` field does not implement {typeof(IBindingContext)}."
+            );
+        }
+
+        [HideInCallstack]
+        private static void LogWhenContextTargetIsNull(UnityEngine.Object context)
+        {
+            Debug.LogError("The target of the Context is null.", context);
+        }
+
+        [HideInCallstack]
+        protected static void LogIfPropertyBindingFailed(
+              BindingProperty bindingProperty
+            , IBindingContext bindingContext
+            , UnityEngine.Object context
+        )
+        {
+            Debug.LogError(
+                  $"Cannot bind to any property named `{bindingProperty.TargetPropertyName}` on {bindingContext?.Target?.GetType()}. " +
+                  $"Please verify if the property is declared for the type."
+                , context
+            );
+        }
+
+        [HideInCallstack]
+        protected static void LogIfPropertyCommandFailed(
+              BindingCommand bindingCommand
+            , IBindingContext bindingContext
+            , UnityEngine.Object context
+        )
+        {
+            Debug.LogError(
+                  $"Cannot bind to any command named `{bindingCommand.TargetCommandName}` on {bindingContext?.Target?.GetType()}. " +
+                  $"Please verify if the command is declared for the type."
+                , context
+            );
         }
 
         internal enum BindingContextSetting

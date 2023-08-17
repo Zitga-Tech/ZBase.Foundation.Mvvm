@@ -22,7 +22,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             if (_targets.Length < 1)
             {
-                Debug.LogWarning($"The target list is empty.", this);
+                Logger.WarnIfTargetListIsEmpty(this);
             }
         }
 
