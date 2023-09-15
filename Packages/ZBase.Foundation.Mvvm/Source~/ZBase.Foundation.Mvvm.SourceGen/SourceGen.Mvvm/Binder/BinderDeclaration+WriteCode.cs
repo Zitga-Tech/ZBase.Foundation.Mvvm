@@ -21,7 +21,8 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             var scopePrinter = new SyntaxNodeScopePrinter(Printer.DefaultLarge, Syntax.Parent);
             var p = scopePrinter.printer;
 
-            p.PrintLine("#pragma warning disable");
+            p.PrintEndLine();
+            p.Print("#pragma warning disable").PrintEndLine();
             p.PrintEndLine();
 
             p = p.IncreasedIndent();

@@ -130,7 +130,8 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
         {
             var p = Printer.DefaultLarge;
 
-            p.PrintLine("#pragma warning disable");
+            p.PrintEndLine();
+            p.Print("#pragma warning disable").PrintEndLine();
             p.PrintEndLine();
 
             p.PrintLine($"namespace ZBase.Foundation.Mvvm.Unions.__Generics.{assemblyName.ToValidIdentifier()}");

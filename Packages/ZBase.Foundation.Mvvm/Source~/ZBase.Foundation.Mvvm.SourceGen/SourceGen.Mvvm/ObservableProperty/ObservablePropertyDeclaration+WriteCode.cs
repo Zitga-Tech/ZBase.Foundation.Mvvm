@@ -27,7 +27,8 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             var scopePrinter = new SyntaxNodeScopePrinter(Printer.DefaultLarge, Syntax.Parent);
             var p = scopePrinter.printer;
 
-            p.PrintLine("#pragma warning disable");
+            p.PrintEndLine();
+            p.Print("#pragma warning disable").PrintEndLine();
             p.PrintEndLine();
 
             p = p.IncreasedIndent();
@@ -154,7 +155,8 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             var p = scopePrinter.printer;
             p = p.IncreasedIndent();
 
-            p.PrintLine("#pragma warning disable");
+            p.PrintEndLine();
+            p.Print("#pragma warning disable").PrintEndLine();
             p.PrintEndLine();
 
             WriteNotifyPropertyChangingInfoAttributes(ref p);
