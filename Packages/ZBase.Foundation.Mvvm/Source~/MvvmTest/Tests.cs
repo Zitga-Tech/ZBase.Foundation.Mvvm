@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Numerics;
 using System.Runtime.CompilerServices;
-using UnityEngine;
 using ZBase.Foundation.Mvvm.ComponentModel;
 using ZBase.Foundation.Mvvm.Input;
 using ZBase.Foundation.Mvvm.Unions;
@@ -25,18 +24,25 @@ namespace MvvmTest
             var binder = new Binder();
 
             binder.Context = model;
-            //binder.SetTargetPropertyName(Binder.BindingProperty_OnUpdate, Model.PropertyName_IntField);
+            binder.SetTargetPropertyName(Binder.BindingProperty_SetIntValue, Model.PropertyName_IntField);
+            binder.SetTargetPropertyName(Binder.BindingProperty_SetAValue, Model.PropertyName_A);
             binder.StartListening();
 
             while (true)
             {
-                var key = Console.ReadKey();
+                var key = Console.ReadKey(true);
 
                 switch (key.Key)
                 {
                     case ConsoleKey.Spacebar:
                     {
                         model.IntField += 1;
+                        break;
+                    }
+
+                    case ConsoleKey.A:
+                    {
+                        model.A = new A { Value = model.IntField += 1 };
                         break;
                     }
 
@@ -59,10 +65,35 @@ namespace MvvmTest
         }
     }
 
-    public partial class A : IObservableObject
+    public partial class A : IObservableObject, IEquatable<A>
     {
         [ObservableProperty]
         private int _value;
+
+        public bool Equals(A other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+
+            return this._value == other._value;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is A other)
+            {
+                return this._value == other._value;
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return this._value.GetHashCode();
+        }
     }
 
     public partial class Model : IObservableObject, IBindingContext
@@ -73,9 +104,6 @@ namespace MvvmTest
         [NotifyCanExecuteChangedFor(nameof(UpdateIntCommand))]
         [NotifyCanExecuteChangedFor(nameof(UpdateNothingCommand))]
         private int _intField;
-
-        [ObservableProperty]
-        private Color _colorValue;
 
         [ObservableProperty]
         private TimeSpan _time;
@@ -111,6 +139,18 @@ namespace MvvmTest
         private void SetIntValue(int value)
         {
             Console.WriteLine(value);
+        }
+
+        [BindingProperty]
+        private void SetAValue(A value)
+        {
+            if (value == null)
+            {
+                Console.WriteLine("null");
+                return;
+            }
+
+            Console.WriteLine($"A {value.Value}");
         }
 
         [BindingProperty]
