@@ -469,7 +469,6 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 }
                 else
                 {
-                    p.PrintLine("if (propertyName == null) throw new global::System.ArgumentNullException(nameof(propertyName));");
                     p.PrintLine("if (listener == null) throw new global::System.ArgumentNullException(nameof(listener));");
                 }
 
@@ -518,7 +517,6 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 }
                 else
                 {
-                    p.PrintLine("if (propertyName == null) throw new global::System.ArgumentNullException(nameof(propertyName));");
                     p.PrintLine("if (listener == null) throw new global::System.ArgumentNullException(nameof(listener));");
                 }
 
@@ -593,7 +591,6 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 }
                 else
                 {
-                    p.PrintLine("if (propertyName == null) throw new global::System.ArgumentNullException(nameof(propertyName));");
                     p.PrintLine("if (listener == null) throw new global::System.ArgumentNullException(nameof(listener));");
                 }
 
@@ -674,10 +671,6 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 if (IsBaseObservableObject)
                 {
                     p.PrintLine("if (base.NotifyPropertyChanged(propertyName)) return true;");
-                }
-                else
-                {
-                    p.PrintLine("if (propertyName == null) throw new global::System.ArgumentNullException(nameof(propertyName));");
                 }
 
                 p.PrintEndLine();
