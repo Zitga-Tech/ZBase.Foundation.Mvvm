@@ -6,6 +6,11 @@ namespace ZBase.Foundation.Mvvm
     {
         public static string GetName(this Type type)
         {
+            if (type.IsEnum)
+            {
+                return type.Name;
+            }
+
             return Type.GetTypeCode(type) switch {
                 TypeCode.Boolean => "bool",
                 TypeCode.Byte => "byte",
@@ -27,6 +32,11 @@ namespace ZBase.Foundation.Mvvm
 
         public static string GetFullName(this Type type)
         {
+            if (type.IsEnum)
+            {
+                return type.FullName;
+            }
+
             return Type.GetTypeCode(type) switch {
                 TypeCode.Boolean => "bool",
                 TypeCode.Byte => "byte",
