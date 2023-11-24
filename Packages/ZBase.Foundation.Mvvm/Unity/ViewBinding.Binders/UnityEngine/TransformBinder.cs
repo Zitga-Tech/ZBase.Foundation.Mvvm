@@ -1,20 +1,16 @@
-using System;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Transform Binder")]
-    public partial class TransformBinder : MonoBinder
+    public partial class TransformBinder : MonoBinder<Transform>
     {
-        [SerializeField]
-        private Transform[] _targets = new Transform[0];
-
-        protected override void OnAwake()
+        protected sealed override void OnAwake(ref Transform[] targets)
         {
-            if (_targets.Length < 1)
+            if (targets.Length < 1)
             {
-                _targets = new Transform[1] { this.gameObject.transform };
+                targets = new Transform[1] { this.gameObject.transform };
             }
         }
 
@@ -23,7 +19,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetPosition(in Vector3 value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -37,7 +33,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetRotation(in Quaternion value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -51,7 +47,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetEulerAngles(in Vector3 value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -65,7 +61,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetLocalPosition(in Vector3 value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -79,7 +75,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetLocalRotation(in Quaternion value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -93,7 +89,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetLocalEulerAngles(in Vector3 value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -107,7 +103,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetLocalScale(in Vector3 value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)

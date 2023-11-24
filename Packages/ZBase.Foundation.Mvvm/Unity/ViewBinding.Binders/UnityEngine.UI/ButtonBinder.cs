@@ -5,28 +5,25 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Button Binder")]
-    public partial class ButtonBinder : MonoBinder
+    public partial class ButtonBinder : MonoBinder<Button>
     {
-        [SerializeField]
-        private Button[] _targets = new Button[0];
-
-        protected override void OnAwake()
+        protected sealed override void OnAwake(ref Button[] targets)
         {
-            if (_targets.Length < 1)
+            if (targets.Length < 1)
             {
                 if (this.gameObject.TryGetComponent<Button>(out var target))
                 {
-                    _targets = new Button[] { target };
+                    targets = new Button[] { target };
                 }
             }
 
-            if (_targets.Length < 1)
+            if (targets.Length < 1)
             {
                 Logger.WarnIfTargetListIsEmpty(this);
                 return;
             }
 
-            foreach (var target in _targets)
+            foreach (var target in targets)
             {
                 target.onClick.AddListener(OnClick);
             }

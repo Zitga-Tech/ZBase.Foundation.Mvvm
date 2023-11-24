@@ -1,26 +1,22 @@
-using System;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/RectTransform Binder")]
-    public partial class RectTransformBinder : MonoBinder
+    public partial class RectTransformBinder : MonoBinder<RectTransform>
     {
-        [SerializeField]
-        private RectTransform[] _targets = new RectTransform[0];
-
-        protected override void OnAwake()
+        protected sealed override void OnAwake(ref RectTransform[] targets)
         {
-            if (_targets.Length < 1)
+            if (targets.Length < 1)
             {
                 if (this.gameObject.transform is RectTransform rectTransform)
                 {
-                    _targets = new RectTransform[] { rectTransform };
+                    targets = new RectTransform[] { rectTransform };
                 }
             }
 
-            if (_targets.Length < 1)
+            if (targets.Length < 1)
             {
                 Logger.WarnIfTargetListIsEmpty(this);
             }
@@ -31,7 +27,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetAnchorMin(in Vector2 value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -45,7 +41,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetAnchorMax(in Vector2 value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -59,7 +55,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetOffsetMin(in Vector2 value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -73,7 +69,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetOffsetMax(in Vector2 value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -87,7 +83,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetAnchoredPosition(in Vector2 value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -101,7 +97,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetAnchoredPosition3D(in Vector3 value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -115,7 +111,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetSizeDelta(in Vector2 value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -129,7 +125,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetPivot(in Vector2 value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)

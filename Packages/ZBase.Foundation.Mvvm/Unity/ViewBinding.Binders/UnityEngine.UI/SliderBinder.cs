@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 using ZBase.Foundation.Mvvm.ViewBinding;
@@ -6,28 +5,25 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Slider Binder")]
-    public partial class SliderBinder : MonoBinder
+    public partial class SliderBinder : MonoBinder<Slider>
     {
-        [SerializeField]
-        private Slider[] _targets = new Slider[0];
-
-        protected override void OnAwake()
+        protected sealed override void OnAwake(ref Slider[] targets)
         {
-            if (_targets.Length < 1)
+            if (targets.Length < 1)
             {
                 if (this.gameObject.TryGetComponent<Slider>(out var target))
                 {
-                    _targets = new Slider[] { target };
+                    targets = new Slider[] { target };
                 }
             }
 
-            if (_targets.Length < 1)
+            if (targets.Length < 1)
             {
                 Logger.WarnIfTargetListIsEmpty(this);
                 return;
             }
 
-            foreach (var target in _targets)
+            foreach (var target in targets)
             {
                 target.onValueChanged.AddListener(OnValueChanged);
             }
@@ -38,7 +34,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetValue(float value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -52,7 +48,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetMinValue(int value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -66,7 +62,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetMaxValue(int value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -80,7 +76,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetWholeNumbers(bool value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)

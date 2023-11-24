@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 using ZBase.Foundation.Mvvm.ViewBinding;
@@ -6,22 +5,19 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Image Binder")]
-    public partial class ImageBinder : MonoBinder
+    public partial class ImageBinder : MonoBinder<Image>
     {
-        [SerializeField]
-        private Image[] _targets = new Image[0];
-
-        protected override void OnAwake()
+        protected sealed override void OnAwake(ref Image[] targets)
         {
-            if (_targets.Length < 1)
+            if (targets.Length < 1)
             {
                 if (this.gameObject.TryGetComponent<Image>(out var target))
                 {
-                    _targets = new Image[] { target };
+                    targets = new Image[] { target };
                 }
             }
 
-            if (_targets.Length < 1)
+            if (targets.Length < 1)
             {
                 Logger.WarnIfTargetListIsEmpty(this);
             }
@@ -32,7 +28,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetColor(Color value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -46,7 +42,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetSprite(Sprite value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -60,7 +56,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetFillMethod(Image.FillMethod value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -74,7 +70,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetFillOrigin(int value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
@@ -88,7 +84,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetFillAmount(float value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)

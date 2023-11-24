@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 using ZBase.Foundation.Mvvm.ViewBinding;
@@ -6,28 +5,25 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Toggle Binder")]
-    public partial class ToggleBinder : MonoBinder
+    public partial class ToggleBinder : MonoBinder<Toggle>
     {
-        [SerializeField]
-        private Toggle[] _targets = new Toggle[0];
-
-        protected override void OnAwake()
+        protected sealed override void OnAwake(ref Toggle[] targets)
         {
-            if (_targets.Length < 1)
+            if (targets.Length < 1)
             {
                 if (this.gameObject.TryGetComponent<Toggle>(out var target))
                 {
-                    _targets = new Toggle[] { target };
+                    targets = new Toggle[] { target };
                 }
             }
 
-            if (_targets.Length < 1)
+            if (targets.Length < 1)
             {
                 Logger.WarnIfTargetListIsEmpty(this);
                 return;
             }
 
-            foreach (var target in _targets)
+            foreach (var target in targets)
             {
                 target.onValueChanged.AddListener(OnValueChanged);
             }
@@ -38,7 +34,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetIsOn(bool value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)

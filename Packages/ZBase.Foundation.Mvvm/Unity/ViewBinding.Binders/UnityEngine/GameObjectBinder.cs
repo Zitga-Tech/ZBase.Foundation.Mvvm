@@ -1,20 +1,16 @@
-using System;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/GameObject Binder")]
-    public partial class GameObjectBinder : MonoBinder
+    public partial class GameObjectBinder : MonoBinder<GameObject>
     {
-        [SerializeField]
-        private GameObject[] _targets = new GameObject[0];
-
-        protected override void OnAwake()
+        protected sealed override void OnAwake(ref GameObject[] targets)
         {
-            if (_targets.Length < 1)
+            if (targets.Length < 1)
             {
-                _targets = new GameObject[1] { this.gameObject };
+                targets = new GameObject[1] { this.gameObject };
             }
         }
 
@@ -23,7 +19,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [field: HideInInspector]
         private void SetActive(bool value)
         {
-            var targets = _targets.AsSpan();
+            var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
