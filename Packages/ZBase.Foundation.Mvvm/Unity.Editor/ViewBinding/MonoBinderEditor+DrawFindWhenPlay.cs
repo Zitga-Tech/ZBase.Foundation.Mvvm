@@ -136,7 +136,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 bindingLabelText = ObjectNames.NicifyVariableName(bindingName);
             }
 
-            var bindingTypeName = bindingType.GetName();
+            var bindingTypeName = bindingType.GetFriendlyName();
             var bindingTypeLabel = new GUIContent(bindingTypeName, bindingType.GetFullName());
             var bindingLabel = new GUIContent(
                   bindingLabelText
@@ -311,7 +311,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 bindingLabelText = ObjectNames.NicifyVariableName(bindingName);
             }
 
-            var bindingTypeName = bindingType?.GetName() ?? string.Empty;
+            var bindingTypeName = bindingType?.GetFriendlyName() ?? string.Empty;
             var bindingTypeLabel = new GUIContent(bindingTypeName, bindingType?.GetFullName() ?? string.Empty);
             var bindingLabel = new GUIContent(
                   bindingLabelText

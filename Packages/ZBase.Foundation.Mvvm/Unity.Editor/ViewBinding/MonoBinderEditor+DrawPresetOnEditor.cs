@@ -320,7 +320,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 bindingLabelText = ObjectNames.NicifyVariableName(bindingName);
             }
 
-            var bindingTypeName = bindingType.GetName();
+            var bindingTypeName = bindingType.GetFriendlyName();
             var bindingTypeLabel = new GUIContent(bindingTypeName, bindingType.GetFullName());
             var bindingLabel = new GUIContent(
                   bindingLabelText
@@ -425,7 +425,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 }
                 else
                 {
-                    var returnTypeName = propertyType.GetName();
+                    var returnTypeName = propertyType.GetFriendlyName();
                     targetPropertyName = candidate;
                     targetPropertyType = propertyType;
                     targetPropertyLabel = new GUIContent(
@@ -494,7 +494,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             foreach (var (propName, propType) in targetPropertyMap)
             {
                 menu.AddItem(
-                      new GUIContent($"{propName} : {propType.GetName()}")
+                      new GUIContent($"{propName} : {propType.GetFriendlyName()}")
                     , propName == targetPropertyName
                     , SetBindingProperty
                     , (binder, serializedBinder, targetPropertyNameSP, adapterPropertySP, bindingType, propName, propType)
@@ -698,7 +698,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
                 if (adapterAttrib?.ToType != null)
                 {
-                    directory = $"{directory}/{adapterAttrib.ToType.GetName()}";
+                    directory = $"{directory}/{adapterAttrib.ToType.GetFriendlyName()}";
                 }
 
                 var label = new GUIContent(
@@ -874,7 +874,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
                     if (adapterAttrib?.ToType != null)
                     {
-                        directory = $"{directory}/{adapterAttrib.ToType.GetName()}";
+                        directory = $"{directory}/{adapterAttrib.ToType.GetFriendlyName()}";
                     }
 
                     var label = new GUIContent(
@@ -974,7 +974,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
                         if (adapterAttrib?.ToType != null)
                         {
-                            directory = $"{directory}/{adapterAttrib.ToType.GetName()}";
+                            directory = $"{directory}/{adapterAttrib.ToType.GetFriendlyName()}";
                         }
 
                         var label = new GUIContent(
@@ -1087,7 +1087,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 bindingLabelText = ObjectNames.NicifyVariableName(bindingName);
             }
 
-            var bindingTypeName = bindingType?.GetName() ?? string.Empty;
+            var bindingTypeName = bindingType?.GetFriendlyName() ?? string.Empty;
             var bindingTypeLabel = new GUIContent(bindingTypeName, bindingType?.GetFullName() ?? string.Empty);
             var bindingLabel = new GUIContent(
                   bindingLabelText
@@ -1162,7 +1162,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 }
                 else
                 {
-                    var returnTypeName = commandType.GetName();
+                    var returnTypeName = commandType.GetFriendlyName();
                     targetCommandName = candidate;
                     targetCommandLabel = new GUIContent(
                           $"{candidate} ( {returnTypeName} )"
@@ -1197,7 +1197,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             {
                 var label = commandType == null
                     ? new GUIContent(commandName)
-                    : new GUIContent($"{commandName} ( {commandType.GetName()} )");
+                    : new GUIContent($"{commandName} ( {commandType.GetFriendlyName()} )");
 
                 menu.AddItem(
                       label
