@@ -35,6 +35,9 @@ namespace Mvvm.Samples
         [ObservableProperty]
         private B _b = new();
 
+        [ObservableProperty]
+        private Vector3 _scale;
+
         public string TimeText => $"Time: {Time}";
 
         private void Start()
@@ -54,6 +57,9 @@ namespace Mvvm.Samples
             if (Updating)
             {
                 Time = TimeSpan.FromSeconds(UnityEngine.Time.time);
+
+                var rnd = UnityEngine.Random.Range(0, 1f);
+                Scale = Vector3.one * rnd;
             }
         }
 
