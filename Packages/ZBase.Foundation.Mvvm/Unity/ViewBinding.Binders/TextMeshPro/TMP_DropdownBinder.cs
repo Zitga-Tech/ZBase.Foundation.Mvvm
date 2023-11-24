@@ -1,0 +1,180 @@
+#if UNITY_TEXT_MESH_PRO
+
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using ZBase.Foundation.Mvvm.ViewBinding;
+
+namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
+{
+    [AddComponentMenu("MVVM/Binders/TMP_Dropdown Binder")]
+    public partial class TMP_DropdownBinder : MonoBinder<TMP_Dropdown>
+    {
+        protected sealed override void OnAwake(ref TMP_Dropdown[] targets)
+        {
+            if (targets.Length < 1)
+            {
+                if (this.gameObject.TryGetComponent<TMP_Dropdown>(out var target))
+                {
+                    targets = new TMP_Dropdown[] { target };
+                }
+            }
+
+            if (targets.Length < 1)
+            {
+                Logger.WarnIfTargetListIsEmpty(this);
+            }
+
+            foreach (var target in targets)
+            {
+                target.onValueChanged.AddListener(OnValueChanged);
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Interactable")]
+        [field: HideInInspector]
+        private void SetInteractable(bool value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].interactable = value;
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Caption Text")]
+        [field: HideInInspector]
+        private void SetCaptionText(string value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                var target = targets[i];
+
+                if (target.captionText == false)
+                {
+                    continue;
+                }
+
+                target.captionText.text = value;
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Value")]
+        [field: HideInInspector]
+        private void SetValue(int value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].value = value;
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Set Options")]
+        [field: HideInInspector]
+        private void SetOptionDataList(List<TMP_Dropdown.OptionData> value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                var target = targets[i];
+                target.options.Clear();
+                target.AddOptions(value);
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Set Options")]
+        [field: HideInInspector]
+        private void SetOptionStringList(List<string> value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                var target = targets[i];
+                target.options.Clear();
+                target.AddOptions(value);
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Set Options")]
+        [field: HideInInspector]
+        private void SetOptionSpriteList(List<Sprite> value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                var target = targets[i];
+                target.options.Clear();
+                target.AddOptions(value);
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Add Options")]
+        [field: HideInInspector]
+        private void AddOptionDataList(List<TMP_Dropdown.OptionData> value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].AddOptions(value);
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Add Options")]
+        [field: HideInInspector]
+        private void AddOptionStringList(List<string> value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].AddOptions(value);
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Add Options")]
+        [field: HideInInspector]
+        private void AddOptionSpriteList(List<Sprite> value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].AddOptions(value);
+            }
+        }
+
+        [BindingCommand]
+        [field: Label("On Value Changed")]
+        [field: HideInInspector]
+        partial void OnValueChanged(int value);
+    }
+}
+
+#endif

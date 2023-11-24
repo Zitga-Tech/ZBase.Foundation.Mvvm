@@ -23,6 +23,20 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         [BindingProperty]
+        [field: Label("Camera")]
+        [field: HideInInspector]
+        private void SetCamera(Camera value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].worldCamera = value;
+            }
+        }
+
+        [BindingProperty]
         [field: Label("Override Sorting")]
         [field: HideInInspector]
         private void SetOverrideSorting(bool value)

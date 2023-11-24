@@ -52,6 +52,20 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         [BindingProperty]
+        [field: Label("Material")]
+        [field: HideInInspector]
+        private void SetMaterial(Material value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].material = value;
+            }
+        }
+
+        [BindingProperty]
         [field: Label("Fill Method")]
         [field: HideInInspector]
         private void SetFillMethod(Image.FillMethod value)
@@ -90,6 +104,34 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             for (var i = 0; i < length; i++)
             {
                 targets[i].fillAmount = value;
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Raycast Target")]
+        [field: HideInInspector]
+        private void SetRaycastTarget(bool value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].raycastTarget = value;
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Maskable")]
+        [field: HideInInspector]
+        private void SetMaskable(bool value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].maskable = value;
             }
         }
     }

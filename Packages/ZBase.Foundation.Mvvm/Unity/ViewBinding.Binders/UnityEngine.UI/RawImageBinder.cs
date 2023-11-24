@@ -4,104 +4,107 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
-    [AddComponentMenu("MVVM/Binders/Slider Binder")]
-    public partial class SliderBinder : MonoBinder<Slider>
+    [AddComponentMenu("MVVM/Binders/Raw Image Binder")]
+    public partial class RawImageBinder : MonoBinder<RawImage>
     {
-        protected sealed override void OnAwake(ref Slider[] targets)
+        protected sealed override void OnAwake(ref RawImage[] targets)
         {
             if (targets.Length < 1)
             {
-                if (this.gameObject.TryGetComponent<Slider>(out var target))
+                if (this.gameObject.TryGetComponent<RawImage>(out var target))
                 {
-                    targets = new Slider[] { target };
+                    targets = new RawImage[] { target };
                 }
             }
 
             if (targets.Length < 1)
             {
                 Logger.WarnIfTargetListIsEmpty(this);
-                return;
-            }
-
-            foreach (var target in targets)
-            {
-                target.onValueChanged.AddListener(OnValueChanged);
             }
         }
 
         [BindingProperty]
-        [field: Label("Interactable")]
+        [field: Label("Color")]
         [field: HideInInspector]
-        private void SetInteractable(bool value)
+        private void SetColor(Color value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].interactable = value;
+                targets[i].color = value;
             }
         }
 
         [BindingProperty]
-        [field: Label("Value")]
+        [field: Label("Texture")]
         [field: HideInInspector]
-        private void SetValue(float value)
+        private void SetTexture(Texture value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].SetValueWithoutNotify(value);
+                targets[i].texture = value;
             }
         }
 
         [BindingProperty]
-        [field: Label("Min Value")]
+        [field: Label("Material")]
         [field: HideInInspector]
-        private void SetMinValue(int value)
+        private void SetMaterial(Material value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].minValue = value;
+                targets[i].material = value;
             }
         }
 
         [BindingProperty]
-        [field: Label("Max Value")]
+        [field: Label("UV Rect")]
         [field: HideInInspector]
-        private void SetMaxValue(int value)
+        private void SetUVRect(Rect value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].maxValue = value;
+                targets[i].uvRect = value;
             }
         }
 
         [BindingProperty]
-        [field: Label("Whole Numbers")]
+        [field: Label("Raycast Target")]
         [field: HideInInspector]
-        private void SetWholeNumbers(bool value)
+        private void SetRaycastTarget(bool value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].wholeNumbers = value;
+                targets[i].raycastTarget = value;
             }
         }
 
-        [BindingCommand]
-        [field: Label("On Value Changed")]
+        [BindingProperty]
+        [field: Label("Maskable")]
         [field: HideInInspector]
-        partial void OnValueChanged(float value);
+        private void SetMaskable(bool value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].maskable = value;
+            }
+        }
     }
 }

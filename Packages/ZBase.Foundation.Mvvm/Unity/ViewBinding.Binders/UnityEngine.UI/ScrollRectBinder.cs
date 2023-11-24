@@ -4,16 +4,16 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
-    [AddComponentMenu("MVVM/Binders/Toggle Binder")]
-    public partial class ToggleBinder : MonoBinder<Toggle>
+    [AddComponentMenu("MVVM/Binders/Scroll Rect Binder")]
+    public partial class ScrollRectBinder : MonoBinder<ScrollRect>
     {
-        protected sealed override void OnAwake(ref Toggle[] targets)
+        protected sealed override void OnAwake(ref ScrollRect[] targets)
         {
             if (targets.Length < 1)
             {
-                if (this.gameObject.TryGetComponent<Toggle>(out var target))
+                if (this.gameObject.TryGetComponent<ScrollRect>(out var target))
                 {
-                    targets = new Toggle[] { target };
+                    targets = new ScrollRect[] { target };
                 }
             }
 
@@ -30,36 +30,36 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         [BindingProperty]
-        [field: Label("Interactable")]
+        [field: Label("Vertical Normalized Position")]
         [field: HideInInspector]
-        private void SetInteractable(bool value)
+        private void SetVerticalNormalizedPosition(float value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].interactable = value;
+                targets[i].verticalNormalizedPosition = value;
             }
         }
 
         [BindingProperty]
-        [field: Label("Is On")]
+        [field: Label("Horizontal Normalized Position")]
         [field: HideInInspector]
-        private void SetIsOn(bool value)
+        private void SetHorizontalNormalizedPosition(float value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].SetIsOnWithoutNotify(value);
+                targets[i].horizontalNormalizedPosition = value;
             }
         }
 
         [BindingCommand]
         [field: Label("On Value Changed")]
         [field: HideInInspector]
-        partial void OnValueChanged(bool value);
+        partial void OnValueChanged(Vector2 value);
     }
 }

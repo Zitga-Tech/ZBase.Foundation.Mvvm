@@ -30,6 +30,20 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         [BindingProperty]
+        [field: Label("Interactable")]
+        [field: HideInInspector]
+        private void SetInteractable(bool value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].interactable = value;
+            }
+        }
+
+        [BindingProperty]
         [field: Label("Value")]
         [field: HideInInspector]
         private void SetValue(float value)
