@@ -1,12 +1,13 @@
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
-    [AddComponentMenu("MVVM/Binders/CanvasGroup Binder")]
+    [AddComponentMenu("MVVM/Binders/Canvas Group Binder")]
     public partial class CanvasGroupBinder : MonoBinder<CanvasGroup>
     {
-        protected sealed override void OnAwake(ref CanvasGroup[] targets)
+        protected override void OnAwake([NotNull] ref CanvasGroup[] targets)
         {
             if (targets.Length < 1)
             {
@@ -14,11 +15,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
                 {
                     targets = new CanvasGroup[] { target };
                 }
-            }
-
-            if (targets.Length < 1)
-            {
-                Logger.WarnIfTargetListIsEmpty(this);
             }
         }
 

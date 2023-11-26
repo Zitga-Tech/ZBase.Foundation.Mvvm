@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.UI;
 using ZBase.Foundation.Mvvm.ViewBinding;
@@ -7,7 +8,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
     [AddComponentMenu("MVVM/Binders/Slider Binder")]
     public partial class SliderBinder : MonoBinder<Slider>
     {
-        protected sealed override void OnAwake(ref Slider[] targets)
+        protected sealed override void OnAwake([NotNull] ref Slider[] targets)
         {
             if (targets.Length < 1)
             {
@@ -15,12 +16,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
                 {
                     targets = new Slider[] { target };
                 }
-            }
-
-            if (targets.Length < 1)
-            {
-                Logger.WarnIfTargetListIsEmpty(this);
-                return;
             }
 
             foreach (var target in targets)

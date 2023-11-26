@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
@@ -6,7 +7,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
     [AddComponentMenu("MVVM/Binders/RectTransform Binder")]
     public partial class RectTransformBinder : MonoBinder<RectTransform>
     {
-        protected sealed override void OnAwake(ref RectTransform[] targets)
+        protected sealed override void OnAwake([NotNull] ref RectTransform[] targets)
         {
             if (targets.Length < 1)
             {
@@ -14,11 +15,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
                 {
                     targets = new RectTransform[] { rectTransform };
                 }
-            }
-
-            if (targets.Length < 1)
-            {
-                Logger.WarnIfTargetListIsEmpty(this);
             }
         }
 

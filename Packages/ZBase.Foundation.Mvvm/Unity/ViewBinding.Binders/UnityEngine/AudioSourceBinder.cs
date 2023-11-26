@@ -1,12 +1,13 @@
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
-    [AddComponentMenu("MVVM/Binders/AudioSource Binder")]
+    [AddComponentMenu("MVVM/Binders/Audio Source Binder")]
     public partial class AudioSourceBinder : MonoBinder<AudioSource>
     {
-        protected sealed override void OnAwake(ref AudioSource[] targets)
+        protected sealed override void OnAwake([NotNull] ref AudioSource[] targets)
         {
             if (targets.Length < 1)
             {
@@ -14,11 +15,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
                 {
                     targets = new AudioSource[] { target };
                 }
-            }
-
-            if (targets.Length < 1)
-            {
-                Logger.WarnIfTargetListIsEmpty(this);
             }
         }
 

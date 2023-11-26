@@ -1,13 +1,14 @@
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.UI;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
-    [AddComponentMenu("MVVM/Binders/Scrollbar Binder")]
+    [AddComponentMenu("MVVM/Binders/Scroll Bar Binder")]
     public partial class ScrollbarBinder : MonoBinder<Scrollbar>
     {
-        protected sealed override void OnAwake(ref Scrollbar[] targets)
+        protected sealed override void OnAwake([NotNull] ref Scrollbar[] targets)
         {
             if (targets.Length < 1)
             {
@@ -15,12 +16,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
                 {
                     targets = new Scrollbar[] { target };
                 }
-            }
-
-            if (targets.Length < 1)
-            {
-                Logger.WarnIfTargetListIsEmpty(this);
-                return;
             }
 
             foreach (var target in targets)

@@ -1,5 +1,10 @@
 #if UNITY_TEXT_MESH_PRO
 
+#pragma warning disable CA1707 // Identifiers should not contain underscores
+#pragma warning disable CA1815 // Override equals and operator equals on value types
+#pragma warning disable CA1051 // Do not declare visible instance fields
+
+using System.Diagnostics.CodeAnalysis;
 using TMPro;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
@@ -26,7 +31,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
     [AddComponentMenu("MVVM/Binders/TMP_InputField Binder")]
     public partial class TMP_InputFieldBinder : MonoBinder<TMP_InputField>
     {
-        protected sealed override void OnAwake(ref TMP_InputField[] targets)
+        protected sealed override void OnAwake([NotNull] ref TMP_InputField[] targets)
         {
             if (targets.Length < 1)
             {
@@ -34,11 +39,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
                 {
                     targets = new TMP_InputField[] { target };
                 }
-            }
-
-            if (targets.Length < 1)
-            {
-                Logger.WarnIfTargetListIsEmpty(this);
             }
 
             foreach (var target in targets)

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.UI;
 using ZBase.Foundation.Mvvm.ViewBinding;
@@ -7,7 +8,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
     [AddComponentMenu("MVVM/Binders/Raw Image Binder")]
     public partial class RawImageBinder : MonoBinder<RawImage>
     {
-        protected sealed override void OnAwake(ref RawImage[] targets)
+        protected sealed override void OnAwake([NotNull] ref RawImage[] targets)
         {
             if (targets.Length < 1)
             {
@@ -15,11 +16,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
                 {
                     targets = new RawImage[] { target };
                 }
-            }
-
-            if (targets.Length < 1)
-            {
-                Logger.WarnIfTargetListIsEmpty(this);
             }
         }
 

@@ -1,5 +1,8 @@
 #if UNITY_TEXT_MESH_PRO
 
+#pragma warning disable CA1707 // Identifiers should not contain underscores
+
+using System.Diagnostics.CodeAnalysis;
 using TMPro;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
@@ -9,7 +12,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
     [AddComponentMenu("MVVM/Binders/TMP_Text Binder")]
     public partial class TMP_TextBinder : MonoBinder<TMP_Text>
     {
-        protected sealed override void OnAwake(ref TMP_Text[] targets)
+        protected sealed override void OnAwake([NotNull] ref TMP_Text[] targets)
         {
             if (targets.Length < 1)
             {
@@ -17,11 +20,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
                 {
                     targets = new TMP_Text[] { target };
                 }
-            }
-
-            if (targets.Length < 1)
-            {
-                Logger.WarnIfTargetListIsEmpty(this);
             }
         }
 

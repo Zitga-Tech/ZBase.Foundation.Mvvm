@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
@@ -6,7 +7,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
     [AddComponentMenu("MVVM/Binders/Canvas Binder")]
     public partial class CanvasBinder : MonoBinder<Canvas>
     {
-        protected sealed override void OnAwake(ref Canvas[] targets)
+        protected sealed override void OnAwake([NotNull] ref Canvas[] targets)
         {
             if (targets.Length < 1)
             {
@@ -14,11 +15,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
                 {
                     targets = new Canvas[] { target };
                 }
-            }
-
-            if (targets.Length < 1)
-            {
-                Logger.WarnIfTargetListIsEmpty(this);
             }
         }
 

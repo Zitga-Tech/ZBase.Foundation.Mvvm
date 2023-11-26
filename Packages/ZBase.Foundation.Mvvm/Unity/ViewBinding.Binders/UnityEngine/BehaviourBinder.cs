@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
@@ -10,7 +11,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [SerializeField]
         private bool _includeMonoBinders = false;
 
-        protected sealed override void OnAwake(ref Behaviour[] targets)
+        protected sealed override void OnAwake([NotNull] ref Behaviour[] targets)
         {
             var container = new List<Behaviour>();
             container.AddRange(targets);
@@ -32,11 +33,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
 
             targets = container.ToArray();
-
-            if (targets.Length < 1)
-            {
-                Logger.WarnIfTargetListIsEmpty(this);
-            }
         }
 
         [BindingProperty]

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
@@ -6,7 +7,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
     [AddComponentMenu("MVVM/Binders/Transform Binder")]
     public partial class TransformBinder : MonoBinder<Transform>
     {
-        protected sealed override void OnAwake(ref Transform[] targets)
+        protected sealed override void OnAwake([NotNull] ref Transform[] targets)
         {
             if (targets.Length < 1)
             {

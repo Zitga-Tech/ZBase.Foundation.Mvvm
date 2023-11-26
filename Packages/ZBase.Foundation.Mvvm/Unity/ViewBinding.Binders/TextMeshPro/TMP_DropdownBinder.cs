@@ -1,6 +1,9 @@
 #if UNITY_TEXT_MESH_PRO
 
+#pragma warning disable CA1707 // Identifiers should not contain underscores
+
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using TMPro;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
@@ -10,7 +13,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
     [AddComponentMenu("MVVM/Binders/TMP_Dropdown Binder")]
     public partial class TMP_DropdownBinder : MonoBinder<TMP_Dropdown>
     {
-        protected sealed override void OnAwake(ref TMP_Dropdown[] targets)
+        protected sealed override void OnAwake([NotNull] ref TMP_Dropdown[] targets)
         {
             if (targets.Length < 1)
             {
@@ -18,11 +21,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
                 {
                     targets = new TMP_Dropdown[] { target };
                 }
-            }
-
-            if (targets.Length < 1)
-            {
-                Logger.WarnIfTargetListIsEmpty(this);
             }
 
             foreach (var target in targets)

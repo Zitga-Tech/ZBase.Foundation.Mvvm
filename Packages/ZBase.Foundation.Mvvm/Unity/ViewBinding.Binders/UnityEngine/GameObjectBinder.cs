@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
@@ -6,7 +7,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
     [AddComponentMenu("MVVM/Binders/GameObject Binder")]
     public partial class GameObjectBinder : MonoBinder<GameObject>
     {
-        protected sealed override void OnAwake(ref GameObject[] targets)
+        protected sealed override void OnAwake([NotNull] ref GameObject[] targets)
         {
             if (targets.Length < 1)
             {

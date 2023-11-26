@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.UI;
 using ZBase.Foundation.Mvvm.ViewBinding;
@@ -7,7 +8,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
     [AddComponentMenu("MVVM/Binders/Scroll Rect Binder")]
     public partial class ScrollRectBinder : MonoBinder<ScrollRect>
     {
-        protected sealed override void OnAwake(ref ScrollRect[] targets)
+        protected sealed override void OnAwake([NotNull] ref ScrollRect[] targets)
         {
             if (targets.Length < 1)
             {
@@ -15,12 +16,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
                 {
                     targets = new ScrollRect[] { target };
                 }
-            }
-
-            if (targets.Length < 1)
-            {
-                Logger.WarnIfTargetListIsEmpty(this);
-                return;
             }
 
             foreach (var target in targets)
