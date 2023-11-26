@@ -4044,7 +4044,7 @@ MonoBehaviour:
     <TargetPropertyName>k__BackingField: 
   _converterForSetText:
     <Adapter>k__BackingField:
-      rid: -2
+      rid: 3243838073852133378
   _converterForSetColor:
     <Adapter>k__BackingField:
       rid: -2
@@ -4089,6 +4089,9 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 3243838073852133378
+      type: {class: StringToStringAdapter, ns: ZBase.Foundation.Mvvm.ViewBinding.Adapters, asm: ZBase.Foundation.Mvvm}
+      data: 
 --- !u!114 &1465506452
 MonoBehaviour:
   m_ObjectHideFlags: 0
