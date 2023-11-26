@@ -1,0 +1,19 @@
+{
+    "name": "Mvvm.Samples",
+    "rootNamespace": "",
+    "references": [
+        "ZBase.Foundation.Mvvm",
+        "ZBase.Foundation.Mvvm.ObservableCollections",
+        "ZBase.Foundation.Mvvm.Unity",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
