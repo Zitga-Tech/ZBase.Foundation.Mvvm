@@ -52,6 +52,48 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         [BindingProperty]
+        [field: Label("Max Visible Characters")]
+        [field: HideInInspector]
+        private void SetMaxVisibleCharacters(int value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].maxVisibleCharacters = value;
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Max Visible Words")]
+        [field: HideInInspector]
+        private void SetMaxVisibleWords(int value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].maxVisibleWords = value;
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Max Visible Lines")]
+        [field: HideInInspector]
+        private void SetMaxVisibleLines(int value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].maxVisibleLines = value;
+            }
+        }
+
+        [BindingProperty]
         [field: Label("Font Asset")]
         [field: HideInInspector]
         private void SetFontAsset(TMP_FontAsset value)
@@ -146,6 +188,34 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             for (var i = 0; i < length; i++)
             {
                 targets[i].maskable = value;
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Word Wrapping")]
+        [field: HideInInspector]
+        private void SetWordWrapping(bool value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].enableWordWrapping = value;
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Overflow Mode")]
+        [field: HideInInspector]
+        private void SetOverflowMode(TextOverflowModes value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].overflowMode = value;
             }
         }
     }

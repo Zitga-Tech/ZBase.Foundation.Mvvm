@@ -167,6 +167,23 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         [BindingProperty]
+        [field: Label("Placeholder Text")]
+        [field: HideInInspector]
+        private void SetPlaceholderText(string value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                if (targets[i].placeholder is TMP_Text placeholder)
+                {
+                    placeholder.text = value;
+                }
+            }
+        }
+
+        [BindingProperty]
         [field: Label("Placeholder Color")]
         [field: HideInInspector]
         private void SetPlaceholderColor(in Color value)

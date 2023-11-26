@@ -48,6 +48,22 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         [BindingProperty]
+        [field: Label("Texture (Native Size)")]
+        [field: HideInInspector]
+        private void SetTextureNativeSize(Texture value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                var target = targets[i];
+                target.texture = value;
+                target.SetNativeSize();
+            }
+        }
+
+        [BindingProperty]
         [field: Label("Material")]
         [field: HideInInspector]
         private void SetMaterial(Material value)
@@ -58,20 +74,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             for (var i = 0; i < length; i++)
             {
                 targets[i].material = value;
-            }
-        }
-
-        [BindingProperty]
-        [field: Label("UV Rect")]
-        [field: HideInInspector]
-        private void SetUVRect(Rect value)
-        {
-            var targets = Targets.Span;
-            var length = targets.Length;
-
-            for (var i = 0; i < length; i++)
-            {
-                targets[i].uvRect = value;
             }
         }
 
@@ -100,6 +102,20 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             for (var i = 0; i < length; i++)
             {
                 targets[i].maskable = value;
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("UV Rect")]
+        [field: HideInInspector]
+        private void SetUVRect(Rect value)
+        {
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                targets[i].uvRect = value;
             }
         }
     }

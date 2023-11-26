@@ -1,56 +1,42 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.UI;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
-    [AddComponentMenu("MVVM/Binders/Image Binder")]
-    public partial class ImageBinder : MonoBinder<Image>
+    [AddComponentMenu("MVVM/Binders/Grid Layout Group Binder")]
+    public partial class GridLayoutGroupBinder : MonoBinder<GridLayoutGroup>
     {
-        protected sealed override void OnAwake([NotNull] ref Image[] targets)
+        protected override void OnAwake([NotNull] ref GridLayoutGroup[] targets)
         {
             if (targets.Length < 1)
             {
-                if (this.gameObject.TryGetComponent<Image>(out var target))
+                if (this.gameObject.TryGetComponent<GridLayoutGroup>(out var target))
                 {
-                    targets = new Image[] { target };
+                    targets = new GridLayoutGroup[] { target };
                 }
             }
         }
 
         [BindingProperty]
-        [field: Label("Color")]
+        [field: Label("Cell Size")]
         [field: HideInInspector]
-        private void SetColor(Color value)
+        private void SetCellSize(Vector2 value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].color = value;
+                targets[i].cellSize = value;
             }
         }
 
         [BindingProperty]
-        [field: Label("Sprite")]
+        [field: Label("Cell Width")]
         [field: HideInInspector]
-        private void SetSprite(Sprite value)
-        {
-            var targets = Targets.Span;
-            var length = targets.Length;
-
-            for (var i = 0; i < length; i++)
-            {
-                targets[i].sprite = value;
-            }
-        }
-
-        [BindingProperty]
-        [field: Label("Sprite (Native Size)")]
-        [field: HideInInspector]
-        private void SetSpriteNativeSize(Sprite value)
+        private void SetCellWidth(float value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
@@ -58,148 +44,136 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             for (var i = 0; i < length; i++)
             {
                 var target = targets[i];
-                target.sprite = value;
-                target.SetNativeSize();
+                target.cellSize = new Vector2(value, target.cellSize.y);
             }
         }
 
         [BindingProperty]
-        [field: Label("Material")]
+        [field: Label("Cell Height")]
         [field: HideInInspector]
-        private void SetMaterial(Material value)
+        private void SetCellHeight(float value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].material = value;
+                var target = targets[i];
+                target.cellSize = new Vector2(target.cellSize.x, value);
             }
         }
 
         [BindingProperty]
-        [field: Label("Raycast Target")]
+        [field: Label("Spacing Size")]
         [field: HideInInspector]
-        private void SetRaycastTarget(bool value)
+        private void SetSpacingSize(Vector2 value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].raycastTarget = value;
+                targets[i].spacing = value;
             }
         }
 
         [BindingProperty]
-        [field: Label("Maskable")]
+        [field: Label("Spacing Width")]
         [field: HideInInspector]
-        private void SetMaskable(bool value)
+        private void SetSpacingWidth(float value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].maskable = value;
+                var target = targets[i];
+                target.spacing = new Vector2(value, target.spacing.y);
             }
         }
 
         [BindingProperty]
-        [field: Label("Image Type")]
+        [field: Label("Spacing Height")]
         [field: HideInInspector]
-        private void SetImageType(Image.Type value)
+        private void SetSpacingHeight(float value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].type = value;
+                var target = targets[i];
+                target.spacing = new Vector2(target.spacing.x, value);
             }
         }
 
         [BindingProperty]
-        [field: Label("Use Sprite Mesh")]
+        [field: Label("Start Corner")]
         [field: HideInInspector]
-        private void SetUseSpriteMesh(bool value)
+        private void SetStartCorner(GridLayoutGroup.Corner value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].useSpriteMesh = value;
+                targets[i].startCorner = value;
             }
         }
 
         [BindingProperty]
-        [field: Label("Preserve Aspect")]
+        [field: Label("Start Axis")]
         [field: HideInInspector]
-        private void SetPreserveAspect(bool value)
+        private void SetStartAxis(GridLayoutGroup.Axis value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].preserveAspect = value;
+                targets[i].startAxis = value;
             }
         }
-
+        
         [BindingProperty]
-        [field: Label("Pixels Per Unit Multiplier")]
+        [field: Label("Child Alignment")]
         [field: HideInInspector]
-        private void SetPixelsPerUnitMultiplier(float value)
+        private void SetChildAlignment(TextAnchor value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].pixelsPerUnitMultiplier = value;
+                targets[i].childAlignment = value;
             }
         }
 
         [BindingProperty]
-        [field: Label("Fill Method")]
+        [field: Label("Constraint")]
         [field: HideInInspector]
-        private void SetFillMethod(Image.FillMethod value)
+        private void SetConstraint(GridLayoutGroup.Constraint value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].fillMethod = value;
+                targets[i].constraint = value;
             }
         }
 
         [BindingProperty]
-        [field: Label("Fill Origin")]
+        [field: Label("Constraint Count")]
         [field: HideInInspector]
-        private void SetFillOrigin(int value)
+        private void SetConstraintCount(int value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].fillOrigin = value;
-            }
-        }
-
-        [BindingProperty]
-        [field: Label("Fill Amount")]
-        [field: HideInInspector]
-        private void SetFillAmount(float value)
-        {
-            var targets = Targets.Span;
-            var length = targets.Length;
-
-            for (var i = 0; i < length; i++)
-            {
-                targets[i].fillAmount = value;
+                targets[i].constraintCount = value;
             }
         }
     }
