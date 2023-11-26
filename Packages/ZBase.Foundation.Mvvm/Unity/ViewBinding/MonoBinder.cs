@@ -1,3 +1,5 @@
+#pragma warning disable CA2201 // Do not raise reserved exception types
+
 using System;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
@@ -177,7 +179,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(bindingProperty.TargetPropertyName))
+            if (string.IsNullOrWhiteSpace(bindingProperty?.TargetPropertyName))
             {
                 return;
             }
@@ -187,7 +189,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
         protected virtual void OnBindCommandFailed(BindingCommand bindingCommand)
         {
-            if (string.IsNullOrWhiteSpace(bindingCommand.TargetCommandName))
+            if (string.IsNullOrWhiteSpace(bindingCommand?.TargetCommandName))
             {
                 return;
             }
@@ -227,7 +229,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             var type = bindingContext?.Target?.GetType();
 
             Debug.LogError(
-                  $"Cannot bind to any property named `{bindingProperty.TargetPropertyName}` on {type}. " +
+                  $"Cannot bind to any property named `{bindingProperty?.TargetPropertyName}` on {type}. " +
                   $"Please verify if {type} contains this property."
                 , context
             );
@@ -243,7 +245,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             var type = bindingContext?.Target?.GetType();
 
             Debug.LogError(
-                  $"Cannot bind to any command named `{bindingCommand.TargetCommandName}` on {type}. " +
+                  $"Cannot bind to any command named `{bindingCommand?.TargetCommandName}` on {type}. " +
                   $"Please verify if {type} contains this command."
                 , context
             );

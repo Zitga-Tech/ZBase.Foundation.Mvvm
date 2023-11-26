@@ -1,3 +1,5 @@
+#pragma warning disable CA2201 // Do not raise reserved exception types
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
