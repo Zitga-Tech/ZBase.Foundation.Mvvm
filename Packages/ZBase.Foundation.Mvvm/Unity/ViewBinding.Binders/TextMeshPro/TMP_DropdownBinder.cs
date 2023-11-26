@@ -74,7 +74,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].value = value;
+                targets[i].SetValueWithoutNotify(value);
             }
         }
 

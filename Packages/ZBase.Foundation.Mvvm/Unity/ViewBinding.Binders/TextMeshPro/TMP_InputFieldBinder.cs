@@ -148,7 +148,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
             for (var i = 0; i < length; i++)
             {
-                targets[i].text = value;
+                targets[i].SetTextWithoutNotify(value);
             }
         }
 
