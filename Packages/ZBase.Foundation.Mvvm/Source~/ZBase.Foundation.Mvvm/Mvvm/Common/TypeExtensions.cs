@@ -6,6 +6,11 @@ namespace ZBase.Foundation.Mvvm
     {
         public static string GetName(this Type type)
         {
+            if (type.IsEnum)
+            {
+                return type.Name;
+            }
+
             return Type.GetTypeCode(type) switch {
                 TypeCode.Boolean => "bool",
                 TypeCode.Byte => "byte",
@@ -27,6 +32,11 @@ namespace ZBase.Foundation.Mvvm
 
         public static string GetFullName(this Type type)
         {
+            if (type.IsEnum)
+            {
+                return type.FullName;
+            }
+
             return Type.GetTypeCode(type) switch {
                 TypeCode.Boolean => "bool",
                 TypeCode.Byte => "byte",
@@ -44,6 +54,35 @@ namespace ZBase.Foundation.Mvvm
                 TypeCode.UInt64 => "ulong",
                 _ => type.FullName
             };
+        }
+
+        public static string GetFriendlyName(this Type type)
+        {
+            var friendlyName = type.GetName();
+
+            if (type.IsGenericType)
+            {
+                var iBacktick = friendlyName.IndexOf('`');
+
+                if (iBacktick > 0)
+                {
+                    friendlyName = friendlyName.Remove(iBacktick);
+                }
+
+                friendlyName += "<";
+                
+                var typeParameters = type.GetGenericArguments();
+
+                for (int i = 0; i < typeParameters.Length; ++i)
+                {
+                    string typeParamName = GetFriendlyName(typeParameters[i]);
+                    friendlyName += (i == 0 ? typeParamName : "," + typeParamName);
+                }
+
+                friendlyName += ">";
+            }
+
+            return friendlyName;
         }
     }
 }
