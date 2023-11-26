@@ -722,6 +722,8 @@ MonoBehaviour:
     <TargetPropertyName>k__BackingField: 
   _bindingFieldForSetTextColor:
     <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetPlaceholderText:
+    <TargetPropertyName>k__BackingField: 
   _bindingFieldForSetPlaceholderColor:
     <TargetPropertyName>k__BackingField: 
   _bindingFieldForSetCustomCaretColor:
@@ -760,6 +762,9 @@ MonoBehaviour:
     <Adapter>k__BackingField:
       rid: -2
   _converterForSetTextColor:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetPlaceholderText:
     <Adapter>k__BackingField:
       rid: -2
   _converterForSetPlaceholderColor:
@@ -1477,6 +1482,12 @@ MonoBehaviour:
     <TargetPropertyName>k__BackingField: Progress
   _bindingFieldForSetColor:
     <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetMaxVisibleCharacters:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetMaxVisibleWords:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetMaxVisibleLines:
+    <TargetPropertyName>k__BackingField: 
   _bindingFieldForSetFontAsset:
     <TargetPropertyName>k__BackingField: 
   _bindingFieldForSetFontSize:
@@ -1491,10 +1502,23 @@ MonoBehaviour:
     <TargetPropertyName>k__BackingField: 
   _bindingFieldForSetMaskable:
     <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetWordWrapping:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetOverflowMode:
+    <TargetPropertyName>k__BackingField: 
   _converterForSetText:
     <Adapter>k__BackingField:
       rid: 7863444904256995329
   _converterForSetColor:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetMaxVisibleCharacters:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetMaxVisibleWords:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetMaxVisibleLines:
     <Adapter>k__BackingField:
       rid: -2
   _converterForSetFontAsset:
@@ -1516,6 +1540,12 @@ MonoBehaviour:
     <Adapter>k__BackingField:
       rid: -2
   _converterForSetMaskable:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetWordWrapping:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetOverflowMode:
     <Adapter>k__BackingField:
       rid: -2
   references:
@@ -1557,10 +1587,10 @@ RectTransform:
   - {fileID: 2046062993}
   m_Father: {fileID: 1590762277}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 960.0001, y: -75}
-  m_SizeDelta: {x: 640.00006, y: 150}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &346146232
 GameObject:
@@ -1684,10 +1714,10 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 743433709}
+  m_Father: {fileID: 488288288}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1731,8 +1761,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: 19f67687959c19f48ac37a45ffd97640, type: 3}
+  m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1804,6 +1834,136 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+--- !u!1 &488288287
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 488288288}
+  - component: {fileID: 488288290}
+  - component: {fileID: 488288289}
+  m_Layer: 5
+  m_Name: root
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &488288288
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 488288287}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 414968984}
+  - {fileID: 1492790009}
+  m_Father: {fileID: 743433709}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &488288289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 488288287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe6409314db33c349be387b2842a36a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _contextSetting: 0
+  _context: {fileID: 606846926}
+  _targets: []
+  _bindingFieldForSetSpacing:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetChildAlignment:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetReverseArrangement:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetControlChildWidth:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetControlChildHeight:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetUseChildScaleWidth:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetUseChildScaleHeight:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetChildForceExpandWidth:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetChildForceExpandHeight:
+    <TargetPropertyName>k__BackingField: 
+  _converterForSetSpacing:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetChildAlignment:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetReverseArrangement:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetControlChildWidth:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetControlChildHeight:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetUseChildScaleWidth:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetUseChildScaleHeight:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetChildForceExpandWidth:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetChildForceExpandHeight:
+    <Adapter>k__BackingField:
+      rid: -2
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+--- !u!114 &488288290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 488288287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 4
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -2448,13 +2608,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 414968984}
+  - {fileID: 488288288}
   m_Father: {fileID: 1590762277}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1600.0001, y: -75}
-  m_SizeDelta: {x: 640.00006, y: 150}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &755158217
 GameObject:
@@ -2621,10 +2781,10 @@ RectTransform:
   - {fileID: 1475401631}
   m_Father: {fileID: 1590762277}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 320.00003, y: -75}
-  m_SizeDelta: {x: 640.00006, y: 150}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &803660148
 GameObject:
@@ -3858,6 +4018,12 @@ MonoBehaviour:
     <TargetPropertyName>k__BackingField: TimeText
   _bindingFieldForSetColor:
     <TargetPropertyName>k__BackingField: TextColor
+  _bindingFieldForSetMaxVisibleCharacters:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetMaxVisibleWords:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetMaxVisibleLines:
+    <TargetPropertyName>k__BackingField: 
   _bindingFieldForSetFontAsset:
     <TargetPropertyName>k__BackingField: 
   _bindingFieldForSetFontSize:
@@ -3872,10 +4038,23 @@ MonoBehaviour:
     <TargetPropertyName>k__BackingField: 
   _bindingFieldForSetMaskable:
     <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetWordWrapping:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetOverflowMode:
+    <TargetPropertyName>k__BackingField: 
   _converterForSetText:
     <Adapter>k__BackingField:
       rid: -2
   _converterForSetColor:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetMaxVisibleCharacters:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetMaxVisibleWords:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetMaxVisibleLines:
     <Adapter>k__BackingField:
       rid: -2
   _converterForSetFontAsset:
@@ -3897,6 +4076,12 @@ MonoBehaviour:
     <Adapter>k__BackingField:
       rid: -2
   _converterForSetMaskable:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetWordWrapping:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetOverflowMode:
     <Adapter>k__BackingField:
       rid: -2
   references:
@@ -4200,6 +4385,134 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1487505901}
+  m_CullTransparentMesh: 1
+--- !u!1 &1492790008
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1492790009}
+  - component: {fileID: 1492790012}
+  - component: {fileID: 1492790011}
+  - component: {fileID: 1492790010}
+  m_Layer: 5
+  m_Name: RawImage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1492790009
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1492790008}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 488288288}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1492790010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1492790008}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbcc39aef71836f40906cfb9890b643e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _contextSetting: 0
+  _context: {fileID: 606846926}
+  _targets: []
+  _bindingFieldForSetColor:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetTexture:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetTextureNativeSize:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetMaterial:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetRaycastTarget:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetMaskable:
+    <TargetPropertyName>k__BackingField: 
+  _bindingFieldForSetUVRect:
+    <TargetPropertyName>k__BackingField: 
+  _converterForSetColor:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetTexture:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetTextureNativeSize:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetMaterial:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetRaycastTarget:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetMaskable:
+    <Adapter>k__BackingField:
+      rid: -2
+  _converterForSetUVRect:
+    <Adapter>k__BackingField:
+      rid: -2
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+--- !u!114 &1492790011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1492790008}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Texture: {fileID: 2800000, guid: 19f67687959c19f48ac37a45ffd97640, type: 3}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!222 &1492790012
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1492790008}
   m_CullTransparentMesh: 1
 --- !u!1 &1543893602
 GameObject:
@@ -4646,7 +4959,7 @@ GameObject:
   - component: {fileID: 1774268205}
   - component: {fileID: 1774268209}
   m_Layer: 5
-  m_Name: Time_Text
+  m_Name: Middle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
