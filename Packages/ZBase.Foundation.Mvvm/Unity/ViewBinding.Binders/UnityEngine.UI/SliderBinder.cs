@@ -55,7 +55,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [BindingProperty]
         [field: Label("Min Value")]
         [field: HideInInspector]
-        private void SetMinValue(int value)
+        private void SetMinValue(float value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
@@ -69,7 +69,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         [BindingProperty]
         [field: Label("Max Value")]
         [field: HideInInspector]
-        private void SetMaxValue(int value)
+        private void SetMaxValue(float value)
         {
             var targets = Targets.Span;
             var length = targets.Length;
