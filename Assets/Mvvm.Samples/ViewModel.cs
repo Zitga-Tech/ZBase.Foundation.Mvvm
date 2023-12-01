@@ -8,7 +8,11 @@ namespace Mvvm.Samples
     public partial class A : IObservableObject
     {
         [ObservableProperty]
-        private float _x;
+        public float X
+        {
+            get => GetValue_X();
+            set => SetValue_X(value);
+        }
     }
 
     public partial class B : IObservableObject

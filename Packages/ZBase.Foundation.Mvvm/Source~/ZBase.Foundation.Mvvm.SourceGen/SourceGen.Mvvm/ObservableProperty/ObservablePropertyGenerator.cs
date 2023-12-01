@@ -61,7 +61,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
                 string source;
 
-                if (declaration.FieldRefs.Length > 0)
+                if (declaration.FieldRefs.Length > 0 || declaration.PropRefs.Length > 0)
                 {
                     source = declaration.WriteCode();
                 }
