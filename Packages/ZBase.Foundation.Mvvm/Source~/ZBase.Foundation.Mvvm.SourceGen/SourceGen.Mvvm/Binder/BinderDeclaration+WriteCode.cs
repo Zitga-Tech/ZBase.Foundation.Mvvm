@@ -7,7 +7,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
     partial class BinderDeclaration
     {
         private const string AGGRESSIVE_INLINING = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]";
-        private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.BinderGenerator\", \"1.0.0\")]";
+        private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.BinderGenerator\", \"1.2.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
         private const string OBSOLETE_METHOD = "[global::System.Obsolete(\"This method is not intended to be use directly by user code.\")]";
         private const string GENERATED_BINDING_PROPERTY = "[global::ZBase.Foundation.Mvvm.ViewBinding.SourceGen.GeneratedBindingProperty({0}, typeof({1}))]";
@@ -385,7 +385,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
             p.PrintLine($"/// <summary>A flag indicates whether this binder is listening to events from <see cref=\"Context\"/>.</summary>");
             p.PrintLine(GENERATED_CODE);
-            p.PrintLine($"private bool _isListening;");
+            p.PrintLine($"private bool {IsListeningName(this)};");
             p.PrintEndLine();
         }
 
@@ -461,10 +461,10 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     p.PrintEndLine();
                 }
 
-                p.PrintLine($"if (this._isListening) return;");
+                p.PrintLine($"if (this.{IsListeningName(this)}) return;");
                 p.PrintEndLine();
 
-                p.PrintLine($"this._isListening = true;");
+                p.PrintLine($"this.{IsListeningName(this)} = true;");
                 p.PrintEndLine();
 
                 if (BindingPropertyRefs.Length > 0)
@@ -554,10 +554,10 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     p.PrintEndLine();
                 }
 
-                p.PrintLine($"if (this._isListening == false) return;");
+                p.PrintLine($"if (this.{IsListeningName(this)} == false) return;");
                 p.PrintEndLine();
 
-                p.PrintLine($"this._isListening = false;");
+                p.PrintLine($"this.{IsListeningName(this)} = false;");
                 p.PrintEndLine();
 
                 if (BindingPropertyRefs.Length > 0)
@@ -905,6 +905,9 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
             p.PrintEndLine();
         }
+
+        private static string IsListeningName(BinderDeclaration dec)
+            => $"_isListening_{dec.Symbol.ToValidIdentifier()}";
 
         private static string ConstName(BindingPropertyRef member)
             => $"BindingProperty_{member.Symbol.Name}";

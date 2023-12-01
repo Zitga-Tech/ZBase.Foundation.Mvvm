@@ -192,7 +192,7 @@ namespace ZBase.Foundation.Mvvm
 
         public static string ToFieldName(this IPropertySymbol property)
         {
-            return $"{FIELD_PREFIX_M_UNDERSCORE}{property.Name}";
+            return $"{FIELD_PREFIX_UNDERSCORE}{property.Name}";
         }
 
         public static string ToTitleCase(in ReadOnlySpan<char> value)

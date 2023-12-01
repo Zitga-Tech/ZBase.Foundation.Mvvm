@@ -77,7 +77,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 foreach (var member in onBindPropertyFaileds)
                 {
                     if (member is IMethodSymbol method
-                        && (isCurrentType == false && method.DeclaredAccessibility is (Accessibility.Public or Accessibility.Protected))
+                        && isCurrentType == false && method.DeclaredAccessibility is (Accessibility.Public or Accessibility.Protected)
                         && method.Parameters.Length == 1
                         && method.Parameters[0].Type.ToFullName() == BINDING_PROPERTY
                     )
@@ -92,7 +92,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 foreach (var member in onBindCommandFaileds)
                 {
                     if (member is IMethodSymbol method
-                        && (isCurrentType == false && method.DeclaredAccessibility is (Accessibility.Public or Accessibility.Protected))
+                        && isCurrentType == false && method.DeclaredAccessibility is (Accessibility.Public or Accessibility.Protected)
                         && method.Parameters.Length == 1
                         && method.Parameters[0].Type.ToFullName() == BINDING_COMMAND
                     )
