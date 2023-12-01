@@ -190,6 +190,11 @@ namespace ZBase.Foundation.Mvvm
             return ToTitleCase(nameSpan);
         }
 
+        public static string ToFieldName(this IPropertySymbol property)
+        {
+            return $"{FIELD_PREFIX_M_UNDERSCORE}{property.Name}";
+        }
+
         public static string ToTitleCase(in ReadOnlySpan<char> value)
         {
             return $"{char.ToUpper(value[0])}{value.Slice(1).ToString()}";

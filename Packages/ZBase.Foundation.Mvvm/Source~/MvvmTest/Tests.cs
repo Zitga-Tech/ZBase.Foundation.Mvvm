@@ -111,6 +111,13 @@ namespace MvvmTest
         [ObservableProperty]
         private A _a;
 
+        [ObservableProperty]
+        public int MySpecialIntProp
+        {
+            get => m_MySpecialIntProp;
+            set => SetProperty_MySpecialIntProp(value);
+        }
+
         public TypeCode Type { get; }
 
         public IObservableObject Target => this;

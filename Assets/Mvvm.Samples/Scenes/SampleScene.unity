@@ -2881,7 +2881,7 @@ MonoBehaviour:
   _bindingFieldForSetInteractable:
     <TargetPropertyName>k__BackingField: 
   _bindingFieldForSetValue:
-    <TargetPropertyName>k__BackingField: Progress
+    <TargetPropertyName>k__BackingField: 
   _bindingFieldForSetMinValue:
     <TargetPropertyName>k__BackingField: 
   _bindingFieldForSetMaxValue:
@@ -2893,7 +2893,7 @@ MonoBehaviour:
       rid: -2
   _converterForSetValue:
     <Adapter>k__BackingField:
-      rid: 7863444904256995330
+      rid: -2
   _converterForSetMinValue:
     <Adapter>k__BackingField:
       rid: -2
@@ -2910,9 +2910,6 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 7863444904256995330
-      type: {class: FloatToFloatAdapter, ns: ZBase.Foundation.Mvvm.ViewBinding.Adapters, asm: ZBase.Foundation.Mvvm}
-      data: 
 --- !u!114 &804311874
 MonoBehaviour:
   m_ObjectHideFlags: 0

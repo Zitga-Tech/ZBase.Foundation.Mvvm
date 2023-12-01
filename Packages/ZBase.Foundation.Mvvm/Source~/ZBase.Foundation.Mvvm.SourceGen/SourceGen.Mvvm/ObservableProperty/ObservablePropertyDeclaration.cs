@@ -24,7 +24,9 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
         public bool IsBaseObservableObject { get; }
 
-        public ImmutableArray<MemberRef> MemberRefs { get; }
+        public ImmutableArray<FieldRef> FieldRefs { get; }
+
+        public ImmutableArray<PropertyRef> PropRefs { get; }
 
         public bool HasMemberObservableObject { get; }
 
@@ -44,7 +46,8 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             , CancellationToken token
         )
         {
-            using var memberRefs = ImmutableArrayBuilder<MemberRef>.Rent();
+            using var fieldRefs = ImmutableArrayBuilder<FieldRef>.Rent();
+            using var propRefs = ImmutableArrayBuilder<PropertyRef>.Rent();
             using var diagnosticBuilder = ImmutableArrayBuilder<DiagnosticInfo>.Rent();
 
             Syntax = candidate;
@@ -62,7 +65,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             }
 
             var members = Symbol.GetMembers();
-            var fieldToPropertyChanged = new Dictionary<string, string>();
+            var propertyChangedMap = new Dictionary<string, string>();
             var commandSet = new HashSet<string>();
             var propertyMap = new Dictionary<string, IPropertySymbol>();
             var methods = new List<IMethodSymbol>();
@@ -73,13 +76,13 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 {
                     if (field.HasAttribute(OBSERVABLE_PROPERTY_ATTRIBUTE))
                     {
-                        var memberRef = new MemberRef {
-                            Member = field,
+                        var fieldRef = new FieldRef {
+                            Field = field,
                             PropertyName = field.ToPropertyName(),
                             IsObservableObject = field.Type.ImplementsInterface(IOBSERVABLE_OBJECT_INTERFACE),
                         };
 
-                        if (memberRef.IsObservableObject)
+                        if (fieldRef.IsObservableObject)
                         {
                             HasMemberObservableObject = true;
                         }
@@ -94,7 +97,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                                 && notifyPropChangedFor.ConstructorArguments[0].Value is string propName
                             )
                             {
-                                fieldToPropertyChanged[field.Name] = propName;
+                                propertyChangedMap[field.Name] = propName;
                             }
                         }
 
@@ -123,8 +126,18 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                             commandNames.AddRange(uniqueCommandNames);
                         }
 
-                        memberRef.CommandNames = commandNames.ToImmutable();
-                        memberRefs.Add(memberRef);
+                        fieldRef.Field.GatherForwardedAttributes(
+                              semanticModel
+                            , token
+                            , diagnosticBuilder
+                            , out var propertyAttributes
+                            , DiagnosticDescriptors.InvalidPropertyTargetedAttributeOnObservableProperty
+                        );
+
+                        fieldRef.ForwardedPropertyAttributes = propertyAttributes;
+                        fieldRef.CommandNames = commandNames.ToImmutable();
+
+                        fieldRefs.Add(fieldRef);
                     }
 
                     continue;
@@ -132,7 +145,77 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
                 if (member is IPropertySymbol property)
                 {
-                    propertyMap[property.Name] = property;
+                    if (property.HasAttribute(OBSERVABLE_PROPERTY_ATTRIBUTE) == false)
+                    {
+                        propertyMap[property.Name] = property;
+                    }
+                    else
+                    {
+                        var propRef = new PropertyRef {
+                            Property = property,
+                            FieldName = property.ToFieldName(),
+                            IsObservableObject = property.Type.ImplementsInterface(IOBSERVABLE_OBJECT_INTERFACE),
+                        };
+
+                        if (propRef.IsObservableObject)
+                        {
+                            HasMemberObservableObject = true;
+                        }
+
+                        var uniqueCommandNames = new HashSet<string>();
+                        var notifyPropChangedFors = property.GetAttributes(NOTIFY_PROPERTY_CHANGED_FOR_ATTRIBUTE);
+
+                        foreach (var notifyPropChangedFor in notifyPropChangedFors)
+                        {
+                            if (notifyPropChangedFor != null
+                                && notifyPropChangedFor.ConstructorArguments.Length > 0
+                                && notifyPropChangedFor.ConstructorArguments[0].Value is string propName
+                            )
+                            {
+                                propertyChangedMap[property.Name] = propName;
+                            }
+                        }
+
+                        var notifyCanExecuteChangedFors = property.GetAttributes(NOTIFY_CAN_EXECUTE_CHANGED_FOR_ATTRIBUTE);
+
+                        using var commandNames = ImmutableArrayBuilder<string>.Rent();
+
+                        foreach (var notifyCanExecuteChangedFor in notifyCanExecuteChangedFors)
+                        {
+                            if (notifyCanExecuteChangedFor != null
+                                && notifyCanExecuteChangedFor.ConstructorArguments.Length > 0
+                            )
+                            {
+                                var args = notifyCanExecuteChangedFor.ConstructorArguments;
+
+                                foreach (var arg in args)
+                                {
+                                    if (arg.Value is string commandName)
+                                    {
+                                        uniqueCommandNames.Add(commandName);
+                                        commandSet.Add(commandName);
+                                    }
+                                }
+                            }
+
+                            commandNames.AddRange(uniqueCommandNames);
+                        }
+
+                        propRef.Property.GatherForwardedAttributes(
+                              semanticModel
+                            , token
+                            , diagnosticBuilder
+                            , out var fieldAttributes
+                            , out var methodAttributes
+                            , DiagnosticDescriptors.InvalidFieldMethodTargetedAttributeOnObservableProperty
+                        );
+
+                        propRef.ForwardedFieldAttributes = fieldAttributes;
+                        propRef.ForwardedMethodAttributes = methodAttributes;
+                        propRef.CommandNames = commandNames.ToImmutable();
+                        propRefs.Add(propRef);
+                    }
+
                     continue;
                 }
 
@@ -147,7 +230,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 }
             }
 
-            foreach (var kv in fieldToPropertyChanged)
+            foreach (var kv in propertyChangedMap)
             {
                 var fieldName = kv.Key;
                 var propertyName = kv.Value;
@@ -168,33 +251,43 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 }
             }
 
-            MemberRefs = memberRefs.ToImmutable();
-
-            foreach (var memberRef in MemberRefs)
-            {
-                memberRef.Member.GatherForwardedAttributes(
-                      semanticModel
-                    , token
-                    , diagnosticBuilder
-                    , out var propertyAttributes
-                    , DiagnosticDescriptors.InvalidFieldOrPropertyTargetedAttributeOnRelayCommandMethod
-                );
-
-                memberRef.ForwardedPropertyAttributes = propertyAttributes;
-            }
+            FieldRefs = fieldRefs.ToImmutable();
+            PropRefs = propRefs.ToImmutable();
         }
 
-        public class MemberRef
+        public abstract class MemberRef
         {
-            public IFieldSymbol Member { get; set; }
-
-            public string PropertyName { get; set; }
-
             public bool IsObservableObject { get; set; }
 
             public ImmutableArray<string> CommandNames { get; set; }
 
+            public abstract string GetPropertyName();
+        }
+
+        public class FieldRef : MemberRef
+        {
+            public IFieldSymbol Field { get; set; }
+
+            public string PropertyName { get; set; }
+
             public ImmutableArray<AttributeInfo> ForwardedPropertyAttributes { get; set; }
+
+            public override string GetPropertyName()
+                => PropertyName;
+        }
+
+        public class PropertyRef : MemberRef
+        {
+            public IPropertySymbol Property { get; set; }
+
+            public string FieldName { get; set; }
+
+            public ImmutableArray<AttributeInfo> ForwardedFieldAttributes { get; set; }
+
+            public ImmutableArray<AttributeInfo> ForwardedMethodAttributes { get; set; }
+
+            public override string GetPropertyName()
+                => Property.Name;
         }
     }
 }

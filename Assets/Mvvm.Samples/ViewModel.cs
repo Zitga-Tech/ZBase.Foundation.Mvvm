@@ -27,7 +27,11 @@ namespace Mvvm.Samples
         private Color _textColor;
 
         [ObservableProperty]
-        private float _progress;
+        public float Progress
+        {
+            get => m_Progress;
+            set => SetProperty_Progress(value);
+        }
 
         [ObservableProperty]
         private bool _updating;

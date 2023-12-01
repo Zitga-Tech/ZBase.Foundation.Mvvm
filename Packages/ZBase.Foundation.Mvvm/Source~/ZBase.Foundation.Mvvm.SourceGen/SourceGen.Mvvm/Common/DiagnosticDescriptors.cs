@@ -16,39 +16,34 @@ namespace ZBase.Foundation.Mvvm
     internal static class DiagnosticDescriptors
     {
         /// <summary>
-        /// The diagnostic id for <see cref="FieldReferenceForObservablePropertyFieldWarning"/>.
-        /// </summary>
-        public const string FieldReferenceForObservablePropertyFieldId = "MVVMTK0034";
-
-        /// <summary>
-        /// Gets a <see cref="DiagnosticDescriptor"/> indicating when a field with <c>[ObservableProperty]</c> is being directly referenced.
-        /// <para>
-        /// Format: <c>"The field {0} is annotated with [ObservableProperty] and should not be directly referenced (use the generated property instead)"</c>.
-        /// </para>
-        /// </summary>
-        public static readonly DiagnosticDescriptor FieldReferenceForObservablePropertyFieldWarning = new DiagnosticDescriptor(
-        id: FieldReferenceForObservablePropertyFieldId,
-        title: "Direct field reference to [ObservableProperty] backing field",
-        messageFormat: "The field {0} is annotated with [ObservableProperty] and should not be directly referenced (use the generated property instead)",
-        category: "ObservablePropertyGenerator",
-        defaultSeverity: DiagnosticSeverity.Warning,
-        isEnabledByDefault: true,
-        description: "Fields with [ObservableProperty] should not be directly referenced, and the generated properties should be used instead.");
-
-        /// <summary>
         /// Gets a <see cref="DiagnosticDescriptor"/> indicating when a field with <c>[ObservableProperty]</c> is using an invalid attribute targeting the property.
         /// <para>
         /// Format: <c>"The field {0} annotated with [ObservableProperty] is using attribute "{1}" which was not recognized as a valid type (are you missing a using directive?)"</c>.
         /// </para>
         /// </summary>
-        public static readonly DiagnosticDescriptor InvalidPropertyTargetedAttributeOnObservablePropertyField = new DiagnosticDescriptor(
-        id: "MVVMTK0035",
+        public static readonly DiagnosticDescriptor InvalidPropertyTargetedAttributeOnObservableProperty = new DiagnosticDescriptor(
+        id: "MVVMTK0034",
         title: "Invalid property targeted attribute type",
         messageFormat: "The field {0} annotated with [ObservableProperty] is using attribute \"{1}\" which was not recognized as a valid type (are you missing a using directive?)",
         category: "ObservablePropertyGenerator",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
         description: "All attributes targeting the generated property for a field annotated with [ObservableProperty] must correctly be resolved to valid types.");
+
+        /// <summary>
+        /// Gets a <see cref="DiagnosticDescriptor"/> indicating when a property with <c>[ObservableProperty]</c> is using an invalid attribute targeting the property.
+        /// <para>
+        /// Format: <c>"The property {0} annotated with [ObservableProperty] is using attribute "{1}" which was not recognized as a valid type (are you missing a using directive?)"</c>.
+        /// </para>
+        /// </summary>
+        public static readonly DiagnosticDescriptor InvalidFieldMethodTargetedAttributeOnObservableProperty = new DiagnosticDescriptor(
+        id: "MVVMTK0035",
+        title: "Invalid field targeted attribute type",
+        messageFormat: "The property {0} annotated with [ObservableProperty] is using attribute \"{1}\" which was not recognized as a valid type (are you missing a using directive?)",
+        category: "ObservablePropertyGenerator",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "All attributes targeting the generated field or method for a property annotated with [ObservableProperty] must correctly be resolved to valid types.");
 
         /// <summary>
         /// Gets a <see cref="DiagnosticDescriptor"/> indicating when a method with <c>[RelayCommand]</c> is using an invalid attribute targeting the field or property.
