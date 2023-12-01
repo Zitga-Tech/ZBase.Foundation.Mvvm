@@ -29,8 +29,8 @@ namespace Mvvm.Samples
         [ObservableProperty]
         public float Progress
         {
-            get => m_Progress;
-            set => SetProperty_Progress(value);
+            get => GetValue_Progress();
+            set => SetValue_Progress(value);
         }
 
         [ObservableProperty]
