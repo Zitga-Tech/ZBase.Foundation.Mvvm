@@ -206,12 +206,10 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                             , token
                             , diagnosticBuilder
                             , out var fieldAttributes
-                            , out var methodAttributes
                             , DiagnosticDescriptors.InvalidFieldMethodTargetedAttributeOnObservableProperty
                         );
 
                         propRef.ForwardedFieldAttributes = fieldAttributes;
-                        propRef.ForwardedMethodAttributes = methodAttributes;
                         propRef.CommandNames = commandNames.ToImmutable();
                         propRefs.Add(propRef);
                     }
@@ -283,8 +281,6 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             public string FieldName { get; set; }
 
             public ImmutableArray<AttributeInfo> ForwardedFieldAttributes { get; set; }
-
-            public ImmutableArray<AttributeInfo> ForwardedMethodAttributes { get; set; }
 
             public override string GetPropertyName()
                 => Property.Name;

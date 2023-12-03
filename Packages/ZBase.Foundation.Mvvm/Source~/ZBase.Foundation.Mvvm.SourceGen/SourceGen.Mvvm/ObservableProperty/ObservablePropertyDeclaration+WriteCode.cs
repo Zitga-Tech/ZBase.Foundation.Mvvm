@@ -400,11 +400,6 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 p.PrintLine($"private {typeName} {fieldName};");
                 p.PrintEndLine();
 
-                foreach (var attribute in member.ForwardedMethodAttributes)
-                {
-                    p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
-                }
-
                 p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(AGGRESSIVE_INLINING);
                 p.PrintLine($"private {typeName} GetValue_{propertyName}()");
                 p.OpenScope();

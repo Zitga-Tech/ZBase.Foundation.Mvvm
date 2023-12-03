@@ -190,6 +190,26 @@ namespace ZBase.Foundation.Mvvm
             return ToTitleCase(nameSpan);
         }
 
+        public static string ToPropertyName(this string fieldName)
+        {
+            var nameSpan = fieldName.AsSpan();
+            var prefix = FIELD_PREFIX_UNDERSCORE.AsSpan();
+
+            if (nameSpan.StartsWith(prefix))
+            {
+                return ToTitleCase(nameSpan.Slice(1));
+            }
+
+            prefix = FIELD_PREFIX_M_UNDERSCORE.AsSpan();
+
+            if (nameSpan.StartsWith(prefix))
+            {
+                return ToTitleCase(nameSpan.Slice(2));
+            }
+
+            return ToTitleCase(nameSpan);
+        }
+
         public static string ToFieldName(this IPropertySymbol property)
         {
             return $"{FIELD_PREFIX_UNDERSCORE}{ToLowerCase(property.Name.AsSpan())}";

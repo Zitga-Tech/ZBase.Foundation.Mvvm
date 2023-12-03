@@ -561,19 +561,16 @@ namespace ZBase.Foundation.SourceGen
         /// <param name="token">The cancellation token for the current operation.</param>
         /// <param name="diagnostics">The current collection of gathered diagnostics.</param>
         /// <param name="fieldAttributes">The resulting field attributes to forward.</param>
-        /// <param name="fieldAttributes">The resulting property attributes to forward.</param>
         public static void GatherForwardedAttributes(
               this IPropertySymbol fieldSymbol
             , SemanticModel semanticModel
             , CancellationToken token
             , in ImmutableArrayBuilder<DiagnosticInfo> diagnostics
             , out ImmutableArray<AttributeInfo> fieldAttributes
-            , out ImmutableArray<AttributeInfo> methodAttributes
             , DiagnosticDescriptor diagnostic
         )
         {
             using var fieldAttributesInfo = ImmutableArrayBuilder<AttributeInfo>.Rent();
-            using var methodAttributesInfo = ImmutableArrayBuilder<AttributeInfo>.Rent();
 
             GatherForwardedAttributes(
                   fieldSymbol
@@ -581,12 +578,10 @@ namespace ZBase.Foundation.SourceGen
                 , token
                 , in diagnostics
                 , in fieldAttributesInfo
-                , in methodAttributesInfo
                 , diagnostic
             );
 
             fieldAttributes = fieldAttributesInfo.ToImmutable();
-            methodAttributes = methodAttributesInfo.ToImmutable();
 
             static void GatherForwardedAttributes(
                   IPropertySymbol symbol
@@ -594,7 +589,6 @@ namespace ZBase.Foundation.SourceGen
                 , CancellationToken token
                 , in ImmutableArrayBuilder<DiagnosticInfo> diagnostics
                 , in ImmutableArrayBuilder<AttributeInfo> fieldAttributesInfo
-                , in ImmutableArrayBuilder<AttributeInfo> methodAttributesInfo
                 , DiagnosticDescriptor diagnostic
             )
             {
@@ -615,7 +609,7 @@ namespace ZBase.Foundation.SourceGen
                 foreach (AttributeListSyntax attributeList in propDeclaration.AttributeLists)
                 {
                     if (attributeList.Target == null
-                        || attributeList.Target.Identifier.Kind() is not (SyntaxKind.FieldKeyword or SyntaxKind.MethodKeyword)
+                        || attributeList.Target.Identifier.Kind() is not SyntaxKind.FieldKeyword
                     )
                     {
                         continue;
@@ -644,10 +638,6 @@ namespace ZBase.Foundation.SourceGen
                             if (attributeList.Target.Identifier.IsKind(SyntaxKind.FieldKeyword))
                             {
                                 fieldAttributesInfo.Add(attributeInfo);
-                            }
-                            else if (attributeList.Target.Identifier.IsKind(SyntaxKind.MethodKeyword))
-                            {
-                                methodAttributesInfo.Add(attributeInfo);
                             }
                         }
                     }
