@@ -89,7 +89,7 @@ namespace ZBase.Foundation.Mvvm.CodeRefactors
                 {
                     foreach (var attrib in attributes)
                     {
-                        var (name, _) = GetAttributeInfo(semanticModel, attrib);
+                        var name = attrib.ToString();
 
                         if (propAttribCheck.Contains(name) == false)
                         {
@@ -104,7 +104,8 @@ namespace ZBase.Foundation.Mvvm.CodeRefactors
 
                 foreach (var attrib in attributes)
                 {
-                    var (name, target) = GetAttributeInfo(semanticModel, attrib);
+                    var (_, target) = GetAttributeInfo(semanticModel, attrib);
+                    var name = attrib.ToString();
 
                     if (target.HasFlag(AttributeTargets.Property))
                     {
