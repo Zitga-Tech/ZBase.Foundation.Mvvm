@@ -65,9 +65,19 @@ namespace MvvmTest
         }
     }
 
+    [AttributeUsage(AttributeTargets.Field)]
+    public class FieldAttribute : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Property)]
+    public class PropertyAttribute : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class MethodAttribute : Attribute { }
+
     public partial class A : IObservableObject, IEquatable<A>
     {
         [ObservableProperty]
+        [property: Property]
         private int _value;
 
         public bool Equals(A other)

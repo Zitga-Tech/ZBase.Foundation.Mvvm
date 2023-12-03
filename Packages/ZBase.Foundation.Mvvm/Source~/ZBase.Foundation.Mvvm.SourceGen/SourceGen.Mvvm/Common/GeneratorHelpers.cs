@@ -172,22 +172,7 @@ namespace ZBase.Foundation.Mvvm
 
         public static string ToPropertyName(this IFieldSymbol field)
         {
-            var nameSpan = field.Name.AsSpan();
-            var prefix = FIELD_PREFIX_UNDERSCORE.AsSpan();
-
-            if (nameSpan.StartsWith(prefix))
-            {
-                return ToTitleCase(nameSpan.Slice(1));
-            }
-
-            prefix = FIELD_PREFIX_M_UNDERSCORE.AsSpan();
-
-            if (nameSpan.StartsWith(prefix))
-            {
-                return ToTitleCase(nameSpan.Slice(2));
-            }
-
-            return ToTitleCase(nameSpan);
+            return ToPropertyName(field.Name);
         }
 
         public static string ToPropertyName(this string fieldName)
@@ -213,6 +198,11 @@ namespace ZBase.Foundation.Mvvm
         public static string ToFieldName(this IPropertySymbol property)
         {
             return $"{FIELD_PREFIX_UNDERSCORE}{ToLowerCase(property.Name.AsSpan())}";
+        }
+
+        public static string ToFieldName(this string propertyName)
+        {
+            return $"{FIELD_PREFIX_UNDERSCORE}{ToLowerCase(propertyName.AsSpan())}";
         }
 
         public static string ToTitleCase(in ReadOnlySpan<char> value)
