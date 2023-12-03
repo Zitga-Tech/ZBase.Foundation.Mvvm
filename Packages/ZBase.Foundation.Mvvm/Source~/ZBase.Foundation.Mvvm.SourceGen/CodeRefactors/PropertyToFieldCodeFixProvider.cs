@@ -168,6 +168,8 @@ namespace ZBase.Foundation.Mvvm.CodeRefactors
                 fieldDecl = fieldDecl.AddAttributeLists(propAttribList);
             }
 
+            fieldDecl = fieldDecl.WithTrailingTrivia(SyntaxFactory.LineFeed);
+
             var newRoot = root.ReplaceNode(propertyDecl, fieldDecl);
             return document.WithSyntaxRoot(newRoot).Project.Solution;
         }
