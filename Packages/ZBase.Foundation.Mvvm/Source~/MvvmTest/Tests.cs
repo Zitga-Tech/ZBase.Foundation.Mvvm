@@ -122,11 +122,7 @@ namespace MvvmTest
         private A _a;
 
         [ObservableProperty]
-        public int MySpecialIntProp
-        {
-            get => GetValue_MySpecialIntProp();
-            set => SetValue_MySpecialIntProp(value);
-        }
+        public int MySpecialIntProp { get => Get_MySpecialIntProp(); set => Set_MySpecialIntProp(value); }
 
         public TypeCode Type { get; }
 

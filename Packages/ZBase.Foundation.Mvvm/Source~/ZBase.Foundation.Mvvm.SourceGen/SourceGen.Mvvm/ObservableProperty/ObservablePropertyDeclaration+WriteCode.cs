@@ -401,7 +401,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 p.PrintEndLine();
 
                 p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(AGGRESSIVE_INLINING);
-                p.PrintLine($"private {typeName} GetValue_{propertyName}()");
+                p.PrintLine($"private {typeName} Get_{propertyName}()");
                 p.OpenScope();
                 {
                     p.PrintLine($"return this.{fieldName};");
@@ -410,7 +410,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 p.PrintEndLine();
 
                 p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(AGGRESSIVE_INLINING);
-                p.PrintLine($"private void SetValue_{propertyName}({typeName} value)");
+                p.PrintLine($"private void Set_{propertyName}({typeName} value)");
                 p.OpenScope();
                 {
                     p.PrintLine($"if (global::System.Collections.Generic.EqualityComparer<{typeName}>.Default.Equals(this.{fieldName}, value)) return;");

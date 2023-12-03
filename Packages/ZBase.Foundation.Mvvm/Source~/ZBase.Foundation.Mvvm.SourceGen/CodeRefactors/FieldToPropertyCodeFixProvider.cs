@@ -145,7 +145,7 @@ namespace ZBase.Foundation.Mvvm.CodeRefactors
                 , keyword: SyntaxFactory.Token(SyntaxKind.GetKeyword)
                 , semicolonToken: SyntaxFactory.Token(SyntaxKind.SemicolonToken)
                 , expressionBody: SyntaxFactory.ArrowExpressionClause(
-                    SyntaxFactory.InvocationExpression(SyntaxFactory.IdentifierName($"GetValue_{propName}"))
+                    SyntaxFactory.InvocationExpression(SyntaxFactory.IdentifierName($"Get_{propName}"))
                 )
             );
 
@@ -157,7 +157,7 @@ namespace ZBase.Foundation.Mvvm.CodeRefactors
                 , semicolonToken: SyntaxFactory.Token(SyntaxKind.SemicolonToken)
                 , expressionBody: SyntaxFactory.ArrowExpressionClause(
                     SyntaxFactory.InvocationExpression(
-                            SyntaxFactory.IdentifierName($"SetValue_{propName}")
+                            SyntaxFactory.IdentifierName($"Set_{propName}")
                         , SyntaxFactory.ArgumentList(
                             SyntaxFactory.SingletonSeparatedList(
                                 SyntaxFactory.Argument(SyntaxFactory.IdentifierName("value"))
@@ -196,6 +196,8 @@ namespace ZBase.Foundation.Mvvm.CodeRefactors
 
                 propDecl = propDecl.AddAttributeLists(propAttribList);
             }
+
+            propDecl = propDecl.WithTrailingTrivia(SyntaxFactory.LineFeed);
 
             var newRoot = root.ReplaceNode(fieldDecl, propDecl);
             return document.WithSyntaxRoot(newRoot).Project.Solution;

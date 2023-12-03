@@ -10,8 +10,8 @@ namespace Mvvm.Samples
         [ObservableProperty]
         public float X
         {
-            get => GetValue_X();
-            set => SetValue_X(value);
+            get => Get_X();
+            set => Set_X(value);
         }
     }
 
@@ -33,8 +33,8 @@ namespace Mvvm.Samples
         [ObservableProperty]
         public float Progress
         {
-            get => GetValue_Progress();
-            set => SetValue_Progress(value);
+            get => Get_Progress();
+            set => Set_Progress(value);
         }
 
         [ObservableProperty]
