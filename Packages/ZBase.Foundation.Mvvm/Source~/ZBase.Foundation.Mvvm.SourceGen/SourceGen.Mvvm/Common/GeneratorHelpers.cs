@@ -192,12 +192,17 @@ namespace ZBase.Foundation.Mvvm
 
         public static string ToFieldName(this IPropertySymbol property)
         {
-            return $"{FIELD_PREFIX_UNDERSCORE}{property.Name}";
+            return $"{FIELD_PREFIX_UNDERSCORE}{ToLowerCase(property.Name.AsSpan())}";
         }
 
         public static string ToTitleCase(in ReadOnlySpan<char> value)
         {
             return $"{char.ToUpper(value[0])}{value.Slice(1).ToString()}";
+        }
+
+        public static string ToLowerCase(in ReadOnlySpan<char> value)
+        {
+            return $"{char.ToLower(value[0])}{value.Slice(1).ToString()}";
         }
 
         public static string GetKeyword(this Accessibility accessibility)
