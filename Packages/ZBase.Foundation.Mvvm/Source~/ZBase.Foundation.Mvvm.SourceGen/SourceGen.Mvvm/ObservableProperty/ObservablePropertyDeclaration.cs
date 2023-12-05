@@ -33,7 +33,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
         /// <summary>
         /// Key is <c>Field.Name</c>
         /// </summary>
-        public Dictionary<string, IPropertySymbol> NotifyPropertyChangedForMap { get; }
+        public Dictionary<string, List<IPropertySymbol>> NotifyPropertyChangedForMap { get; }
 
         /// <summary>
         /// Key is the command name (<c>Method.Name + "Command"</c>)
@@ -53,7 +53,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             Syntax = candidate;
             Symbol = semanticModel.GetDeclaredSymbol(candidate, token);
             FullyQualifiedName = Symbol.ToFullName();
-            NotifyPropertyChangedForMap = new Dictionary<string, IPropertySymbol>();
+            NotifyPropertyChangedForMap = new Dictionary<string, List<IPropertySymbol>>();
             NotifyCanExecuteChangedForSet = new HashSet<string>();
             
             if (Symbol.BaseType != null && Symbol.BaseType.TypeKind == TypeKind.Class)
@@ -65,7 +65,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             }
 
             var members = Symbol.GetMembers();
-            var propertyChangedMap = new Dictionary<string, string>();
+            var propertyChangedMap = new Dictionary<string, List<string>>();
             var commandSet = new HashSet<string>();
             var propertyMap = new Dictionary<string, IPropertySymbol>();
             var methods = new List<IMethodSymbol>();
@@ -97,7 +97,12 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                                 && notifyPropChangedFor.ConstructorArguments[0].Value is string propName
                             )
                             {
-                                propertyChangedMap[field.Name] = propName;
+                                if (propertyChangedMap.TryGetValue(field.Name, out var propNames) == false)
+                                {
+                                    propertyChangedMap[field.Name] = propNames = new List<string>();
+                                }
+
+                                propNames.Add(propName);
                             }
                         }
 
@@ -136,7 +141,6 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
                         fieldRef.ForwardedPropertyAttributes = propertyAttributes;
                         fieldRef.CommandNames = commandNames.ToImmutable();
-
                         fieldRefs.Add(fieldRef);
                     }
 
@@ -151,9 +155,10 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                     }
                     else
                     {
+                        var fieldName = property.ToFieldName();
                         var propRef = new PropertyRef {
                             Property = property,
-                            FieldName = property.ToFieldName(),
+                            FieldName = fieldName,
                             IsObservableObject = property.Type.ImplementsInterface(IOBSERVABLE_OBJECT_INTERFACE),
                         };
 
@@ -172,7 +177,12 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                                 && notifyPropChangedFor.ConstructorArguments[0].Value is string propName
                             )
                             {
-                                propertyChangedMap[property.Name] = propName;
+                                if (propertyChangedMap.TryGetValue(fieldName, out var propNames) == false)
+                                {
+                                    propertyChangedMap[fieldName] = propNames = new List<string>();
+                                }
+
+                                propNames.Add(propName);
                             }
                         }
 
@@ -231,11 +241,21 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             foreach (var kv in propertyChangedMap)
             {
                 var fieldName = kv.Key;
-                var propertyName = kv.Value;
+                var propNames = kv.Value;
 
-                if (propertyMap.TryGetValue(propertyName, out var property))
+                foreach (var propName in propNames)
                 {
-                    NotifyPropertyChangedForMap[fieldName] = property;
+                    if (propertyMap.TryGetValue(propName, out var property) == false)
+                    {
+                        continue;
+                    }
+
+                    if (NotifyPropertyChangedForMap.TryGetValue(fieldName, out var properties) == false)
+                    {
+                        NotifyPropertyChangedForMap[fieldName] = properties = new List<IPropertySymbol>();
+                    }
+
+                    properties.Add(property);
                 }
             }
 

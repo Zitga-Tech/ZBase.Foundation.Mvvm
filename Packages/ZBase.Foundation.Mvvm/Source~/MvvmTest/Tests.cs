@@ -122,6 +122,7 @@ namespace MvvmTest
         private A _a;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(SpecialString))]
         public int MySpecialIntProp { get => Get_MySpecialIntProp(); set => Set_MySpecialIntProp(value); }
 
         public TypeCode Type { get; }
@@ -131,6 +132,8 @@ namespace MvvmTest
         public bool IsCreated => true;
 
         public bool IsCreatedNew => false;
+
+        public string SpecialString => $"{MySpecialIntProp}...";
 
         [RelayCommand]
         private void UpdateNothing()

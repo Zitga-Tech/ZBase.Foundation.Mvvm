@@ -25,12 +25,14 @@ namespace Mvvm.Samples
     {
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(TimeText))]
+        [NotifyPropertyChangedFor(nameof(Seconds))]
         private TimeSpan _time;
 
         [ObservableProperty]
         private Color _textColor;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ProgressText))]
         public float Progress
         {
             get => Get_Progress();
@@ -47,6 +49,10 @@ namespace Mvvm.Samples
         private Vector3 _scale;
 
         public string TimeText => $"Time: {Time}";
+
+        public double Seconds => Time.TotalSeconds;
+
+        public string ProgressText => $"{Progress * 100f} %";
 
         private void Start()
         {
