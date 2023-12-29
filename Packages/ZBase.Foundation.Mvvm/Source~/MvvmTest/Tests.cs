@@ -123,6 +123,7 @@ namespace MvvmTest
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(SpecialString))]
+        [field: FieldAttribute]
         public int MySpecialIntProp { get => Get_MySpecialIntProp(); set => Set_MySpecialIntProp(value); }
 
         public TypeCode Type { get; }
