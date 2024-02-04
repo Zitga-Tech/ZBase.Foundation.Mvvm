@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
@@ -73,6 +74,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 case MonoBindingContext.ContextTargetKind.UnityObject:
                 {
                     DrawTargetUnityObject(this.serializedObject, unityObjectProp, context);
+                    DrawTargetButtons(this.serializedObject, systemObjectProp, unityObjectProp, context);
                     DrawTargetPropertyPath(
                           this.serializedObject
                         , targetPropertyPath
@@ -82,6 +84,60 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                     break;
                 }
             }
+        }
+
+        private static void DrawTargetButtons(
+              SerializedObject serializedObject
+            , SerializedProperty systemObjectProp
+            , SerializedProperty unityObjectProp
+            , MonoBindingContext context
+        )
+        {
+            EditorGUILayout.BeginHorizontal();
+
+            if (context._targetKind == MonoBindingContext.ContextTargetKind.UnityObject
+                && GUILayout.Button("Find Nearest Target")
+            )
+            {
+                var component = FindNearestContext(context.gameObject);
+
+                Undo.RecordObject(context, "Find context._targetUnityObject");
+                unityObjectProp.objectReferenceValue = component;
+                serializedObject.ApplyModifiedProperties();
+                serializedObject.Update();
+            }
+
+            if (GUILayout.Button("Clear Target"))
+            {
+                Undo.RecordObject(context, "Clear context._targets");
+                systemObjectProp.managedReferenceValue = null;
+                unityObjectProp.objectReferenceValue = null;
+                serializedObject.ApplyModifiedProperties();
+                serializedObject.Update();
+            }
+
+            EditorGUILayout.EndHorizontal();
+        }
+
+        private static Component FindNearestContext(GameObject go)
+        {
+            var parent = go.transform;
+            var components = new List<IObservableObject>();
+
+            while (parent)
+            {
+                components.Clear();
+                parent.GetComponents(components);
+
+                if (components.Count > 0)
+                {
+                    return components[0] as Component;
+                }
+
+                parent = parent.parent;
+            }
+
+            return null;
         }
 
         private static void DrawCreateOnAwake(
