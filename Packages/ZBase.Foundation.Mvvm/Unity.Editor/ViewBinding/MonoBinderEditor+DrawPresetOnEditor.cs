@@ -213,8 +213,8 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             var targetKind = (MonoBindingContext.ContextTargetKind)targetKindProp.enumValueIndex;
 
             var type = targetKind switch {
-                MonoBindingContext.ContextTargetKind.SystemObject => systemObjectProp.managedReferenceValue.GetType(),
-                MonoBindingContext.ContextTargetKind.UnityObject => unityObjectProp.objectReferenceValue.GetType(),
+                MonoBindingContext.ContextTargetKind.SystemObject => systemObjectProp.managedReferenceValue?.GetType(),
+                MonoBindingContext.ContextTargetKind.UnityObject => GetType(unityObjectProp.objectReferenceValue),
                 _ => null,
             };
 
@@ -242,6 +242,11 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
 
             return type;
+
+            static Type GetType(UnityEngine.Object objectRef)
+            {
+                return objectRef ? objectRef.GetType() : null;
+            }
         }
 
         private static bool DrawContextTarget(UnityEngine.Object obj, Type targetType)
