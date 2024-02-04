@@ -24,6 +24,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             var systemObjectProp = this.serializedObject.FindProperty(nameof(MonoBindingContext._targetSystemObject));
             var unityObjectProp = this.serializedObject.FindProperty(nameof(MonoBindingContext._targetUnityObject));
             var targetPropertyPath = this.serializedObject.FindProperty(nameof(MonoBindingContext._targetPropertyPath));
+            var createOnAwake = this.serializedObject.FindProperty(nameof(MonoBindingContext._createOnAwake));
 
             EditorGUI.BeginChangeCheck();
 
@@ -65,6 +66,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                         , targetPropertyPath
                         , context._targetSystemObject
                     );
+                    DrawCreateOnAwake(createOnAwake, context);
                     break;
                 }
 
@@ -76,8 +78,37 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                         , targetPropertyPath
                         , context._targetUnityObject as IObservableObject
                     );
+                    DrawCreateOnAwake(createOnAwake, context);
                     break;
                 }
+            }
+        }
+
+        private static void DrawCreateOnAwake(
+              SerializedProperty createOnAwakeSP
+            , MonoBindingContext context
+        )
+        {
+            EditorGUI.BeginChangeCheck();
+
+            var value = EditorGUILayout.Toggle("Create On Awake", context._createOnAwake);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(context, "Set context._createOnAwake");
+                createOnAwakeSP.boolValue = value;
+                createOnAwakeSP.serializedObject.ApplyModifiedProperties();
+                createOnAwakeSP.serializedObject.Update();
+            }
+
+            if (value == false)
+            {
+                EditorGUILayout.HelpBox(
+                      "The target of this binding context will NOT be automatically created on `MonoBehaviour.Awake()`.\n" +
+                      "At runtime the `MonoBindingContext.InitializeManually(target)` method must be used " +
+                      "to provide the appropriate target."
+                    , MessageType.Warning
+                );
             }
         }
 
