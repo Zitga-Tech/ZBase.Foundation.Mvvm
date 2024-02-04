@@ -172,19 +172,16 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             , MonoBinder binder
         )
         {
-            if (serializedProperty.objectReferenceValue is IBindingContext)
-            {
-                return;
-            }
+            var objectRef = serializedProperty.objectReferenceValue;
 
-            if (serializedProperty.objectReferenceValue)
+            if (objectRef && objectRef is not IBindingContext)
             {
                 EditorGUILayout.HelpBox(
-                    $"The component {serializedProperty.objectReferenceValue.GetType()} does not implement {typeof(IBindingContext)}."
+                    $"The component {objectRef.GetType()} does not implement {typeof(IBindingContext)}."
                     , MessageType.Error
                 );
             }
-            else
+            else if (objectRef == false)
             {
                 EditorGUILayout.HelpBox(
                     "Preset On Editor requires the Context to be not null."
