@@ -40,7 +40,7 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
                     continue;
                 }
 
-                if (candidate.TypeArgument.IsValueType)
+                if (candidate.TypeArgument.IsUnmanagedType)
                 {
                     if (valueTypeFiltered.ContainsKey(typeName) == false)
                     {

@@ -38,7 +38,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
                     continue;
                 }
 
-                if (symbol.IsValueType)
+                if (symbol.IsUnmanagedType)
                 {
                     if (valueTypeFiltered.ContainsKey(typeName) == false)
                     {
