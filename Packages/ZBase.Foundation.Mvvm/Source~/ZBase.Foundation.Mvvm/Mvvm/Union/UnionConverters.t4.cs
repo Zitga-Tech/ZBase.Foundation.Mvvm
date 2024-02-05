@@ -15,7 +15,10 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+
+#if UNITY_5_3_OR_NEWER
 using UnityEngine;
+#endif
 
 namespace ZBase.Foundation.Mvvm.Unions.Converters
 {
@@ -51,7 +54,10 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.Bool.ToString();
 
-        [DoesNotReturn, HideInCallstack]
+        [DoesNotReturn]
+#if UNITY_5_3_OR_NEWER
+        [HideInCallstack]
+#endif
         private static void ThrowIfInvalidCast()
         {
             throw new InvalidCastException($"Cannot get value of {typeof(bool)} from the input union.");
@@ -89,7 +95,10 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.Byte.ToString();
 
-        [DoesNotReturn, HideInCallstack]
+        [DoesNotReturn]
+#if UNITY_5_3_OR_NEWER
+        [HideInCallstack]
+#endif
         private static void ThrowIfInvalidCast()
         {
             throw new InvalidCastException($"Cannot get value of {typeof(byte)} from the input union.");
@@ -127,7 +136,10 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.SByte.ToString();
 
-        [DoesNotReturn, HideInCallstack]
+        [DoesNotReturn]
+#if UNITY_5_3_OR_NEWER
+        [HideInCallstack]
+#endif
         private static void ThrowIfInvalidCast()
         {
             throw new InvalidCastException($"Cannot get value of {typeof(sbyte)} from the input union.");
@@ -165,7 +177,10 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.Char.ToString();
 
-        [DoesNotReturn, HideInCallstack]
+        [DoesNotReturn]
+#if UNITY_5_3_OR_NEWER
+        [HideInCallstack]
+#endif
         private static void ThrowIfInvalidCast()
         {
             throw new InvalidCastException($"Cannot get value of {typeof(char)} from the input union.");
@@ -203,7 +218,10 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.Double.ToString();
 
-        [DoesNotReturn, HideInCallstack]
+        [DoesNotReturn]
+#if UNITY_5_3_OR_NEWER
+        [HideInCallstack]
+#endif
         private static void ThrowIfInvalidCast()
         {
             throw new InvalidCastException($"Cannot get value of {typeof(double)} from the input union.");
@@ -241,7 +259,10 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.Float.ToString();
 
-        [DoesNotReturn, HideInCallstack]
+        [DoesNotReturn]
+#if UNITY_5_3_OR_NEWER
+        [HideInCallstack]
+#endif
         private static void ThrowIfInvalidCast()
         {
             throw new InvalidCastException($"Cannot get value of {typeof(float)} from the input union.");
@@ -279,7 +300,10 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.Int.ToString();
 
-        [DoesNotReturn, HideInCallstack]
+        [DoesNotReturn]
+#if UNITY_5_3_OR_NEWER
+        [HideInCallstack]
+#endif
         private static void ThrowIfInvalidCast()
         {
             throw new InvalidCastException($"Cannot get value of {typeof(int)} from the input union.");
@@ -317,7 +341,10 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.UInt.ToString();
 
-        [DoesNotReturn, HideInCallstack]
+        [DoesNotReturn]
+#if UNITY_5_3_OR_NEWER
+        [HideInCallstack]
+#endif
         private static void ThrowIfInvalidCast()
         {
             throw new InvalidCastException($"Cannot get value of {typeof(uint)} from the input union.");
@@ -355,7 +382,10 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.Long.ToString();
 
-        [DoesNotReturn, HideInCallstack]
+        [DoesNotReturn]
+#if UNITY_5_3_OR_NEWER
+        [HideInCallstack]
+#endif
         private static void ThrowIfInvalidCast()
         {
             throw new InvalidCastException($"Cannot get value of {typeof(long)} from the input union.");
@@ -393,7 +423,10 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.ULong.ToString();
 
-        [DoesNotReturn, HideInCallstack]
+        [DoesNotReturn]
+#if UNITY_5_3_OR_NEWER
+        [HideInCallstack]
+#endif
         private static void ThrowIfInvalidCast()
         {
             throw new InvalidCastException($"Cannot get value of {typeof(ulong)} from the input union.");
@@ -431,7 +464,10 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.Short.ToString();
 
-        [DoesNotReturn, HideInCallstack]
+        [DoesNotReturn]
+#if UNITY_5_3_OR_NEWER
+        [HideInCallstack]
+#endif
         private static void ThrowIfInvalidCast()
         {
             throw new InvalidCastException($"Cannot get value of {typeof(short)} from the input union.");
@@ -469,7 +505,10 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union) => union.UShort.ToString();
 
-        [DoesNotReturn, HideInCallstack]
+        [DoesNotReturn]
+#if UNITY_5_3_OR_NEWER
+        [HideInCallstack]
+#endif
         private static void ThrowIfInvalidCast()
         {
             throw new InvalidCastException($"Cannot get value of {typeof(ushort)} from the input union.");

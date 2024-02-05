@@ -2,8 +2,11 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using UnityEngine;
 using ZBase.Foundation.Mvvm.Unions.Converters;
+
+#if UNITY_5_3_OR_NEWER
+using UnityEngine;
+#endif
 
 namespace ZBase.Foundation.Mvvm.Unions
 {
@@ -88,7 +91,10 @@ namespace ZBase.Foundation.Mvvm.Unions
         public static string ToString<T>(in Union union)
             => GetConverter<T>().ToString(union);
 
-        [DoesNotReturn, HideInCallstack]
+        [DoesNotReturn]
+#if UNITY_5_3_OR_NEWER
+        [HideInCallstack]
+#endif
         private static void ThrowIfNullOrSizeOfTIsBiggerThanUnionDataSize<T>(IUnionConverter<T> converter)
         {
             if (converter == null)

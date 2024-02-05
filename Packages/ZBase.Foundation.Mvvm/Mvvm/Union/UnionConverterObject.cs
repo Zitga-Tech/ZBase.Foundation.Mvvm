@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+
+#if UNITY_5_3_OR_NEWER
 using UnityEngine;
+#endif
 
 namespace ZBase.Foundation.Mvvm.Unions.Converters
 {
@@ -41,7 +44,10 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
         public string ToString(in Union union)
             => union.GCHandle.Target?.ToString() ?? string.Empty;
 
-        [DoesNotReturn, HideInCallstack]
+        [DoesNotReturn]
+#if UNITY_5_3_OR_NEWER
+        [HideInCallstack]
+#endif
         private static void ThrowIfInvalidCast()
         {
             throw new InvalidCastException($"Cannot get value of {typeof(object)} from the input union.");

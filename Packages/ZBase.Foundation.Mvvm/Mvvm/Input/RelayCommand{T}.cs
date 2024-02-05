@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using UnityEngine;
 using ZBase.Foundation.Mvvm.Event;
 using ZBase.Foundation.Mvvm.Unions;
+
+#if UNITY_5_3_OR_NEWER
+using UnityEngine;
+#endif
 
 namespace ZBase.Foundation.Mvvm.Input
 {
@@ -104,7 +107,10 @@ namespace ZBase.Foundation.Mvvm.Input
             Execute(result);
         }
 
-        [DoesNotReturn, HideInCallstack]
+        [DoesNotReturn]
+#if UNITY_5_3_OR_NEWER
+        [HideInCallstack]
+#endif
         [MethodImpl(MethodImplOptions.NoInlining)]
         internal static void ThrowArgumentException()
             => throw new ArgumentException($"The command type requires an argument of type {typeof(T)}.");
