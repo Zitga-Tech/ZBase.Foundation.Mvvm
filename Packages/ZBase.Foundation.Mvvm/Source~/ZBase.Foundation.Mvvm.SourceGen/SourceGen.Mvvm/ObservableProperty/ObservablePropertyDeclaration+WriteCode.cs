@@ -920,7 +920,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                             p.PrintLine($"var {converterForPropertyVariable} = this._unionConverter{converterForProperty};");
                             p.PrintLine($"var union = {converterForPropertyVariable}.ToUnion(this.{property.Name});");
                             p.PrintLine($"var {otherArgsName} = new {PROPERTY_CHANGE_EVENT_ARGS}(this, {ConstName(property)}, union, union);");
-                            p.PrintLine($"this.{OnChangedEventName(property)}?.Invoke({otherArgsName});");
+                            p.PrintLine($"listener.OnEvent({otherArgsName});");
                             p.PrintLine("return true;");
                         }
                         p.CloseScope();
