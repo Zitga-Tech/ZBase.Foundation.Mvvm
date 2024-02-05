@@ -21,8 +21,9 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
             p = p.IncreasedIndent();
 
             WriteRelayCommandInfoAttributes(ref p);
-
-            p.PrintLine($"partial class {Syntax.Identifier.Text} : global::ZBase.Foundation.Mvvm.Input.ICommandListener");
+            
+            p.PrintBeginLine("partial class ").Print(ClassName)
+                .PrintEndLine(" : global::ZBase.Foundation.Mvvm.Input.ICommandListener");
 
             p.OpenScope();
             {
@@ -39,14 +40,12 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
 
         private void WriteRelayCommandInfoAttributes(ref Printer p)
         {
-            var className = Symbol.ToFullName();
-
             foreach (var member in MemberRefs)
             {
-                var constName = ConstName(member);
+                var propName = CommandPropertyName(member);
 
                 p.PrintBeginLine()
-                    .Print($"[global::ZBase.Foundation.Mvvm.Input.RelayCommandInfo({className}.{constName}, ");
+                    .Print($"[global::ZBase.Foundation.Mvvm.Input.RelayCommandInfo(\"{propName}\", ");
 
                 if (member.Member.Parameters.Length > 0)
                 {
@@ -66,15 +65,13 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
 
         private void WriteConstantFields(ref Printer p)
         {
-            var className = Syntax.Identifier.Text;
-
             foreach (var member in MemberRefs)
             {
                 var name = CommandPropertyName(member);
 
                 p.PrintLine($"/// <summary>The name of <see cref=\"{name}\"/></summary>");
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"public const string {ConstName(member)} = nameof({className}.{name});");
+                p.PrintLine($"public const string {ConstName(member)} = nameof({ClassName}.{name});");
                 p.PrintEndLine();
             }
 

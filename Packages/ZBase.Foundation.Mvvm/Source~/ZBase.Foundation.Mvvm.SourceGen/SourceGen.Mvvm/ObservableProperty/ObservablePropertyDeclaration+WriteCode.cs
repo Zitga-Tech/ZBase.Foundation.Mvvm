@@ -33,25 +33,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
             p = p.IncreasedIndent();
 
-            p.PrintBeginLine("partial class ").Print(Syntax.Identifier.Text);
-
-            if (IsBaseObservableObject)
-            {
-                p.PrintEndLine($" : {IOBSERVABLE_OBJECT_INTERFACE}");
-
-                p = p.IncreasedIndent();
-                p.Print($", {INOTIFY_PROPERTY_CHANGING_INTERFACE}");
-            }
-            else
-            {
-                p.PrintEndLine($" : {INOTIFY_PROPERTY_CHANGING_INTERFACE}");
-
-                p = p.IncreasedIndent();
-            }
-
-            p.PrintBeginLine($", {INOTIFY_PROPERTY_CHANGED_INTERFACE}");
-            p.PrintEndLine();
-            p = p.DecreasedIndent();
+            WriteClassDeclaration(ref p);
 
             p.OpenScope();
             {
@@ -161,26 +143,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
             WriteNotifyPropertyChangingInfoAttributes(ref p);
             WriteNotifyPropertyChangedInfoAttributes(ref p);
-
-            p.PrintBeginLine("partial class ").Print(Syntax.Identifier.Text);
-
-            if (IsBaseObservableObject)
-            {
-                p.PrintEndLine($" : {IOBSERVABLE_OBJECT_INTERFACE}");
-
-                p = p.IncreasedIndent();
-                p.Print($", {INOTIFY_PROPERTY_CHANGING_INTERFACE}");
-            }
-            else
-            {
-                p.PrintEndLine($" : {INOTIFY_PROPERTY_CHANGING_INTERFACE}");
-
-                p = p.IncreasedIndent();
-            }
-
-            p.PrintBeginLine($", {INOTIFY_PROPERTY_CHANGED_INTERFACE}");
-            p.PrintEndLine();
-            p = p.DecreasedIndent();
+            WriteClassDeclaration(ref p);
 
             p.OpenScope();
             {
@@ -203,9 +166,31 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             return p.Result;
         }
 
+        private void WriteClassDeclaration(ref Printer p)
+        {
+            p.PrintBeginLine("partial class ").Print(ClassName);
+
+            if (IsBaseObservableObject)
+            {
+                p.PrintEndLine($" : {IOBSERVABLE_OBJECT_INTERFACE}");
+
+                p = p.IncreasedIndent();
+                p.Print($", {INOTIFY_PROPERTY_CHANGING_INTERFACE}");
+            }
+            else
+            {
+                p.PrintEndLine($" : {INOTIFY_PROPERTY_CHANGING_INTERFACE}");
+
+                p = p.IncreasedIndent();
+            }
+
+            p.PrintBeginLine($", {INOTIFY_PROPERTY_CHANGED_INTERFACE}");
+            p.PrintEndLine();
+            p = p.DecreasedIndent();
+        }
+
         private void WriteConstantFields(ref Printer p)
         {
-            var className = Syntax.Identifier.Text;
             var additionalProperties = new Dictionary<string, IPropertySymbol>();
 
             foreach (var member in FieldRefs)
@@ -223,7 +208,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 }
 
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"public const string {ConstName(member)} = nameof({className}.{name});");
+                p.PrintLine($"public const string {ConstName(member)} = nameof({ClassName}.{name});");
                 p.PrintEndLine();
 
                 if (NotifyPropertyChangedForMap.TryGetValue(fieldName, out var properties))
@@ -253,7 +238,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
                 }
 
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"public const string {ConstName(member)} = nameof({className}.{name});");
+                p.PrintLine($"public const string {ConstName(member)} = nameof({ClassName}.{name});");
                 p.PrintEndLine();
 
                 if (NotifyPropertyChangedForMap.TryGetValue(fieldName, out var properties))
@@ -274,7 +259,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
                 p.PrintLine($"/// <summary>The name of <see cref=\"{name}\"/></summary>");
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"public const string {ConstName(property)} = nameof({className}.{name});");
+                p.PrintLine($"public const string {ConstName(property)} = nameof({ClassName}.{name});");
                 p.PrintEndLine();
             }
 
@@ -1130,41 +1115,38 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
         private void WriteNotifyPropertyChangingInfoAttributes(ref Printer p)
         {
-            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.NotifyPropertyChangingInfo({0}.{1}, typeof({2}))]";
-
-            var className = Symbol.ToFullName();
+            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.NotifyPropertyChangingInfo(\"{0}\", typeof({1}))]";
 
             foreach (var member in FieldRefs)
             {
-                var constName = ConstName(member);
+                var propName = member.GetPropertyName();
                 var typeName = member.Field.Type.ToFullName();
 
-                p.PrintLine(string.Format(ATTRIBUTE, className, constName, typeName));
+                p.PrintLine(string.Format(ATTRIBUTE, propName, typeName));
             }
 
             foreach (var member in PropRefs)
             {
-                var constName = ConstName(member);
+                var propName = member.GetPropertyName();
                 var typeName = member.Property.Type.ToFullName();
 
-                p.PrintLine(string.Format(ATTRIBUTE, className, constName, typeName));
+                p.PrintLine(string.Format(ATTRIBUTE, propName, typeName));
             }
         }
 
         private void WriteNotifyPropertyChangedInfoAttributes(ref Printer p)
         {
-            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.NotifyPropertyChangedInfo({0}.{1}, typeof({2}))]";
+            const string ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ComponentModel.SourceGen.NotifyPropertyChangedInfo(\"{0}\", typeof({1}))]";
 
-            var className = Symbol.ToFullName();
             var additionalProperties = new Dictionary<string, IPropertySymbol>();
 
             foreach (var member in FieldRefs)
             {
                 var fieldName = member.Field.Name;
-                var constName = ConstName(member);
+                var propName = member.GetPropertyName();
                 var typeName = member.Field.Type.ToFullName();
 
-                p.PrintLine(string.Format(ATTRIBUTE, className, constName, typeName));
+                p.PrintLine(string.Format(ATTRIBUTE, propName, typeName));
 
                 if (NotifyPropertyChangedForMap.TryGetValue(fieldName, out var properties))
                 {
@@ -1181,10 +1163,10 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
             foreach (var member in PropRefs)
             {
                 var fieldName = member.Property.ToFieldName();
-                var constName = ConstName(member);
+                var propName = member.GetPropertyName();
                 var typeName = member.Property.Type.ToFullName();
 
-                p.PrintLine(string.Format(ATTRIBUTE, className, constName, typeName));
+                p.PrintLine(string.Format(ATTRIBUTE, propName, typeName));
 
                 if (NotifyPropertyChangedForMap.TryGetValue(fieldName, out var properties))
                 {
@@ -1200,7 +1182,7 @@ namespace ZBase.Foundation.Mvvm.ObservablePropertySourceGen
 
             foreach (var property in additionalProperties.Values)
             {
-                p.PrintLine(string.Format(ATTRIBUTE, className, ConstName(property), property.Type.ToFullName()));
+                p.PrintLine(string.Format(ATTRIBUTE, property.Name, property.Type.ToFullName()));
             }
         }
 

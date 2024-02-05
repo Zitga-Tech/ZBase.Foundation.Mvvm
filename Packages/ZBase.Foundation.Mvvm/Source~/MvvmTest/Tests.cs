@@ -183,5 +183,28 @@ namespace MvvmTest
         partial void OnBoolValueChanged(ref bool value);
     }
 
+    public partial class GenericModel<T> : IObservableObject
+    {
+        [ObservableProperty]
+        public int Value { get => Get_Value(); set => Set_Value(value); }
+
+        [RelayCommand]
+        private void UpdateInt(int value)
+        {
+
+        }
+    }
+
+    public partial class GenericBinder<T> : IBinder
+    {
+        public IBindingContext Context { get; set; }
+
+        [BindingProperty]
+        private void SetIntValue(int value)
+        {
+            Console.WriteLine(value);
+        }
+    }
+
     public readonly partial struct Vector3Union : IUnion<Vector3> { }
 }

@@ -30,7 +30,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             WriteBindingPropertyMethodInfoAttributes(ref p);
             WriteBindingCommandMethodInfoAttributes(ref p);
 
-            p.PrintBeginLine("partial class ").Print(Syntax.Identifier.Text);
+            p.PrintBeginLine("partial class ").Print(ClassName);
             
             if (HasBaseBinder)
             {
@@ -78,13 +78,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteBindingPropertyMethodInfoAttributes(ref Printer p)
         {
-            var className = Symbol.ToFullName();
-
             foreach (var member in BindingPropertyRefs)
             {
                 p.PrintBeginLine()
                     .Print("[global::ZBase.Foundation.Mvvm.ViewBinding.SourceGen.BindingPropertyMethodInfo(")
-                    .Print($"{className}.{ConstName(member)}, typeof(")
+                    .Print($"\"{member.Symbol.Name}\", typeof(")
                     .Print(member.Symbol.Parameters[0].Type.ToFullName()).Print("))]")
                     .PrintEndLine();
             }
@@ -92,13 +90,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
         private void WriteBindingCommandMethodInfoAttributes(ref Printer p)
         {
-            var className = Symbol.ToFullName();
-
             foreach (var member in BindingCommandRefs)
             {
                 p.PrintBeginLine()
                     .Print("[global::ZBase.Foundation.Mvvm.ViewBinding.SourceGen.BindingCommandMethodInfo(")
-                    .Print($"{className}.{ConstName(member)}, ");
+                    .Print($"\"{member.Symbol.Name}\", ");
 
                 if (member.Parameter == null)
                 {
@@ -120,15 +116,13 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 return;
             }
 
-            var className = Syntax.Identifier.Text;
-
             foreach (var member in BindingPropertyRefs)
             {
                 var name = member.Symbol.Name;
 
                 p.PrintLine($"/// <summary>The name of <see cref=\"{name}\"/></summary>");
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"public const string {ConstName(member)} = nameof({className}.{name});");
+                p.PrintLine($"public const string {ConstName(member)} = nameof({ClassName}.{name});");
                 p.PrintEndLine();
             }
 
@@ -142,15 +136,13 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 return;
             }
 
-            var className = Syntax.Identifier.Text;
-
             foreach (var member in BindingCommandRefs)
             {
                 var name = member.Symbol.Name;
 
                 p.PrintLine($"/// <summary>The name of <see cref=\"{name}\"/></summary>");
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"public const string {ConstName(member)} = nameof({className}.{name});");
+                p.PrintLine($"public const string {ConstName(member)} = nameof({ClassName}.{name});");
                 p.PrintEndLine();
             }
 
@@ -330,8 +322,6 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 return;
             }
 
-            var className = Syntax.Identifier.Text;
-
             foreach (var member in BindingPropertyRefs)
             {
                 p.PrintLine($"/// <summary>");
@@ -339,7 +329,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 p.PrintLine($"/// to the property chosen by <see cref=\"{BindingPropertyName(member)}\"/>.");
                 p.PrintLine($"/// </summary>");
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine($"private readonly global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener<{className}> {ListenerName(member)};");
+                p.PrintLine($"private readonly global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener<{ClassName}> {ListenerName(member)};");
                 p.PrintEndLine();
             }
 
@@ -395,11 +385,9 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             {
                 return;
             }
-
-            var className = Syntax.Identifier.Text;
-
+            
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-            p.PrintBeginLine().Print($"public {className}()");
+            p.PrintBeginLine().Print($"public {Syntax.Identifier.Text}()");
 
             if (HasBaseBinder)
             {
@@ -414,7 +402,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 {
                     var methodName = MethodName(member);
 
-                    p.PrintLine($"this.{ListenerName(member)} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener<{className}>(this)");
+                    p.PrintLine($"this.{ListenerName(member)} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener<{ClassName}>(this)");
                     p.OpenScope();
                     p.PrintLine($"OnEventAction = (instance, args) => instance.{methodName}(this.{ConverterName(member)}.Convert(args.NewValue))");
                     p.CloseScope("};");

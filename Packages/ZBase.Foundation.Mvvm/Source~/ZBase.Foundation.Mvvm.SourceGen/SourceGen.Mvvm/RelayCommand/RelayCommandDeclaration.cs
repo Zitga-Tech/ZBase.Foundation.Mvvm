@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Text;
 using System.Threading;
 using ZBase.Foundation.SourceGen;
 
@@ -14,9 +15,11 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
 
         public ClassDeclarationSyntax Syntax { get; }
 
-        public ITypeSymbol Symbol { get; }
+        public INamedTypeSymbol Symbol { get; }
 
-        public string FullyQualifiedName { get; private set; }
+        public string ClassName { get; }
+
+        public string FullyQualifiedName { get; }
 
         public bool IsValid { get; }
 
@@ -33,6 +36,32 @@ namespace ZBase.Foundation.Mvvm.RelayCommandSourceGen
 
             Syntax = candidate;
             Symbol = semanticModel.GetDeclaredSymbol(candidate, token);
+
+            var classNameSb = new StringBuilder(Syntax.Identifier.Text);
+
+            if (candidate.TypeParameterList is TypeParameterListSyntax typeParamList
+                && typeParamList.Parameters.Count > 0
+            )
+            {
+                classNameSb.Append("<");
+
+                var typeParams = typeParamList.Parameters;
+                var last = typeParams.Count - 1;
+
+                for (var i = 0; i <= last; i++)
+                {
+                    classNameSb.Append(typeParams[i].Identifier.Text);
+
+                    if (i < last)
+                    {
+                        classNameSb.Append(", ");
+                    }
+                }
+
+                classNameSb.Append(">");
+            }
+
+            ClassName = classNameSb.ToString();
             FullyQualifiedName = Symbol.ToFullName();
 
             var members = Symbol.GetMembers();
