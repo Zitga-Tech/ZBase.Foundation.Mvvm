@@ -56,7 +56,7 @@ namespace ZBase.Foundation.Mvvm.Unions
                 }
             }
 
-            if (UnionTypeId.TypeOf<T>().IsValueType == false)
+            if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
             {
                 return UnionConverterObject<T>.Default;
             }
