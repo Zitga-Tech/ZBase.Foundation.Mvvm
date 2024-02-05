@@ -145,17 +145,27 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
                     p.PrintLine($"if (union.TypeId != {unionName}.TypeId)");
                     p.OpenScope();
                     {
-                        p.PrintLine("throw new global::System.InvalidCastException");
-                        p.OpenScope("(");
-                        {
-                            p.PrintLine($"$\"Cannot cast {{union.TypeId.AsType()}} to {{typeof({typeName})}}\"");
-                        }
-                        p.CloseScope(");");
+                        p.PrintLine("ThrowIfInvalidCast(union);");
                     }
                     p.CloseScope();
                 }
                 p.CloseScope();
                 p.PrintEndLine();
+
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(DOES_NOT_RETURN);
+                p.PrintLine($"private static void ThrowIfInvalidCast(in {UNION_TYPE} union)");
+                p.OpenScope();
+                {
+                    p.PrintLine("throw new global::System.InvalidCastException");
+                    p.OpenScope("(");
+                    {
+                        p.PrintLine($"$\"Cannot cast {{union.TypeId.AsType()}} to {{typeof({typeName})}}\"");
+                    }
+                    p.CloseScope(");");
+                }
+                p.CloseScope();
+                p.PrintEndLine();
+
                 return p;
             }
 
@@ -279,12 +289,16 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
                     p.CloseScope();
                     p.PrintEndLine();
 
-                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine("[global::System.Diagnostics.CodeAnalysis.DoesNotReturn]");
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE).PrintLine(DOES_NOT_RETURN);
                     p.PrintLine("private static void ThrowIfInvalidCast()");
                     p.OpenScope();
                     {
-                        p.PrintLine($"throw new global::System.InvalidCastException($\"Cannot get value of {{typeof({typeName})}} from the input union.\");");
+                        p.PrintLine("throw new global::System.InvalidCastException");
+                        p.OpenScope("(");
+                        {
+                            p.PrintLine($"$\"Cannot get value of {{typeof({typeName})}} from the input union.\"");
+                        }
+                        p.CloseScope(");");
                     }
                     p.CloseScope();
                     p.PrintEndLine();
