@@ -18,7 +18,7 @@ namespace ZBase.Foundation.Mvvm.Unions
     /// </remarks>
     /// <seealso cref="UnionBase" />
     [StructLayout(LayoutKind.Explicit, Size = UnionData.SIZE)]
-    public readonly partial struct Union : IDisposable
+    public readonly partial struct Union
     {
         public const int UNION_TYPE_KIND_SIZE = sizeof(UnionTypeKind);
         public const int UNION_TYPE_ID_OFFSET = UnionBase.META_OFFSET + UNION_TYPE_KIND_SIZE;
@@ -40,7 +40,7 @@ namespace ZBase.Foundation.Mvvm.Unions
         [FieldOffset(UnionBase.DATA_OFFSET)] public readonly ulong ULong;
         [FieldOffset(UnionBase.DATA_OFFSET)] public readonly short Short;
         [FieldOffset(UnionBase.DATA_OFFSET)] public readonly ushort UShort;
-        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly GCHandle GCHandle;
+        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly object Object;
 
         public Union(UnionBase @base, UnionTypeKind type, UnionTypeId typeId) : this()
         {
@@ -72,38 +72,30 @@ namespace ZBase.Foundation.Mvvm.Unions
         public Union(ulong value)  : this() { TypeKind = UnionTypeKind.ULong ; TypeId = UnionTypeId.Of<ulong>(); ULong = value; }
         public Union(short value)  : this() { TypeKind = UnionTypeKind.Short ; TypeId = UnionTypeId.Of<short>(); Short = value; }
         public Union(ushort value) : this() { TypeKind = UnionTypeKind.UShort; TypeId = UnionTypeId.Of<ushort>(); UShort = value; }
-        public Union(string value) : this() { TypeKind = UnionTypeKind.String; TypeId = UnionTypeId.Of<string>(); GCHandle = GCHandle.Alloc(value, GCHandleType.Weak); }
-        public Union(object value) : this() { TypeKind = UnionTypeKind.Object; TypeId = UnionTypeId.Of<object>(); GCHandle = GCHandle.Alloc(value, GCHandleType.Weak); }
+        public Union(string value) : this() { TypeKind = UnionTypeKind.String; TypeId = UnionTypeId.Of<string>(); Object = value; }
+        public Union(object value) : this() { TypeKind = UnionTypeKind.Object; TypeId = UnionTypeId.Of<object>(); Object = value; }
         
         public Union(UnionTypeId typeId, object value) : this()
         {
             TypeKind = UnionTypeKind.Object;
             TypeId = typeId;
-            GCHandle = GCHandle.Alloc(value, GCHandleType.Weak);
+            Object = value;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(bool value) => new Union(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(byte value) => new Union(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(sbyte value) => new Union(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(char value) => new Union(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(decimal value) => new Union(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(double value) => new Union(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(float value) => new Union(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(int value) => new Union(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(uint value) => new Union(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(long value) => new Union(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(ulong value) => new Union(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(short value) => new Union(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(ushort value) => new Union(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(string value) => new Union(value);
-
-        public void Dispose()
-        {
-            if (GCHandle.IsAllocated)
-            {
-                GCHandle.Free();
-            }
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(bool value) => new(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(byte value) => new(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(sbyte value) => new(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(char value) => new(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(decimal value) => new(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(double value) => new(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(float value) => new(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(int value) => new(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(uint value) => new(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(long value) => new(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(ulong value) => new(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(short value) => new(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(ushort value) => new(value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static implicit operator Union(string value) => new(value);
 
         public bool TypeEquals(in Union other)
             => TypeKind == other.TypeKind;
@@ -274,9 +266,9 @@ namespace ZBase.Foundation.Mvvm.Unions
 
         public bool TryGetValue(out string result)
         {
-            if (TypeKind == UnionTypeKind.String && GCHandle.IsAllocated == true)
+            if (TypeKind == UnionTypeKind.String && Object is string stringValue)
             {
-                result = GCHandle.Target as string;
+                result = stringValue;
                 return true;
             }
 
@@ -286,9 +278,9 @@ namespace ZBase.Foundation.Mvvm.Unions
 
         public bool TryGetValue(out object result)
         {
-            if (TypeKind == UnionTypeKind.Object && GCHandle.IsAllocated == true)
+            if (TypeKind == UnionTypeKind.Object && Object is object objectValue)
             {
-                result = GCHandle.Target;
+                result = objectValue;
                 return true;
             }
 
@@ -462,9 +454,9 @@ namespace ZBase.Foundation.Mvvm.Unions
 
         public bool TrySetValueTo(ref string dest)
         {
-            if (TypeKind == UnionTypeKind.String && GCHandle.IsAllocated == true)
+            if (TypeKind == UnionTypeKind.String && Object is string stringValue)
             {
-                dest = GCHandle.Target as string;
+                dest = stringValue;
                 return true;
             }
 
@@ -473,9 +465,9 @@ namespace ZBase.Foundation.Mvvm.Unions
 
         public bool TrySetValueTo(ref object dest)
         {
-            if (TypeKind == UnionTypeKind.Object && GCHandle.IsAllocated == true)
+            if (TypeKind == UnionTypeKind.Object && Object is object objectValue)
             {
-                dest = GCHandle.Target;
+                dest = objectValue;
                 return true;
             }
 
@@ -501,7 +493,7 @@ namespace ZBase.Foundation.Mvvm.Unions
 
                 case UnionTypeKind.String:
                 {
-                    if (GCHandle.IsAllocated == true && GCHandle.Target is string value)
+                    if (Object is string value)
                     {
                         return value;
                     }
@@ -511,7 +503,7 @@ namespace ZBase.Foundation.Mvvm.Unions
 
                 case UnionTypeKind.Object:
                 {
-                    if (GCHandle.IsAllocated == true && GCHandle.Target is object value)
+                    if (Object is object value)
                     {
                         return value.ToString();
                     }

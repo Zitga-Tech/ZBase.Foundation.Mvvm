@@ -42,7 +42,7 @@ namespace ZBase.Foundation.Mvvm.Unions.Converters
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(in Union union)
-            => union.GCHandle.Target?.ToString() ?? string.Empty;
+            => union.Object?.ToString() ?? string.Empty;
 
         [DoesNotReturn]
 #if UNITY_5_3_OR_NEWER

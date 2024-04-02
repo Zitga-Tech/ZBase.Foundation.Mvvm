@@ -10,7 +10,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
     public sealed class MonoBindingContext : MonoBehaviour, IBindingContext
     {
         [SerializeField, HideInInspector]
-        internal ContextTargetKind _targetKind;
+        internal ContextTargetKind _targetKind = ContextTargetKind.UnityObject;
 
         [SerializeField, SerializeReference, HideInInspector]
         internal IObservableObject _targetSystemObject;
