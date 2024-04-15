@@ -4,6 +4,7 @@
     "references": [
         "ZBase.Foundation.Mvvm",
         "ZBase.Foundation.Mvvm.Unity",
+        "Unity.Localization",
         "Unity.TextMeshPro"
     ],
     "includePlatforms": [
@@ -20,6 +21,11 @@
             "name": "com.unity.ugui",
             "expression": "1.0.0",
             "define": "UNITY_UGUI"
+        },
+        {
+            "name": "com.unity.localization",
+            "expression": "",
+            "define": "UNITY_LOCALIZATION"
         },
         {
             "name": "com.unity.textmeshpro",

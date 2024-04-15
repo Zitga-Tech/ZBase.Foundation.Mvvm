@@ -3,8 +3,9 @@
     "rootNamespace": "",
     "references": [
         "ZBase.Foundation.Mvvm",
-        "Unity.TextMeshPro",
-        "UniTask"
+        "UniTask",
+        "Unity.Localization",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -15,19 +16,24 @@
     "defineConstraints": [],
     "versionDefines": [
         {
+            "name": "com.cysharp.unitask",
+            "expression": "",
+            "define": "CYSHARP_UNITASK"
+        },
+        {
             "name": "com.unity.ugui",
             "expression": "1.0.0",
             "define": "UNITY_UGUI"
         },
         {
+            "name": "com.unity.localization",
+            "expression": "",
+            "define": "UNITY_LOCALIZATION"
+        },
+        {
             "name": "com.unity.textmeshpro",
             "expression": "",
             "define": "UNITY_TEXT_MESH_PRO"
-        },
-        {
-            "name": "com.cysharp.unitask",
-            "expression": "",
-            "define": "CYSHARP_UNITASK"
         }
     ],
     "noEngineReferences": false
