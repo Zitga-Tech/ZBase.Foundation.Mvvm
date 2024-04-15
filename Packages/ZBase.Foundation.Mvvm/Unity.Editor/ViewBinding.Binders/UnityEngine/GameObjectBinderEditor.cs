@@ -9,8 +9,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/GameObject/Binder")]
         static void BindGameObject(MenuCommand command)
         {
-            var target = command.context as GameObject;
-            Setup(target);
+            if (command.context is GameObject target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(GameObject target)

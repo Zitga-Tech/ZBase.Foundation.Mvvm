@@ -12,8 +12,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/HorizontalOrVerticalLayoutGroup/Binder")]
         static void BindHorizontalOrVerticalLayoutGroup(MenuCommand command)
         {
-            var target = command.context as HorizontalOrVerticalLayoutGroup;
-            Setup(target);
+            if (command.context is HorizontalOrVerticalLayoutGroup target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(HorizontalOrVerticalLayoutGroup target)

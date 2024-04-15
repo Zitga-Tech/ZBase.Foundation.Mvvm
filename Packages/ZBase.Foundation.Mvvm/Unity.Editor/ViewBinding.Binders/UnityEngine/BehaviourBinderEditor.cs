@@ -9,8 +9,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/Behaviour/Binder")]
         static void BindBehaviour(MenuCommand command)
         {
-            var target = command.context as Behaviour;
-            Setup(target);
+            if (command.context is Behaviour target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(Behaviour target)

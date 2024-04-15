@@ -12,8 +12,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/TMP_Dropdown/Binder")]
         static void BindTMP_Dropdown(MenuCommand command)
         {
-            var target = command.context as TMP_Dropdown;
-            Setup(target);
+            if (command.context is TMP_Dropdown target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(TMP_Dropdown target)

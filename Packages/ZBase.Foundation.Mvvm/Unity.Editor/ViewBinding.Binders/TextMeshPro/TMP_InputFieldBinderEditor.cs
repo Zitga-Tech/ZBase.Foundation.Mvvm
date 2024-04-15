@@ -12,8 +12,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/TMP_InputField/Binder")]
         static void BindTMP_InputField(MenuCommand command)
         {
-            var target = command.context as TMP_InputField;
-            Setup(target);
+            if (command.context is TMP_InputField target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(TMP_InputField target)

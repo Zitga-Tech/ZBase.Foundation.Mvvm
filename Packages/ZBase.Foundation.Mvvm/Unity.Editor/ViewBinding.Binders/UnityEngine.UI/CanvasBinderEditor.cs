@@ -9,8 +9,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/CanvasGroup/Binder")]
         static void BindCanvasGroup(MenuCommand command)
         {
-            var target = command.context as CanvasGroup;
-            Setup(target);
+            if (command.context is CanvasGroup target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(CanvasGroup target)

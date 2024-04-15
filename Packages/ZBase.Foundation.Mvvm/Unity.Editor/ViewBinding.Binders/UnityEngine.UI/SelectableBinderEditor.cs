@@ -12,8 +12,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/Selectable/Binder")]
         static void BindSelectable(MenuCommand command)
         {
-            var target = command.context as Selectable;
-            Setup(target);
+            if (command.context is Selectable target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(Selectable target)

@@ -12,8 +12,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/Toggle/Binder")]
         static void BindToggle(MenuCommand command)
         {
-            var target = command.context as Toggle;
-            Setup(target);
+            if (command.context is Toggle target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(Toggle target)

@@ -9,8 +9,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/RectTransform/Binder")]
         static void BindRectTransform(MenuCommand command)
         {
-            var target = command.context as RectTransform;
-            Setup(target);
+            if (command.context is RectTransform target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(RectTransform target)

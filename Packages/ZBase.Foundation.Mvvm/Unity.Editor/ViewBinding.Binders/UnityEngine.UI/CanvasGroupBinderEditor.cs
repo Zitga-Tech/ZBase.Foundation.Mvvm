@@ -9,8 +9,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/Canvas/Binder")]
         static void BindCanvas(MenuCommand command)
         {
-            var target = command.context as Canvas;
-            Setup(target);
+            if (command.context is Canvas target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(Canvas target)

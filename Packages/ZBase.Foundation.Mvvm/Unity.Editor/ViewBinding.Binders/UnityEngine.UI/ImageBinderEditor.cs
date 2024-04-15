@@ -12,8 +12,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/Image/Binder")]
         static void BindImage(MenuCommand command)
         {
-            var target = command.context as Image;
-            Setup(target);
+            if (command.context is Image target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(Image target)

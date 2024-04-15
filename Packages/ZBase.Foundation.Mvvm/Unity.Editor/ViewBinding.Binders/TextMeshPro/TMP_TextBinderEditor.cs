@@ -12,8 +12,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/TMP_Text/Binder")]
         static void BindTMP_Text(MenuCommand command)
         {
-            var target = command.context as TMP_Text;
-            Setup(target);
+            if (command.context is TMP_Text target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(TMP_Text target)

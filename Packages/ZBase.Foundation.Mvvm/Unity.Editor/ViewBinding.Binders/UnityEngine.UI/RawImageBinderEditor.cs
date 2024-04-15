@@ -12,8 +12,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/RawImage/Binder")]
         static void BindRawImage(MenuCommand command)
         {
-            var target = command.context as RawImage;
-            Setup(target);
+            if (command.context is RawImage target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(RawImage target)

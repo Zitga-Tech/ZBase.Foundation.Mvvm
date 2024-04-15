@@ -9,8 +9,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/AudioSource/Binder")]
         static void BindAudioSource(MenuCommand command)
         {
-            var target = command.context as AudioSource;
-            Setup(target);
+            if (command.context is AudioSource target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(AudioSource target)

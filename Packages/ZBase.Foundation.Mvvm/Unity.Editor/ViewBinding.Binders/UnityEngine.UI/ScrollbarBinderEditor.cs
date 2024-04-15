@@ -12,8 +12,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/Scrollbar/Binder")]
         static void BindScrollbar(MenuCommand command)
         {
-            var target = command.context as Scrollbar;
-            Setup(target);
+            if (command.context is Scrollbar target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(Scrollbar target)

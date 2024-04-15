@@ -9,8 +9,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/Transform/Binder")]
         static void BindTransform(MenuCommand command)
         {
-            var target = command.context as Transform;
-            Setup(target);
+            if (command.context is Transform target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(Transform target)

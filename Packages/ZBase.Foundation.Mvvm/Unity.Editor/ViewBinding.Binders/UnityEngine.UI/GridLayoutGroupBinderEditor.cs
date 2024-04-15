@@ -12,8 +12,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/GridLayoutGroup/Binder")]
         static void BindGridLayoutGroup(MenuCommand command)
         {
-            var target = command.context as GridLayoutGroup;
-            Setup(target);
+            if (command.context is GridLayoutGroup target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(GridLayoutGroup target)

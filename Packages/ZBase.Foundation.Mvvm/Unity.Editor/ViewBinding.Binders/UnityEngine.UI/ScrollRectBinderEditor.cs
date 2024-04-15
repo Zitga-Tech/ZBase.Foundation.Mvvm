@@ -12,8 +12,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/ScrollRect/Binder")]
         static void BindScrollRect(MenuCommand command)
         {
-            var target = command.context as ScrollRect;
-            Setup(target);
+            if (command.context is ScrollRect target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(ScrollRect target)

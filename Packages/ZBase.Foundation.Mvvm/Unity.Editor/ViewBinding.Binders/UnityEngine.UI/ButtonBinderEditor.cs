@@ -12,8 +12,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/Button/Binder")]
         static void BindButton(MenuCommand command)
         {
-            var target = command.context as Button;
-            Setup(target);
+            if (command.context is Button target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(Button target)

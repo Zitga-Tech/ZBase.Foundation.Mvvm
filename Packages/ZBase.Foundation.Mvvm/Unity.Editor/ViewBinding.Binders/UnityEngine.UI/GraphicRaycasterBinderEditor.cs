@@ -12,8 +12,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/GraphicRaycaster/Binder")]
         static void BindGraphicRaycaster(MenuCommand command)
         {
-            var target = command.context as GraphicRaycaster;
-            Setup(target);
+            if (command.context is GraphicRaycaster target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(GraphicRaycaster target)

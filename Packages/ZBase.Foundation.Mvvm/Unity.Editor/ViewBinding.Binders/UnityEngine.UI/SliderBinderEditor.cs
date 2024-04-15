@@ -12,8 +12,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         [MenuItem("CONTEXT/Slider/Binder")]
         static void BindSlider(MenuCommand command)
         {
-            var target = command.context as Slider;
-            Setup(target);
+            if (command.context is Slider target)
+            {
+                Setup(target);
+            }
         }
 
         public static MonoBehaviour Setup(Slider target)
