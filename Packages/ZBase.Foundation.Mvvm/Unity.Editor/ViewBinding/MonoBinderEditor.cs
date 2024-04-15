@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
 using ZBase.Foundation.Mvvm.ViewBinding;
@@ -72,5 +73,62 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 DrawPresetOnEditor(binder);
             }
         }
+
+        public static Component TryEnsureComponent(Component input)
+        {
+            if (input == false)
+            {
+                return input;
+            }
+
+            var components = input.gameObject.GetComponents<IBindingContext>();
+
+            if (components == null || components.Length < 1)
+                return input;
+
+            return components[0] as Component;
+        }
+
+        public static void TryResolveNearestContext(MonoBinder binder)
+        {
+            if (binder == null || binder == false)
+            {
+                return;
+            }
+
+            var comp = FindNearestContext(binder.gameObject);
+
+            if (comp != null && comp)
+            {
+                binder._context = comp;
+            }
+        }
+
+        public static Component FindNearestContext(GameObject go)
+        {
+            if (go == null || go == false)
+            {
+                return null;
+            }
+
+            var parent = go.transform;
+            var components = new List<IBindingContext>();
+
+            while (parent)
+            {
+                components.Clear();
+                parent.GetComponents(components);
+
+                if (components.Count > 0)
+                {
+                    return components[0] as Component;
+                }
+
+                parent = parent.parent;
+            }
+
+            return null;
+        }
+
     }
 }

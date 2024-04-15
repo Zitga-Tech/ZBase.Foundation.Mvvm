@@ -1,4 +1,4 @@
-#if UNITY_TEXT_MESH_PRO
+#if UNITY_TEXT_MESH_PRO || (UNITY_2023_2_OR_NEWER && UNITY_UGUI)
 
 #pragma warning disable CA1707 // Identifiers should not contain underscores
 #pragma warning disable CA1815 // Override equals and operator equals on value types

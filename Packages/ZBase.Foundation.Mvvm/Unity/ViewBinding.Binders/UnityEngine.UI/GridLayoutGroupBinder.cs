@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿#if UNITY_UGUI
+
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.UI;
 using ZBase.Foundation.Mvvm.ViewBinding;
@@ -178,3 +180,5 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
     }
 }
+
+#endif

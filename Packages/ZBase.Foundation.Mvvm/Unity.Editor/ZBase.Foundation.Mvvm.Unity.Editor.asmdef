@@ -3,7 +3,8 @@
     "rootNamespace": "ZBase.Foundation.Mvvm.Unity.Editor",
     "references": [
         "ZBase.Foundation.Mvvm",
-        "ZBase.Foundation.Mvvm.Unity"
+        "ZBase.Foundation.Mvvm.Unity",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [
         "Editor"
@@ -14,6 +15,17 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.ugui",
+            "expression": "1.0.0",
+            "define": "UNITY_UGUI"
+        },
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "",
+            "define": "UNITY_TEXT_MESH_PRO"
+        }
+    ],
     "noEngineReferences": false
 }

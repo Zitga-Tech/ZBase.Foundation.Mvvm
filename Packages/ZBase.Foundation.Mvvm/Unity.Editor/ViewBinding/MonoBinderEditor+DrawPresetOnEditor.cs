@@ -1026,42 +1026,6 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
         }
 
-        private Component TryEnsureComponent(Component input)
-        {
-            if (input == false)
-            {
-                return input;
-            }
-
-            var components = input.gameObject.GetComponents<IBindingContext>();
-
-            if (components == null || components.Length < 1)
-                return input;
-
-            return components[0] as Component;
-        }
-
-        private Component FindNearestContext(GameObject go)
-        {
-            var parent = go.transform;
-            var components = new List<IBindingContext>();
-
-            while (parent)
-            {
-                components.Clear();
-                parent.GetComponents(components);
-
-                if (components.Count > 0)
-                {
-                    return components[0] as Component;
-                }
-
-                parent = parent.parent;
-            }
-
-            return null;
-        }
-
         private static void DrawBindingCommand(
               MonoBinder binder
             , SerializedObject serializedBinder

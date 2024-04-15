@@ -1,3 +1,5 @@
+#if UNITY_UGUI
+
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.UI;
@@ -100,3 +102,5 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         partial void OnValueChanged(float value);
     }
 }
+
+#endif
