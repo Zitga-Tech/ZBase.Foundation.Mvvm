@@ -1,6 +1,4 @@
-﻿#if UNITY_TEXT_MESH_PRO || (UNITY_2023_2_OR_NEWER && UNITY_UGUI)
-
-using UnityEditor;
+﻿using UnityEditor;
 using ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders;
 using UnityEngine;
 
@@ -23,5 +21,3 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         }
     }
 }
-
-#endif
