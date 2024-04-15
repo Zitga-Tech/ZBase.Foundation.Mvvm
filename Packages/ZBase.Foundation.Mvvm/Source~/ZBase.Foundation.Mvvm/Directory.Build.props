@@ -6,5 +6,6 @@
 
     <ItemGroup>
         <Reference Include="$(UnityEditorPath)" Private="false" />
+        <Reference Include="$(UnityScriptAssembliesPath)\UniTask.dll" Private="false" />
     </ItemGroup>
 </Project>
