@@ -5,7 +5,10 @@
         "ZBase.Foundation.Mvvm",
         "ZBase.Foundation.Mvvm.ObservableCollections",
         "ZBase.Foundation.Mvvm.Unity",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.Localization",
+        "Unity.Addressables",
+        "Unity.ResourceManager"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

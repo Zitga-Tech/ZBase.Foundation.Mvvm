@@ -1339,6 +1339,7 @@ GameObject:
   - component: {fileID: 304125471}
   - component: {fileID: 304125473}
   - component: {fileID: 304125472}
+  - component: {fileID: 304125475}
   - component: {fileID: 304125474}
   m_Layer: 5
   m_Name: Text (TMP)
@@ -1472,80 +1473,40 @@ MonoBehaviour:
   m_GameObject: {fileID: 304125470}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 171388d3ee8bde446bbb138e15adc5c3, type: 3}
+  m_Script: {fileID: 11500000, guid: 37957a3d313b60f42be98473fd86a18d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _contextSetting: 0
   _context: {fileID: 606846926}
   _targets: []
-  _bindingFieldForSetText:
-    <TargetPropertyName>k__BackingField: Progress
-  _bindingFieldForSetColor:
+  _bindingFieldForSetTable:
     <TargetPropertyName>k__BackingField: 
-  _bindingFieldForSetMaxVisibleCharacters:
+  _bindingFieldForSetEntry:
     <TargetPropertyName>k__BackingField: 
-  _bindingFieldForSetMaxVisibleWords:
+  _bindingFieldForSetIVariable:
     <TargetPropertyName>k__BackingField: 
-  _bindingFieldForSetMaxVisibleLines:
+  _bindingFieldForSetIVariables:
+    <TargetPropertyName>k__BackingField: ProgressVariables
+  _bindingFieldForSetVariable:
     <TargetPropertyName>k__BackingField: 
-  _bindingFieldForSetFontAsset:
+  _bindingFieldForSetVariables:
     <TargetPropertyName>k__BackingField: 
-  _bindingFieldForSetFontSize:
-    <TargetPropertyName>k__BackingField: 
-  _bindingFieldForSetAutoSizing:
-    <TargetPropertyName>k__BackingField: 
-  _bindingFieldForSetFontSizeMin:
-    <TargetPropertyName>k__BackingField: 
-  _bindingFieldForSetFontSizeMax:
-    <TargetPropertyName>k__BackingField: 
-  _bindingFieldForSetRaycastTarget:
-    <TargetPropertyName>k__BackingField: 
-  _bindingFieldForSetMaskable:
-    <TargetPropertyName>k__BackingField: 
-  _bindingFieldForSetWordWrapping:
-    <TargetPropertyName>k__BackingField: 
-  _bindingFieldForSetOverflowMode:
-    <TargetPropertyName>k__BackingField: 
-  _converterForSetText:
-    <Adapter>k__BackingField:
-      rid: 7863444904256995329
-  _converterForSetColor:
+  _converterForSetTable:
     <Adapter>k__BackingField:
       rid: -2
-  _converterForSetMaxVisibleCharacters:
+  _converterForSetEntry:
     <Adapter>k__BackingField:
       rid: -2
-  _converterForSetMaxVisibleWords:
+  _converterForSetIVariable:
     <Adapter>k__BackingField:
       rid: -2
-  _converterForSetMaxVisibleLines:
+  _converterForSetIVariables:
     <Adapter>k__BackingField:
       rid: -2
-  _converterForSetFontAsset:
+  _converterForSetVariable:
     <Adapter>k__BackingField:
       rid: -2
-  _converterForSetFontSize:
-    <Adapter>k__BackingField:
-      rid: -2
-  _converterForSetAutoSizing:
-    <Adapter>k__BackingField:
-      rid: -2
-  _converterForSetFontSizeMin:
-    <Adapter>k__BackingField:
-      rid: -2
-  _converterForSetFontSizeMax:
-    <Adapter>k__BackingField:
-      rid: -2
-  _converterForSetRaycastTarget:
-    <Adapter>k__BackingField:
-      rid: -2
-  _converterForSetMaskable:
-    <Adapter>k__BackingField:
-      rid: -2
-  _converterForSetWordWrapping:
-    <Adapter>k__BackingField:
-      rid: -2
-  _converterForSetOverflowMode:
+  _converterForSetVariables:
     <Adapter>k__BackingField:
       rid: -2
   references:
@@ -1553,9 +1514,46 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 7863444904256995329
-      type: {class: FloatToStringAdapter, ns: ZBase.Foundation.Mvvm.ViewBinding.Adapters, asm: ZBase.Foundation.Mvvm}
-      data: 
+--- !u!114 &304125475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 304125470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_StringReference:
+    m_TableReference:
+      m_TableCollectionName: GUID:f3b1354b29705a34cb114d7d395ec680
+    m_TableEntryReference:
+      m_KeyId: 17639809024
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  m_FormatArguments: []
+  m_UpdateString:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 304125472}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 1
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &308905154
 GameObject:
   m_ObjectHideFlags: 0
@@ -2305,6 +2303,7 @@ MonoBehaviour:
     rid: -2
   _targetUnityObject: {fileID: 606846927}
   _targetPropertyPath: []
+  _createOnAwake: 1
   references:
     version: 2
     RefIds:
@@ -2861,7 +2860,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -50, y: 0}
-  m_SizeDelta: {x: 300, y: 50}
+  m_SizeDelta: {x: 700, y: 50}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &804311873
 MonoBehaviour:
@@ -2955,8 +2954,8 @@ MonoBehaviour:
   m_HandleRect: {fileID: 993807836}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 1
-  m_WholeNumbers: 0
+  m_MaxValue: 100
+  m_WholeNumbers: 1
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -5373,7 +5372,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 700232953}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.6100001
+  m_Size: 0.61
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

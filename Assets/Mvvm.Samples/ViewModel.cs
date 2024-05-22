@@ -1,7 +1,10 @@
 using System;
 using UnityEngine;
+using UnityEngine.Localization;
+using UnityEngine.Localization.SmartFormat.PersistentVariables;
 using ZBase.Foundation.Mvvm.ComponentModel;
 using ZBase.Foundation.Mvvm.Input;
+using ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders;
 
 namespace Mvvm.Samples
 {
@@ -32,12 +35,7 @@ namespace Mvvm.Samples
         private Color _textColor;
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(ProgressText))]
-        public float Progress
-        {
-            get => Get_Progress();
-            set => Set_Progress(value);
-        }
+        public LocalizedIVariable[] ProgressVariables { get => Get_ProgressVariables(); set => Set_ProgressVariables(value); }
 
         [ObservableProperty]
         private bool _updating;
@@ -52,13 +50,26 @@ namespace Mvvm.Samples
 
         public double Seconds => Time.TotalSeconds;
 
-        public string ProgressText => $"{Progress * 100f} %";
+        private IntVariable _progressVariable;
+        private IntVariable _unitVariable;
+        private LocalizedString _localizedUnit;
 
         private void Start()
         {
             this.Time = TimeSpan.Zero;
             this.TextColor = Color.white;
-            this.Progress = 0f;
+
+            this.ProgressVariables = new LocalizedIVariable[] {
+                new(_progressVariable = new(), "value"),
+                new(_localizedUnit = new("L10n", "unit_format") {
+                    { "0", _unitVariable = new() }
+                }, "unit"),
+            };
+        }
+
+        private void OnDestroy()
+        {
+            ((IDisposable)_localizedUnit).Dispose();
         }
 
         private void Update()
@@ -92,7 +103,39 @@ namespace Mvvm.Samples
         [RelayCommand]
         private void OnSetProgress(float value)
         {
-            this.Progress = value;
+            var progress = ReduceToUnit((int)value, out var unit);
+            _progressVariable.Value = progress;
+            _unitVariable.Value = unit;
+        }
+
+        private static int ReduceToUnit(int value, out int unit)
+        {
+            if (value < 10)
+            {
+                unit = 0;
+                return value;
+            }
+
+            if (value < 20)
+            {
+                unit = 1;
+                return value / 10;
+            }
+
+            if (value < 100)
+            {
+                unit = 2;
+                return value / 10;
+            }
+
+            if (value < 1000)
+            {
+                unit = 3;
+                return value / 100;
+            }
+
+            unit = 4;
+            return value / 1000;
         }
     }
 }
