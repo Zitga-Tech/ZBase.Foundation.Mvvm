@@ -79,9 +79,9 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
                 var target = targets[i];
                 var stringRef = target.StringReference;
 
-                if (stringRef.TryGetValue(name, out var variable) == false)
+                if (stringRef.ContainsKey(name) == false)
                 {
-                    stringRef.Add(name, variable);
+                    stringRef.Add(name, value);
                 }
 
                 target.RefreshString();
@@ -122,9 +122,9 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
                         name = "0";
                     }
 
-                    if (stringRef.TryGetValue(name, out var variable) == false)
+                    if (stringRef.ContainsKey(name) == false)
                     {
-                        stringRef.Add(name, variable);
+                        stringRef.Add(name, value);
                     }
                 }
 
