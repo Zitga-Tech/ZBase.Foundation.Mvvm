@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class GridLayoutGroupBinderEditor
     {
-        [MenuItem("CONTEXT/GridLayoutGroup/Binder")]
+        [MenuItem("CONTEXT/GridLayoutGroup/Binder For This Component")]
         static void BindGridLayoutGroup(MenuCommand command)
         {
             if (command.context is GridLayoutGroup target)

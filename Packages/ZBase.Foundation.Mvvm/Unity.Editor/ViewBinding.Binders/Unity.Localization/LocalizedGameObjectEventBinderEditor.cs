@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class LocalizedGameObjectEventBinderEditor
     {
-        [MenuItem("CONTEXT/LocalizedGameObjectEvent/Binder")]
+        [MenuItem("CONTEXT/LocalizedGameObjectEvent/Binder For This Component")]
         static void BindLocalizedGameObjectEvent(MenuCommand command)
         {
             if (command.context is LocalizedGameObjectEvent target)

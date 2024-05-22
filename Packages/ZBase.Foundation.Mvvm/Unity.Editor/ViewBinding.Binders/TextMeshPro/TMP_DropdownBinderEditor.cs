@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class TMP_DropdownBinderEditor
     {
-        [MenuItem("CONTEXT/TMP_Dropdown/Binder")]
+        [MenuItem("CONTEXT/TMP_Dropdown/Binder For This Component")]
         static void BindTMP_Dropdown(MenuCommand command)
         {
             if (command.context is TMP_Dropdown target)

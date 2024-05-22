@@ -6,7 +6,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class CanvasBinderEditor
     {
-        [MenuItem("CONTEXT/Canvas/Binder")]
+        [MenuItem("CONTEXT/Canvas/Binder For This Component")]
         static void BindCanvas(MenuCommand command)
         {
             if (command.context is Canvas target)

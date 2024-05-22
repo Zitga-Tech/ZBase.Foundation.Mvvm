@@ -6,7 +6,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class AudioSourceBinderEditor
     {
-        [MenuItem("CONTEXT/AudioSource/Binder")]
+        [MenuItem("CONTEXT/AudioSource/Binder For This Component")]
         static void BindAudioSource(MenuCommand command)
         {
             if (command.context is AudioSource target)

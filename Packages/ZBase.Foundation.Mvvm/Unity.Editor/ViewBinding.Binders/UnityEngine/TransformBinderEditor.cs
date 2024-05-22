@@ -6,7 +6,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class TransformBinderEditor
     {
-        [MenuItem("CONTEXT/Transform/Binder")]
+        [MenuItem("CONTEXT/Transform/Binder For This Component")]
         static void BindTransform(MenuCommand command)
         {
             if (command.context is Transform target)

@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class SelectableBinderEditor
     {
-        [MenuItem("CONTEXT/Selectable/Binder")]
+        [MenuItem("CONTEXT/Selectable/Binder For This Component")]
         static void BindSelectable(MenuCommand command)
         {
             if (command.context is Selectable target)

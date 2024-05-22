@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class ScrollbarBinderEditor
     {
-        [MenuItem("CONTEXT/Scrollbar/Binder")]
+        [MenuItem("CONTEXT/Scrollbar/Binder For This Component")]
         static void BindScrollbar(MenuCommand command)
         {
             if (command.context is Scrollbar target)

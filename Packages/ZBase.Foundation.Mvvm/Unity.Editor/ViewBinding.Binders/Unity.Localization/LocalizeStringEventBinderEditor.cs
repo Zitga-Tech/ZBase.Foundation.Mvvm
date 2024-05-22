@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class LocalizeStringEventBinderEditor
     {
-        [MenuItem("CONTEXT/LocalizeStringEvent/Binder")]
+        [MenuItem("CONTEXT/LocalizeStringEvent/Binder For This Component")]
         static void BindLocalizeStringEvent(MenuCommand command)
         {
             if (command.context is LocalizeStringEvent target)

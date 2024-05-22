@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class ButtonBinderEditor
     {
-        [MenuItem("CONTEXT/Button/Binder")]
+        [MenuItem("CONTEXT/Button/Binder For This Component")]
         static void BindButton(MenuCommand command)
         {
             if (command.context is Button target)

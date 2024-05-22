@@ -6,7 +6,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class RectTransformBinderEditor
     {
-        [MenuItem("CONTEXT/RectTransform/Binder")]
+        [MenuItem("CONTEXT/RectTransform/Binder For This Component")]
         static void BindRectTransform(MenuCommand command)
         {
             if (command.context is RectTransform target)

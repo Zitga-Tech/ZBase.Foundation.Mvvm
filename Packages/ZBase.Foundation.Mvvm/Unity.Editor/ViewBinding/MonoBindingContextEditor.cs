@@ -1,3 +1,5 @@
+#pragma warning disable CA1031 // Do not catch general exception types
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

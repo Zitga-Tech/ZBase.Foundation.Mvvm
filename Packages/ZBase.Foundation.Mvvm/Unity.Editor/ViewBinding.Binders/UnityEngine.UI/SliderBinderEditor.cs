@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class SliderBinderEditor
     {
-        [MenuItem("CONTEXT/Slider/Binder")]
+        [MenuItem("CONTEXT/Slider/Binder For This Component")]
         static void BindSlider(MenuCommand command)
         {
             if (command.context is Slider target)

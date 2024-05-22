@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class ToggleBinderEditor
     {
-        [MenuItem("CONTEXT/Toggle/Binder")]
+        [MenuItem("CONTEXT/Toggle/Binder For This Component")]
         static void BindToggle(MenuCommand command)
         {
             if (command.context is Toggle target)

@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class ImageBinderEditor
     {
-        [MenuItem("CONTEXT/Image/Binder")]
+        [MenuItem("CONTEXT/Image/Binder For This Component")]
         static void BindImage(MenuCommand command)
         {
             if (command.context is Image target)

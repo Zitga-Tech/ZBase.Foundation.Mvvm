@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class TMP_TextBinderEditor
     {
-        [MenuItem("CONTEXT/TMP_Text/Binder")]
+        [MenuItem("CONTEXT/TMP_Text/Binder For This Component")]
         static void BindTMP_Text(MenuCommand command)
         {
             if (command.context is TMP_Text target)

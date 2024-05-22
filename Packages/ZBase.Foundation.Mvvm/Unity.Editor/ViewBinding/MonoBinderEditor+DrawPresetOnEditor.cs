@@ -1,3 +1,6 @@
+#pragma warning disable CA1031 // Do not catch general exception types
+#pragma warning disable CA2000 // Dispose objects before losing scope
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -145,7 +148,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
         }
 
-        private void DrawContextField(
+        private static void DrawContextField(
               SerializedObject serializedObject
             , SerializedProperty serializedProperty
             , MonoBinder binder
@@ -166,7 +169,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             }
         }
 
-        private void DrawFindNearestContext(
+        private static void DrawFindNearestContext(
               SerializedObject serializedObject
             , SerializedProperty serializedProperty
             , MonoBinder binder
@@ -483,15 +486,12 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         {
             var menu = new GenericMenu();
 
-            if (targetPropertyMap.Count > 0)
-            {
-                menu.AddItem(
-                      new GUIContent("None")
-                    , false
-                    , RemoveBindingProperty
-                    , (binder, serializedBinder, targetPropertyNameSP, adapterPropertySP)
-                );
-            }
+            menu.AddItem(
+                  new GUIContent("<None>")
+                , false
+                , RemoveBindingProperty
+                , (binder, serializedBinder, targetPropertyNameSP, adapterPropertySP)
+            );
 
             foreach (var (propName, propType) in targetPropertyMap)
             {
@@ -622,7 +622,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             var menu = new GenericMenu();
 
             menu.AddItem(
-                  new GUIContent("None")
+                  new GUIContent("<None>")
                 , false
                 , RemoveAdapterProperty
                 , (binder, serializedBinder, adapterPropertySP)
@@ -653,7 +653,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             menu.ShowAsContext();
         }
 
-        private static IEnumerable<Type> GetOtherAdapterTypesExcludeFromType(Type fromTypeToExclude)
+        private static List<Type> GetOtherAdapterTypesExcludeFromType(Type fromTypeToExclude)
         {
             var result = new List<Type>();
 
@@ -684,7 +684,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             , SerializedObject serializedBinder
             , SerializedProperty adapterPropertySP
             , Type adapterTypeSaved
-            , IEnumerable<Type> adapterTypes
+            , List<Type> adapterTypes
             , bool includeDirectory
             , string directoryPrefix
         )
@@ -1149,15 +1149,12 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         {
             var menu = new GenericMenu();
 
-            if (targetCommandMap.Count > 0)
-            {
-                menu.AddItem(
-                      new GUIContent("None")
-                    , false
-                    , RemoveBindingCommand
-                    , (binder, serializedBinder, targetCommandNameSP)
-                );
-            }
+            menu.AddItem(
+                  new GUIContent("<None>")
+                , false
+                , RemoveBindingCommand
+                , (binder, serializedBinder, targetCommandNameSP)
+            );
 
             foreach (var (commandName, commandType) in targetCommandMap)
             {

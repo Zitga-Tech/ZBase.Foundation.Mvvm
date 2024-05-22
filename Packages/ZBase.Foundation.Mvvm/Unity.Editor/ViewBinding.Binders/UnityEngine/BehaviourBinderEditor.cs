@@ -6,7 +6,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class BehaviourBinderEditor
     {
-        [MenuItem("CONTEXT/Behaviour/Binder")]
+        [MenuItem("CONTEXT/Behaviour/Binder For This Component")]
         static void BindBehaviour(MenuCommand command)
         {
             if (command.context is Behaviour target)

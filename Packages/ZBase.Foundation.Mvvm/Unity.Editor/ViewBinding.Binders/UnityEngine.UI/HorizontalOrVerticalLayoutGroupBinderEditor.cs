@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class HorizontalOrVerticalLayoutGroupBinderEditor
     {
-        [MenuItem("CONTEXT/HorizontalOrVerticalLayoutGroup/Binder")]
+        [MenuItem("CONTEXT/HorizontalOrVerticalLayoutGroup/Binder For This Component")]
         static void BindHorizontalOrVerticalLayoutGroup(MenuCommand command)
         {
             if (command.context is HorizontalOrVerticalLayoutGroup target)

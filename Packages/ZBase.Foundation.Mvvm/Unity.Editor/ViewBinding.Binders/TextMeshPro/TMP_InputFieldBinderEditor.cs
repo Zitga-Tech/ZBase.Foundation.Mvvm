@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class TMP_InputFieldBinderEditor
     {
-        [MenuItem("CONTEXT/TMP_InputField/Binder")]
+        [MenuItem("CONTEXT/TMP_InputField/Binder For This Component")]
         static void BindTMP_InputField(MenuCommand command)
         {
             if (command.context is TMP_InputField target)

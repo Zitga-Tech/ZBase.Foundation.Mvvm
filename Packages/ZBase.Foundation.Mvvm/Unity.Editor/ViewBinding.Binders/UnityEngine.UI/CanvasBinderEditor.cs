@@ -6,7 +6,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class CanvasGroupBinderEditor
     {
-        [MenuItem("CONTEXT/CanvasGroup/Binder")]
+        [MenuItem("CONTEXT/CanvasGroup/Binder For This Component")]
         static void BindCanvasGroup(MenuCommand command)
         {
             if (command.context is CanvasGroup target)

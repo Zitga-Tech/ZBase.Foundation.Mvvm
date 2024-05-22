@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class GraphicRaycasterBinderEditor
     {
-        [MenuItem("CONTEXT/GraphicRaycaster/Binder")]
+        [MenuItem("CONTEXT/GraphicRaycaster/Binder For This Component")]
         static void BindGraphicRaycaster(MenuCommand command)
         {
             if (command.context is GraphicRaycaster target)

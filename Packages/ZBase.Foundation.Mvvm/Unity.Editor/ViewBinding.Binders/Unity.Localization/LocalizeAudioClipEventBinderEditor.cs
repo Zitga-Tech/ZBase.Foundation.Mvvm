@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class LocalizeAudioClipEventBinderEditor
     {
-        [MenuItem("CONTEXT/LocalizeAudioClipEvent/Binder")]
+        [MenuItem("CONTEXT/LocalizeAudioClipEvent/Binder For This Component")]
         static void BindLocalizeAudioClipEvent(MenuCommand command)
         {
             if (command.context is LocalizeAudioClipEvent target)

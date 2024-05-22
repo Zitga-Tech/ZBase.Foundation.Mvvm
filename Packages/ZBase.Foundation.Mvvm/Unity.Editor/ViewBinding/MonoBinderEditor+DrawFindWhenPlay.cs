@@ -1,3 +1,5 @@
+#pragma warning disable CA1031 // Do not catch general exception types
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -158,7 +160,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 {
                     var selectedPropName = EditorGUILayout.TextField("Bind To Property", targetPropertyNameSP.stringValue);
 
-                    if (string.Equals(targetPropertyNameSP.stringValue, selectedPropName) == false)
+                    if (string.Equals(targetPropertyNameSP.stringValue, selectedPropName, StringComparison.Ordinal) == false)
                     {
                         Undo.RecordObject(binder, $"Set {targetPropertyNameSP.propertyPath}");
 
@@ -238,7 +240,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             var menu = new GenericMenu();
 
             menu.AddItem(
-                  new GUIContent("None")
+                  new GUIContent("<None>")
                 , false
                 , RemoveAdapterProperty
                 , (binder, serializedBinder, adapterPropertySP)
@@ -269,7 +271,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             menu.ShowAsContext();
         }
 
-        private static IEnumerable<Type> GetOtherAdapterTypesExcludeToType(Type toTypeToExclude)
+        private static List<Type> GetOtherAdapterTypesExcludeToType(Type toTypeToExclude)
         {
             var result = new List<Type>();
 
@@ -333,7 +335,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 {
                     var selectedCommandName = EditorGUILayout.TextField("Bind To Command", targetCommandNameSP.stringValue);
 
-                    if (string.Equals(selectedCommandName, targetCommandNameSP.stringValue) == false)
+                    if (string.Equals(selectedCommandName, targetCommandNameSP.stringValue, StringComparison.Ordinal) == false)
                     {
                         Undo.RecordObject(binder, $"Set {targetCommandNameSP.propertyPath}");
 

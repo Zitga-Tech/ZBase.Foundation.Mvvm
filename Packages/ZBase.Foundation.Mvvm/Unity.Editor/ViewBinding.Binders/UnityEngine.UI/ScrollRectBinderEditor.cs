@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class ScrollRectBinderEditor
     {
-        [MenuItem("CONTEXT/ScrollRect/Binder")]
+        [MenuItem("CONTEXT/ScrollRect/Binder For This Component")]
         static void BindScrollRect(MenuCommand command)
         {
             if (command.context is ScrollRect target)

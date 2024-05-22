@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class LocalizeTextureEventBinderEditor
     {
-        [MenuItem("CONTEXT/LocalizeTextureEvent/Binder")]
+        [MenuItem("CONTEXT/LocalizeTextureEvent/Binder For This Component")]
         static void BindLocalizeTextureEvent(MenuCommand command)
         {
             if (command.context is LocalizeTextureEvent target)

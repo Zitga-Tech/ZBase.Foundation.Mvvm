@@ -6,8 +6,17 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class GameObjectBinderEditor
     {
-        [MenuItem("CONTEXT/GameObject/Binder")]
+        [MenuItem("GameObject/Add Binder For GameObject", priority = 0)]
         static void BindGameObject(MenuCommand command)
+        {
+            if (command.context is GameObject target)
+            {
+                Setup(target);
+            }
+        }
+        
+        [MenuItem("CONTEXT/Component/Binder For This GameObject")]
+        static void BindGameObjectComponent(MenuCommand command)
         {
             if (command.context is GameObject target)
             {

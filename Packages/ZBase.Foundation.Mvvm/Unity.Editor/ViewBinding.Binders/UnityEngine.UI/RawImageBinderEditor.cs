@@ -9,7 +9,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
     internal static class RawImageBinderEditor
     {
-        [MenuItem("CONTEXT/RawImage/Binder")]
+        [MenuItem("CONTEXT/RawImage/Binder For This Component")]
         static void BindRawImage(MenuCommand command)
         {
             if (command.context is RawImage target)
