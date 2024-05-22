@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
@@ -22,7 +23,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             if (_targets.Length < 1)
             {
-                WarnIfTargetListIsEmpty(this);
+                WarnTargetListIsEmpty(this);
             }
 
             OnPostAwake();
@@ -32,10 +33,10 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
         protected abstract void OnAwake([NotNull] ref TTarget[] targets);
 
-        [HideInCallstack]
-        private static void WarnIfTargetListIsEmpty(UnityEngine.Object context)
+        [HideInCallstack, DoesNotReturn, Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+        private static void WarnTargetListIsEmpty(UnityEngine.Object context)
         {
-            Debug.LogWarning("The target list is empty.", context);
+            UnityEngine.Debug.LogWarning("The target list is empty.", context);
         }
     }
 }

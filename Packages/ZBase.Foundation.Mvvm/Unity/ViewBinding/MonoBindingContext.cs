@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ComponentModel;
@@ -50,35 +51,35 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 {
                     if (_targetSystemObject == null)
                     {
-                        LogIfTargetSystemObjectIsNull(_targetKind);
+                        ErrorTargetSystemObjectIsNull(_targetKind, this);
                         result = null;
                         return false;
                     }
 
-                    return TryResolvePropertyPath(_targetSystemObject, _targetPropertyPath, out result);
+                    return TryResolvePropertyPath(_targetSystemObject, _targetPropertyPath, out result, this);
                 }
 
                 case ContextTargetKind.UnityObject:
                 {
                     if (_targetUnityObject == false)
                     {
-                        LogIfTargetUnityObjectIsNull(_targetKind);
+                        ErrorTargetUnityObjectIsNull(_targetKind, this);
                         result = null;
                         return false;
                     }
 
                     if (_targetUnityObject is not IObservableObject target)
                     {
-                        LogIfTargetUnityObjectIsNotObservableObject();
+                        ErrorTargetUnityObjectIsNotObservableObject(this);
                         result = null;
                         return false;
                     }
 
-                    return TryResolvePropertyPath(target, _targetPropertyPath, out result);
+                    return TryResolvePropertyPath(target, _targetPropertyPath, out result, this);
                 }
             }
 
-            LogIfTargetKindIsInvalid(_targetKind);
+            ErrorTargetKindIsInvalid(_targetKind, this);
             result = null;
             return false;
         }
@@ -91,7 +92,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 _targetUnityObject = targetUnityObject;
                 _targetSystemObject = null;
 
-                if (TryResolvePropertyPath(target, _targetPropertyPath, out var resolvedTarget))
+                if (TryResolvePropertyPath(target, _targetPropertyPath, out var resolvedTarget, this))
                 {
                     Target = resolvedTarget;
                     return IsCreated = true;
@@ -103,14 +104,14 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 _targetSystemObject = targetSystemObject;
                 _targetUnityObject = null;
 
-                if (TryResolvePropertyPath(target, _targetPropertyPath, out var resolvedTarget))
+                if (TryResolvePropertyPath(target, _targetPropertyPath, out var resolvedTarget, this))
                 {
                     Target = resolvedTarget;
                     return IsCreated = true;
                 }
             }
 
-            LogIfTargetArgumentIsNull();
+            ErrorTargetArgumentIsNull(this);
             return false;
         }
 
@@ -118,6 +119,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
               IObservableObject target
             , ReadOnlySpan<string> propertyPath
             , out IObservableObject result
+            , UnityEngine.Object context
         )
         {
             if (propertyPath.Length < 1)
@@ -132,7 +134,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             {
                 if (string.IsNullOrEmpty(propertyName))
                 {
-                    LogIfCannotResolvePropertyPath();
+                    ErrorCannotResolvePropertyPath(context);
                     result = null;
                     return false;
                 }
@@ -146,52 +148,56 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 return true;
             }
 
-            LogIfCannotResolvePropertyPath();
+            ErrorCannotResolvePropertyPath(context);
             result = null;
             return false;
         }
 
-        [DoesNotReturn, HideInCallstack]
-        private static void LogIfTargetArgumentIsNull()
+        [HideInCallstack, DoesNotReturn, Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+        private static void ErrorTargetArgumentIsNull(UnityEngine.Object context)
         {
-            Debug.LogError("The `target` argument is null.");
+            UnityEngine.Debug.LogError("The `target` argument is null.", context);
         }
 
-        [DoesNotReturn, HideInCallstack]
-        private static void LogIfTargetSystemObjectIsNull(ContextTargetKind targetKind)
+        [HideInCallstack, DoesNotReturn, Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+        private static void ErrorTargetSystemObjectIsNull(ContextTargetKind targetKind, UnityEngine.Object context)
         {
-            Debug.LogError(
-                $"The target kind is {targetKind} but reference on the `Target System Object` field is null."
+            UnityEngine.Debug.LogError(
+                  $"The target kind is {targetKind} but reference on the `Target System Object` field is null."
+                , context
             );
         }
 
-        [DoesNotReturn, HideInCallstack]
-        private static void LogIfTargetUnityObjectIsNull(ContextTargetKind targetKind)
+        [HideInCallstack, DoesNotReturn, Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+        private static void ErrorTargetUnityObjectIsNull(ContextTargetKind targetKind, UnityEngine.Object context)
         {
-            Debug.LogError(
-                $"The target kind is {targetKind} but reference on the `Target Unity Object` field is null."
+            UnityEngine.Debug.LogError(
+                  $"The target kind is {targetKind} but reference on the `Target Unity Object` field is null."
+                , context
             );
         }
 
-        [DoesNotReturn, HideInCallstack]
-        private static void LogIfTargetUnityObjectIsNotObservableObject()
+        [HideInCallstack, DoesNotReturn, Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+        private static void ErrorTargetUnityObjectIsNotObservableObject(UnityEngine.Object context)
         {
-            Debug.LogError(
-                $"Reference on the `Target Unity Object` field does not implement {typeof(IObservableObject)}."
+            UnityEngine.Debug.LogError(
+                  $"Reference on the `Target Unity Object` field does not implement {typeof(IObservableObject)}."
+                , context
             );
         }
 
-        [DoesNotReturn, HideInCallstack]
-        private static void LogIfTargetKindIsInvalid(ContextTargetKind targetKind)
+        [HideInCallstack, DoesNotReturn, Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+        private static void ErrorTargetKindIsInvalid(ContextTargetKind targetKind, UnityEngine.Object context)
         {
-            Debug.LogError($"{targetKind} is not a valid target kind.");
+            UnityEngine.Debug.LogError($"{targetKind} is not a valid target kind.", context);
         }
 
-        [DoesNotReturn, HideInCallstack]
-        private static void LogIfCannotResolvePropertyPath()
+        [HideInCallstack, DoesNotReturn, Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+        private static void ErrorCannotResolvePropertyPath(UnityEngine.Object context)
         {
-            Debug.LogError(
-                $"The target {nameof(IObservableObject)} cannot be retrieved by values on the `Target Property Path` field."
+            UnityEngine.Debug.LogError(
+                  $"The target {nameof(IObservableObject)} cannot be retrieved by values on the `Target Property Path` field."
+                , context
             );
         }
 

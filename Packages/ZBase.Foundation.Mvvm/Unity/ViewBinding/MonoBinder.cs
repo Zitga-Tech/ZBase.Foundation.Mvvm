@@ -5,6 +5,8 @@ using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics;
+
 
 #if CYSHARP_UNITASK
 using Cysharp.Threading.Tasks;
@@ -46,7 +48,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             if (Context.Target == null)
             {
-                LogWhenContextTargetIsNull(this);
+                ErrorContextTargetIsNull(this);
                 return;
             }
             
@@ -102,13 +104,13 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         {
             if (_context == false)
             {
-                ThrowIfContextIsNull();
+                ErrorContextIsNull(this);
                 return null;
             }
 
             if (_context is not IBindingContext context)
             {
-                ThrowIfContextIsInvalid();
+                ErrorContextIsInvalid(this);
                 return null;
             }
 
@@ -145,7 +147,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
             if (this.Context.Target == null)
             {
-                LogWhenContextTargetIsNull(this);
+                ErrorContextTargetIsNull(this);
                 return;
             }
 
@@ -184,7 +186,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 return;
             }
 
-            LogIfPropertyBindingFailed(bindingProperty, this.Context, this);
+            ErrorPropertyBindingFailed(bindingProperty, this.Context, this);
         }
 
         protected virtual void OnBindCommandFailed(BindingCommand bindingCommand)
@@ -194,33 +196,29 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 return;
             }
 
-            LogIfPropertyCommandFailed(bindingCommand, this.Context, this);
+            ErrorPropertyCommandFailed(bindingCommand, this.Context, this);
         }
 
-        [DoesNotReturn, HideInCallstack]
-        private static void ThrowIfContextIsNull()
+        [HideInCallstack, DoesNotReturn, Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+        private static void ErrorContextIsNull(UnityEngine.Object context)
         {
-            throw new NullReferenceException(
-                $"Reference on the `Context` field is null."
-            );
+            UnityEngine.Debug.LogError("Reference on the `Context` field is null.", context);
         }
 
-        [DoesNotReturn, HideInCallstack]
-        private static void ThrowIfContextIsInvalid()
+        [HideInCallstack, DoesNotReturn, Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+        private static void ErrorContextIsInvalid(UnityEngine.Object context)
         {
-            throw new InvalidCastException(
-                $"Reference on the `Context` field does not implement {typeof(IBindingContext)}."
-            );
+            UnityEngine.Debug.LogError("Reference on the `Context` field does not implement {typeof(IBindingContext)}.", context);
         }
 
-        [HideInCallstack]
-        private static void LogWhenContextTargetIsNull(UnityEngine.Object context)
+        [HideInCallstack, DoesNotReturn, Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+        private static void ErrorContextTargetIsNull(UnityEngine.Object context)
         {
-            Debug.LogError("The target of the Context is null.", context);
+            UnityEngine.Debug.LogError("The target of the Context is null.", context);
         }
 
-        [HideInCallstack]
-        protected static void LogIfPropertyBindingFailed(
+        [HideInCallstack, DoesNotReturn, Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+        protected static void ErrorPropertyBindingFailed(
               BindingProperty bindingProperty
             , IBindingContext bindingContext
             , UnityEngine.Object context
@@ -228,15 +226,15 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         {
             var type = bindingContext?.Target?.GetType();
 
-            Debug.LogError(
+            UnityEngine.Debug.LogError(
                   $"Cannot bind to any property named `{bindingProperty?.TargetPropertyName}` on {type}. " +
                   $"Please verify if {type} contains this property."
                 , context
             );
         }
 
-        [HideInCallstack]
-        protected static void LogIfPropertyCommandFailed(
+        [HideInCallstack, DoesNotReturn, Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+        protected static void ErrorPropertyCommandFailed(
               BindingCommand bindingCommand
             , IBindingContext bindingContext
             , UnityEngine.Object context
@@ -244,7 +242,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         {
             var type = bindingContext?.Target?.GetType();
 
-            Debug.LogError(
+            UnityEngine.Debug.LogError(
                   $"Cannot bind to any command named `{bindingCommand?.TargetCommandName}` on {type}. " +
                   $"Please verify if {type} contains this command."
                 , context
