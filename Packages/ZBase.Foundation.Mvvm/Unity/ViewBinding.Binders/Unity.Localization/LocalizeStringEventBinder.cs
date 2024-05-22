@@ -55,7 +55,85 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         [BindingProperty]
-        [field: Label("Variable")]
+        [field: Label("Localized IVariable")]
+        [field: HideInInspector]
+        private void SetIVariable(LocalizedIVariable v)
+        {
+            var (name, value) = v;
+
+            if (value == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(name))
+            {
+                name = "0";
+            }
+
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                var target = targets[i];
+                var stringRef = target.StringReference;
+
+                if (stringRef.TryGetValue(name, out var variable) == false)
+                {
+                    stringRef.Add(name, variable);
+                }
+
+                target.RefreshString();
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Localized IVariable Array")]
+        [field: HideInInspector]
+        private void SetIVariables(LocalizedIVariable[] v)
+        {
+            var vars = v.AsSpan();
+
+            if (vars.Length < 1)
+            {
+                return;
+            }
+
+            var targets = Targets.Span;
+            var length = targets.Length;
+
+            for (var i = 0; i < length; i++)
+            {
+                var target = targets[i];
+                var stringRef = target.StringReference;
+
+                for (var k = 0; k < vars.Length; k++)
+                {
+                    var (name, value) = vars[k];
+
+                    if (value == null)
+                    {
+                        continue;
+                    }
+
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        name = "0";
+                    }
+
+                    if (stringRef.TryGetValue(name, out var variable) == false)
+                    {
+                        stringRef.Add(name, variable);
+                    }
+                }
+
+                target.RefreshString();
+            }
+        }
+
+        [BindingProperty]
+        [field: Label("Localized String Variable")]
         [field: HideInInspector]
         private void SetVariable(LocalizedStringVariable v)
         {
@@ -94,7 +172,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         [BindingProperty]
-        [field: Label("Variables")]
+        [field: Label("Localized String Variable Array")]
         [field: HideInInspector]
         private void SetVariables(LocalizedStringVariable[] v)
         {
@@ -161,6 +239,24 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
         }
 
         public void Deconstruct(out string name, out string value)
+        {
+            name = _name;
+            value = _value;
+        }
+    }
+
+    public readonly struct LocalizedIVariable
+    {
+        private readonly string _name;
+        private readonly IVariable _value;
+
+        public LocalizedIVariable(IVariable value, string name = "0")
+        {
+            _name = name;
+            _value = value;
+        }
+
+        public void Deconstruct(out string name, out IVariable value)
         {
             name = _name;
             value = _value;
