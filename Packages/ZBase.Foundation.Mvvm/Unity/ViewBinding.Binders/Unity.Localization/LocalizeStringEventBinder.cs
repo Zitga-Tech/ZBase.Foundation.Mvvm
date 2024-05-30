@@ -13,7 +13,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/LocalizeStringEvent Binder")]
-    public partial class LocalizeStringEventBinder : MonoBinder<LocalizeStringEvent>
+    public partial class LocalizeStringEventBinder : MonoBinder<LocalizeStringEvent>, IBinder
     {
         protected sealed override void OnAwake([NotNull] ref LocalizeStringEvent[] targets)
         {

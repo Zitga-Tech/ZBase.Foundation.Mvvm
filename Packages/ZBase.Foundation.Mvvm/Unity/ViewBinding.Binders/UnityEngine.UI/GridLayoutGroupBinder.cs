@@ -8,7 +8,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Grid Layout Group Binder")]
-    public partial class GridLayoutGroupBinder : MonoBinder<GridLayoutGroup>
+    public partial class GridLayoutGroupBinder : MonoBinder<GridLayoutGroup>, IBinder
     {
         protected override void OnAwake([NotNull] ref GridLayoutGroup[] targets)
         {

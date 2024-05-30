@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using ZBase.Foundation.SourceGen;
 
@@ -21,13 +22,13 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
             var projectPathProvider = SourceGenHelpers.GetSourceGenConfigProvider(context);
 
             var candidateProvider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: static (node, token) => IsSyntaxMatch(node, token),
-                transform: static (syntaxContext, token) => GetSemanticMatch(syntaxContext, token)
+                predicate: IsSyntaxMatch,
+                transform: GetSemanticMatch
             ).Where(static t => t is { });
 
             var candidateToIgnoreProvider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: static (node, token) => GeneratorHelpers.IsStructSyntaxMatch(node, token),
-                transform: static (syntaxContext, token) => GetTypeInGenericUnionDeclaration(syntaxContext, token)
+                predicate: IsStructSyntaxMatch,
+                transform: GetTypeInGenericUnionDeclaration
             ).Where(static t => t is { });
 
             var combined = candidateProvider.Collect()
@@ -45,6 +46,18 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
                     , source.Right.outputSourceGenFiles
                 );
             });
+        }
+
+        public static bool IsStructSyntaxMatch(SyntaxNode syntaxNode, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            return syntaxNode is StructDeclarationSyntax structSyntax
+                && structSyntax.BaseList != null
+                && structSyntax.BaseList.Types.Count > 0
+                && structSyntax.BaseList.Types.Any(
+                    static x => x.Type.IsTypeNameGenericCandidate("ZBase.Foundation.Mvvm.Unions", "IUnion", out _)
+                );
         }
 
         public static bool IsSyntaxMatch(SyntaxNode syntaxNode, CancellationToken token)

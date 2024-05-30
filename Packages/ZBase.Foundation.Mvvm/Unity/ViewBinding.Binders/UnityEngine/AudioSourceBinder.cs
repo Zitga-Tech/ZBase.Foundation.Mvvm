@@ -5,7 +5,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Audio Source Binder")]
-    public partial class AudioSourceBinder : MonoBinder<AudioSource>
+    public partial class AudioSourceBinder : MonoBinder<AudioSource>, IBinder
     {
         protected sealed override void OnAwake([NotNull] ref AudioSource[] targets)
         {

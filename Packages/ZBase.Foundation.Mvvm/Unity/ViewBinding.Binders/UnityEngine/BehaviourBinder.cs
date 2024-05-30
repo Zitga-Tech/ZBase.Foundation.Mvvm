@@ -6,7 +6,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Behaviour Binder")]
-    public partial class BehaviourBinder : MonoBinder<Behaviour>
+    public partial class BehaviourBinder : MonoBinder<Behaviour>, IBinder
     {
         [SerializeField]
         private bool _includeMonoBinders = false;

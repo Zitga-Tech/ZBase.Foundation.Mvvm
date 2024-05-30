@@ -8,7 +8,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Button Binder")]
-    public partial class ButtonBinder : MonoBinder<Button>
+    public partial class ButtonBinder : MonoBinder<Button>, IBinder
     {
         protected sealed override void OnAwake([NotNull] ref Button[] targets)
         {

@@ -5,7 +5,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Transform Binder")]
-    public partial class TransformBinder : MonoBinder<Transform>
+    public partial class TransformBinder : MonoBinder<Transform>, IBinder
     {
         protected sealed override void OnAwake([NotNull] ref Transform[] targets)
         {

@@ -4,10 +4,11 @@ using System.Diagnostics.CodeAnalysis;
 using UnityEngine.Events;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Components;
+using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
-    public abstract partial class LocalizedAssetEventBinder<TLocalize, TObject, TReference, TEvent> : MonoBinder<TLocalize>
+    public abstract partial class LocalizedAssetEventBinder<TLocalize, TObject, TReference, TEvent> : MonoBinder<TLocalize>, IBinder
         where TLocalize : LocalizedAssetEvent<TObject, TReference, TEvent>
         where TObject : UnityEngine.Object
         where TReference : LocalizedAsset<TObject>, new()

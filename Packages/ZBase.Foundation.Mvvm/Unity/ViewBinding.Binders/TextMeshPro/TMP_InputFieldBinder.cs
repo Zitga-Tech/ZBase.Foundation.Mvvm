@@ -29,7 +29,7 @@ namespace TMPro
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/TMP_InputField Binder")]
-    public partial class TMP_InputFieldBinder : MonoBinder<TMP_InputField>
+    public partial class TMP_InputFieldBinder : MonoBinder<TMP_InputField>, IBinder
     {
         protected sealed override void OnAwake([NotNull] ref TMP_InputField[] targets)
         {

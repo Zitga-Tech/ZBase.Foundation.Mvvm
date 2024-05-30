@@ -8,7 +8,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Slider Binder")]
-    public partial class SliderBinder : MonoBinder<Slider>
+    public partial class SliderBinder : MonoBinder<Slider>, IBinder
     {
         protected sealed override void OnAwake([NotNull] ref Slider[] targets)
         {

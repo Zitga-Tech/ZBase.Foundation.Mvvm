@@ -2,10 +2,11 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
+using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 {
-    public abstract partial class MonoBinder<TTarget> : MonoBinder
+    public abstract partial class MonoBinder<TTarget> : MonoBinder, IBinder
         where TTarget : UnityEngine.Object
     {
         [SerializeField]

@@ -8,7 +8,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Scroll Bar Binder")]
-    public partial class ScrollbarBinder : MonoBinder<Scrollbar>
+    public partial class ScrollbarBinder : MonoBinder<Scrollbar>, IBinder
     {
         protected sealed override void OnAwake([NotNull] ref Scrollbar[] targets)
         {

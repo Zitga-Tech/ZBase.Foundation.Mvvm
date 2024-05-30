@@ -8,7 +8,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Graphic Raycaster Binder")]
-    public partial class GraphicRaycasterBinder : MonoBinder<GraphicRaycaster>
+    public partial class GraphicRaycasterBinder : MonoBinder<GraphicRaycaster>, IBinder
     {
         protected sealed override void OnAwake([NotNull] ref GraphicRaycaster[] targets)
         {

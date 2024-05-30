@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using ZBase.Foundation.SourceGen;
 
@@ -17,8 +18,8 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
             var projectPathProvider = SourceGenHelpers.GetSourceGenConfigProvider(context);
 
             var candidateProvider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: static (node, token) => GeneratorHelpers.IsStructSyntaxMatch(node, token),
-                transform: static (syntaxContext, token) => GetStructSemanticMatch(syntaxContext, token)
+                predicate: IsStructSyntaxMatch,
+                transform: GetStructSemanticMatch
             ).Where(static t => t is { });
 
             var combined = candidateProvider.Collect()
@@ -34,6 +35,18 @@ namespace ZBase.Foundation.Mvvm.GenericUnionSourceGen
                     , source.Right.outputSourceGenFiles
                 );
             });
+        }
+
+        public static bool IsStructSyntaxMatch(SyntaxNode syntaxNode, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            return syntaxNode is StructDeclarationSyntax structSyntax
+                && structSyntax.BaseList != null
+                && structSyntax.BaseList.Types.Count > 0
+                && structSyntax.BaseList.Types.Any(
+                    static x => x.Type.IsTypeNameGenericCandidate("ZBase.Foundation.Mvvm.Unions", "IUnion", out _)
+                );
         }
 
         public static StructRef GetStructSemanticMatch(

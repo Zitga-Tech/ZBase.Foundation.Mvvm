@@ -5,7 +5,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Canvas Binder")]
-    public partial class CanvasBinder : MonoBinder<Canvas>
+    public partial class CanvasBinder : MonoBinder<Canvas>, IBinder
     {
         protected sealed override void OnAwake([NotNull] ref Canvas[] targets)
         {

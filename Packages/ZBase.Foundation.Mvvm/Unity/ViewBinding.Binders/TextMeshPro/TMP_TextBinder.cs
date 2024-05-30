@@ -10,7 +10,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/TMP_Text Binder")]
-    public partial class TMP_TextBinder : MonoBinder<TMP_Text>
+    public partial class TMP_TextBinder : MonoBinder<TMP_Text>, IBinder
     {
         protected sealed override void OnAwake([NotNull] ref TMP_Text[] targets)
         {

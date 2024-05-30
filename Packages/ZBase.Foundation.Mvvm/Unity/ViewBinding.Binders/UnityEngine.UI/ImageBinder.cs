@@ -8,7 +8,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Image Binder")]
-    public partial class ImageBinder : MonoBinder<Image>
+    public partial class ImageBinder : MonoBinder<Image>, IBinder
     {
         protected sealed override void OnAwake([NotNull] ref Image[] targets)
         {

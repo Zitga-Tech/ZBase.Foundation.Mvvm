@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Linq;
 using System.Threading;
 using ZBase.Foundation.SourceGen;
 
@@ -10,7 +11,6 @@ namespace ZBase.Foundation.Mvvm.MonoBindingContextSourceGen
     [Generator]
     public class MonoBindingContextGenerator : IIncrementalGenerator
     {
-        public const string INTERFACE = "global::ZBase.Foundation.Mvvm.ComponentModel.IObservableObject";
         public const string COMPONENT = "global::UnityEngine.Component";
         public const string MONO_BEHAVIOUR = "global::UnityEngine.MonoBehaviour";
         public const string GENERATOR_NAME = nameof(MonoBindingContextGenerator);
@@ -20,8 +20,8 @@ namespace ZBase.Foundation.Mvvm.MonoBindingContextSourceGen
             var projectPathProvider = SourceGenHelpers.GetSourceGenConfigProvider(context);
 
             var candidateProvider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: static (node, token) => GeneratorHelpers.IsClassSyntaxMatch(node, token),
-                transform: static (syntaxContext, token) => GetClassSemanticMatch(syntaxContext, token)
+                predicate: IsClassSyntaxMatch,
+                transform: GetClassSemanticMatch
             ).Where(static t => t is { });
 
             var combined = candidateProvider
@@ -40,6 +40,18 @@ namespace ZBase.Foundation.Mvvm.MonoBindingContextSourceGen
             });
         }
 
+        public static bool IsClassSyntaxMatch(SyntaxNode syntaxNode, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            return syntaxNode is ClassDeclarationSyntax classSyntax
+                && classSyntax.BaseList != null
+                && classSyntax.BaseList.Types.Count > 0
+                && classSyntax.BaseList.Types.Any(
+                    static x => x.Type.IsTypeNameCandidate("ZBase.Foundation.Mvvm.ComponentModel", "IObservableObject")
+                );
+        }
+
         public static ClassDeclarationSyntax GetClassSemanticMatch(
               GeneratorSyntaxContext context
             , CancellationToken token
@@ -49,7 +61,7 @@ namespace ZBase.Foundation.Mvvm.MonoBindingContextSourceGen
 
             if (context.Node is not ClassDeclarationSyntax classSyntax
                 || classSyntax.BaseList == null
-                || classSyntax.DoesSemanticMatch(INTERFACE, context.SemanticModel, token) == false
+                || classSyntax.BaseList.Types.Count < 1
             )
             {
                 return null;

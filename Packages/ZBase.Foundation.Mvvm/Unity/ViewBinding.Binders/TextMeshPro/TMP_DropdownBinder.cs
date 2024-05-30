@@ -11,7 +11,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/TMP_Dropdown Binder")]
-    public partial class TMP_DropdownBinder : MonoBinder<TMP_Dropdown>
+    public partial class TMP_DropdownBinder : MonoBinder<TMP_Dropdown>, IBinder
     {
         protected sealed override void OnAwake([NotNull] ref TMP_Dropdown[] targets)
         {

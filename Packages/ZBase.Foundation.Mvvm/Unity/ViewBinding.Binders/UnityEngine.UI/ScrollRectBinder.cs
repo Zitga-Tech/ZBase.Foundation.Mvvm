@@ -8,7 +8,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Scroll Rect Binder")]
-    public partial class ScrollRectBinder : MonoBinder<ScrollRect>
+    public partial class ScrollRectBinder : MonoBinder<ScrollRect>, IBinder
     {
         protected sealed override void OnAwake([NotNull] ref ScrollRect[] targets)
         {

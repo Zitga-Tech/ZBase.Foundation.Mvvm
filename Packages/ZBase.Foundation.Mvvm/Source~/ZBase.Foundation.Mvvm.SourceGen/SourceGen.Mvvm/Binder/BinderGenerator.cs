@@ -1,6 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Linq;
+using System.Threading;
 using ZBase.Foundation.SourceGen;
 
 namespace ZBase.Foundation.Mvvm.BinderSourceGen
@@ -8,7 +10,6 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
     [Generator]
     public class BinderGenerator : IIncrementalGenerator
     {
-        public const string INTERFACE = "global::ZBase.Foundation.Mvvm.ViewBinding.IBinder";
         public const string GENERATOR_NAME = nameof(BinderGenerator);
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -16,8 +17,8 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
             var projectPathProvider = SourceGenHelpers.GetSourceGenConfigProvider(context);
 
             var candidateProvider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: static (node, token) => GeneratorHelpers.IsClassSyntaxMatch(node, token),
-                transform: static (syntaxContext, token) => GeneratorHelpers.GetClassSemanticMatch(syntaxContext, token, INTERFACE)
+                predicate: IsClassSyntaxMatch,
+                transform: GetClassSemanticMatch
             ).Where(static t => t is { });
 
             var combined = candidateProvider
@@ -34,6 +35,36 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     , source.Right.outputSourceGenFiles
                 );
             });
+        }
+
+        public static bool IsClassSyntaxMatch(SyntaxNode syntaxNode, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            return syntaxNode is ClassDeclarationSyntax classSyntax
+                && classSyntax.BaseList != null
+                && classSyntax.BaseList.Types.Count > 0
+                && classSyntax.BaseList.Types.Any(
+                    static x => x.Type.IsTypeNameCandidate("ZBase.Foundation.Mvvm.ViewBinding", "IBinder")
+                );
+        }
+
+        public static ClassDeclarationSyntax GetClassSemanticMatch(
+              GeneratorSyntaxContext context
+            , CancellationToken token
+        )
+        {
+            token.ThrowIfCancellationRequested();
+
+            if (context.Node is not ClassDeclarationSyntax classSyntax
+                || classSyntax.BaseList == null
+                || classSyntax.BaseList.Types.Count < 1
+            )
+            {
+                return null;
+            }
+
+            return classSyntax;
         }
 
         private static void GenerateOutput(

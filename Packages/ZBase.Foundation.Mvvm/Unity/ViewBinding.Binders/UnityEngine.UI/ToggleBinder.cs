@@ -8,7 +8,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Toggle Binder")]
-    public partial class ToggleBinder : MonoBinder<Toggle>
+    public partial class ToggleBinder : MonoBinder<Toggle>, IBinder
     {
         protected sealed override void OnAwake([NotNull] ref Toggle[] targets)
         {

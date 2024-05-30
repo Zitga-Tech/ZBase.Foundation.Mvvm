@@ -8,7 +8,7 @@ using ZBase.Foundation.Mvvm.ViewBinding;
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 {
     [AddComponentMenu("MVVM/Binders/Selectable Binder")]
-    public partial class SelectableBinder : MonoBinder<Selectable>
+    public partial class SelectableBinder : MonoBinder<Selectable>, IBinder
     {
         protected sealed override void OnAwake([NotNull] ref Selectable[] targets)
         {
