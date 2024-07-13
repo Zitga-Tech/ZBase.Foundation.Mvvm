@@ -1,12 +1,8 @@
-#pragma warning disable CA2201 // Do not raise reserved exception types
-
-using System;
 using UnityEngine;
 using ZBase.Foundation.Mvvm.ViewBinding;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics;
-
+using UnityEngine.Pool;
 
 #if CYSHARP_UNITASK
 using Cysharp.Threading.Tasks;
@@ -157,7 +153,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
         private void FindNearestContext()
         {
             var parent = this.transform;
-            var components = new List<IBindingContext>();
+            var components = ListPool<IBindingContext>.Get();
 
             while (parent)
             {
@@ -172,6 +168,8 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
                 parent = parent.parent;
             }
+
+            ListPool<IBindingContext>.Release(components);
         }
 
         protected virtual void OnBindPropertyFailed(BindingProperty bindingProperty)

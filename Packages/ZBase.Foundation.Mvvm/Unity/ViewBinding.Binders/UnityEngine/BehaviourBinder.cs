@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
+using UnityEngine.Pool;
 using ZBase.Foundation.Mvvm.ViewBinding;
 
 namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
@@ -13,7 +13,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
 
         protected sealed override void OnAwake([NotNull] ref Behaviour[] targets)
         {
-            var container = new List<Behaviour>();
+            var container = ListPool<Behaviour>.Get();
             container.AddRange(targets);
 
             if (container.Count < 1)
@@ -33,6 +33,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders
             }
 
             targets = container.ToArray();
+            ListPool<Behaviour>.Release(container);
         }
 
         [BindingProperty]
