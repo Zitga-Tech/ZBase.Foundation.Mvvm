@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using Unity.Collections.LowLevel.Unsafe;
 using ZBase.Foundation.Mvvm.Unions.Converters;
 
 #if UNITY_5_3_OR_NEWER
@@ -102,7 +103,14 @@ namespace ZBase.Foundation.Mvvm.Unions
                 throw new ArgumentNullException(nameof(converter));
             }
 
-            var sizeOfT = Unsafe.SizeOf<T>();
+            var type = typeof(T);
+
+            if (type.IsValueType == false)
+            {
+                return;
+            }
+
+            var sizeOfT = UnsafeUtility.SizeOf(type);
 
             if (sizeOfT > UnionData.SIZE)
             {

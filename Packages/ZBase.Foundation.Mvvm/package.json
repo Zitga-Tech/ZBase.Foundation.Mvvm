@@ -5,8 +5,5 @@
   "unity": "2022.2",
   "documentationUrl": "https://github.com/Zitga-Tech/ZBase.Foundation.Mvvm/blob/main/README.md",
   "type": "library",
-  "dependencies": {
-    "org.nuget.system.runtime.compilerservices.unsafe": "6.0.0"
-  },
   "description": "An MVVM framework for Unity that utilises C# Source Generator for better performance."
 }
