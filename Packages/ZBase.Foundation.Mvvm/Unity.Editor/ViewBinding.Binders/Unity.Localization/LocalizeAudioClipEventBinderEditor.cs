@@ -1,4 +1,5 @@
 ﻿#if UNITY_TEXT_MESH_PRO || (UNITY_2023_2_OR_NEWER && UNITY_UGUI)
+#if UNITY_LOCALIZATION
 
 using UnityEditor;
 using ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders;
@@ -27,4 +28,5 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
     }
 }
 
+#endif
 #endif

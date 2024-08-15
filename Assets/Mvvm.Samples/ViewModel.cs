@@ -1,10 +1,13 @@
 using System;
 using UnityEngine;
-using UnityEngine.Localization;
-using UnityEngine.Localization.SmartFormat.PersistentVariables;
 using ZBase.Foundation.Mvvm.ComponentModel;
 using ZBase.Foundation.Mvvm.Input;
 using ZBase.Foundation.Mvvm.Unity.ViewBinding.Binders;
+
+#if UNITY_LOCALIZATION
+using UnityEngine.Localization;
+using UnityEngine.Localization.SmartFormat.PersistentVariables;
+#endif
 
 namespace Mvvm.Samples
 {
@@ -34,8 +37,10 @@ namespace Mvvm.Samples
         [ObservableProperty]
         private Color _textColor;
 
+#if UNITY_LOCALIZATION
         [ObservableProperty]
         public LocalizedIVariable[] ProgressVariables { get => Get_ProgressVariables(); set => Set_ProgressVariables(value); }
+#endif
 
         [ObservableProperty]
         private bool _updating;
@@ -50,26 +55,32 @@ namespace Mvvm.Samples
 
         public double Seconds => Time.TotalSeconds;
 
+#if UNITY_LOCALIZATION
         private IntVariable _progressVariable;
         private IntVariable _unitVariable;
         private LocalizedString _localizedUnit;
+#endif
 
         private void Start()
         {
             this.Time = TimeSpan.Zero;
             this.TextColor = Color.white;
 
+#if UNITY_LOCALIZATION
             this.ProgressVariables = new LocalizedIVariable[] {
                 new(_progressVariable = new(), "value"),
                 new(_localizedUnit = new("L10n", "unit_format") {
                     { "0", _unitVariable = new() }
                 }, "unit"),
             };
+#endif
         }
 
         private void OnDestroy()
         {
+#if UNITY_LOCALIZATION
             ((IDisposable)_localizedUnit).Dispose();
+#endif
         }
 
         private void Update()
@@ -104,8 +115,11 @@ namespace Mvvm.Samples
         private void OnSetProgress(float value)
         {
             var progress = ReduceToUnit((int)value, out var unit);
+
+#if UNITY_LOCALIZATION
             _progressVariable.Value = progress;
             _unitVariable.Value = unit;
+#endif
         }
 
         private static int ReduceToUnit(int value, out int unit)
