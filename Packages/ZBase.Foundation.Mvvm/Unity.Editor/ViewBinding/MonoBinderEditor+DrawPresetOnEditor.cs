@@ -364,36 +364,39 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
                 }
                 EditorGUILayout.EndHorizontal();
 
-                EditorGUILayout.BeginHorizontal();
+                if (adapterPropertySP != null)
                 {
-                    EditorGUILayout.PrefixLabel("Convert By");
-
-                    if (GUILayout.Button(adapterPropertyLabel))
+                    EditorGUILayout.BeginHorizontal();
                     {
-                        DrawAdapterPropertyMenu(
-                              binder
-                            , serializedBinder
-                            , bindingType
-                            , targetPropertyType
-                            , adapterPropertySP
-                            , adapterType
-                        );
+                        EditorGUILayout.PrefixLabel("Convert By");
+
+                        if (GUILayout.Button(adapterPropertyLabel))
+                        {
+                            DrawAdapterPropertyMenu(
+                                  binder
+                                , serializedBinder
+                                , bindingType
+                                , targetPropertyType
+                                , adapterPropertySP
+                                , adapterType
+                            );
+                        }
                     }
+                    EditorGUILayout.EndHorizontal();
+
+                    DrawScriptableAdapter(
+                          serializedBinder
+                        , adapterPropertySP
+                        , scriptableAdapter
+                    );
+
+                    DrawCompositeAdapter(
+                          serializedBinder
+                        , adapterPropertySP
+                        , compositeAdapter
+                        , rolMap
+                    );
                 }
-                EditorGUILayout.EndHorizontal();
-
-                DrawScriptableAdapter(
-                      serializedBinder
-                    , adapterPropertySP
-                    , scriptableAdapter
-                );
-
-                DrawCompositeAdapter(
-                      serializedBinder
-                    , adapterPropertySP
-                    , compositeAdapter
-                    , rolMap
-                );
 
                 EditorGUILayout.EndVertical();
             }
@@ -449,7 +452,7 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
             , out CompositeAdapter compositeAdapter
         )
         {
-            if (adapterPropertySP.managedReferenceValue is IAdapter adapter)
+            if (adapterPropertySP?.managedReferenceValue is IAdapter adapter)
             {
                 adapterType = adapter.GetType();
 
@@ -532,30 +535,51 @@ namespace ZBase.Foundation.Mvvm.Unity.ViewBinding
 
         private static void SetBindingProperty(object param)
         {
-            if (param is not (
-                  MonoBinder binder
-                , SerializedObject serializedBinder
-                , SerializedProperty targetPropertyNameSP
-                , SerializedProperty adapterPropertySP
-                , Type bindingType
-                , string selectedPropName
-                , Type selectedPropType
-            ))
             {
-                return;
+                if (param is (
+                      MonoBinder binder
+                    , SerializedObject serializedBinder
+                    , SerializedProperty targetPropertyNameSP
+                    , SerializedProperty adapterPropertySP
+                    , Type bindingType
+                    , string selectedPropName
+                    , Type selectedPropType
+                ))
+                {
+                    Undo.RecordObject(binder, $"Set {targetPropertyNameSP.propertyPath}");
+
+                    targetPropertyNameSP.stringValue = selectedPropName;
+
+                    if (TryCreateDefaultAdapter(selectedPropType, bindingType, out var adapter))
+                    {
+                        adapterPropertySP.managedReferenceValue = adapter;
+                    }
+
+                    serializedBinder.ApplyModifiedProperties();
+                    serializedBinder.Update();
+                    return;
+                }
             }
 
-            Undo.RecordObject(binder, $"Set {targetPropertyNameSP.propertyPath}");
-
-            targetPropertyNameSP.stringValue = selectedPropName;
-
-            if (TryCreateDefaultAdapter(selectedPropType, bindingType, out var adapter))
             {
-                adapterPropertySP.managedReferenceValue = adapter;
-            }
+                if (param is (
+                      MonoBinder binder
+                    , SerializedObject serializedBinder
+                    , SerializedProperty targetPropertyNameSP
+                    , _
+                    , _
+                    , string selectedPropName
+                    , _
+                ))
+                {
+                    Undo.RecordObject(binder, $"Set {targetPropertyNameSP.propertyPath}");
 
-            serializedBinder.ApplyModifiedProperties();
-            serializedBinder.Update();
+                    targetPropertyNameSP.stringValue = selectedPropName;
+                    serializedBinder.ApplyModifiedProperties();
+                    serializedBinder.Update();
+                    return;
+                }
+            }
         }
 
         private static bool TryCreateDefaultAdapter(Type fromType, Type toType, out IAdapter adapter)

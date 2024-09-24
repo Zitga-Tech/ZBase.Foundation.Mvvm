@@ -80,11 +80,14 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         {
             foreach (var member in BindingPropertyRefs)
             {
+                var param = member.Parameter;
+                var paramType = param != null ? param.Type.ToFullName() : "void";
+
                 p.PrintBeginLine()
                     .Print("[global::ZBase.Foundation.Mvvm.ViewBinding.SourceGen.BindingPropertyMethodInfo(")
                     .Print($"\"{member.Symbol.Name}\", typeof(")
-                    .Print(member.Symbol.Parameters[0].Type.ToFullName()).Print("))]")
-                    .PrintEndLine();
+                    .Print(paramType)
+                    .PrintEndLine("))]");
             }
         }
 
@@ -174,8 +177,6 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     readonlyKeyword = "readonly ";
                 }
 
-                var typeName = member.Parameter.Type.ToFullName();
-
                 p.PrintLine($"/// <summary>The binding property for <see cref=\"{member.Symbol.Name}\"/></summary>");
                 p.Print("#if UNITY_5_3_OR_NEWER").PrintEndLine();
                 p.PrintLine("[global::UnityEngine.SerializeField]");
@@ -186,8 +187,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     p.PrintLine($"[{attribute.GetSyntax().ToFullString()}]");
                 }
 
+                var param = member.Parameter;
+                var paramType = param != null ? param.Type.ToFullName() : "void";
+
                 p.PrintLine(GENERATED_CODE);
-                p.PrintLine(string.Format(GENERATED_BINDING_PROPERTY, ConstName(member), typeName));
+                p.PrintLine(string.Format(GENERATED_BINDING_PROPERTY, ConstName(member), paramType));
                 p.PrintLine($"private {readonlyKeyword}global::ZBase.Foundation.Mvvm.ViewBinding.BindingProperty {BindingPropertyName(member)} =  new global::ZBase.Foundation.Mvvm.ViewBinding.BindingProperty();");
                 p.PrintEndLine();
             }
@@ -204,7 +208,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
             foreach (var member in BindingPropertyRefs)
             {
-                if (member.SkipConverter)
+                if (member.SkipConverter || member.Parameter == null)
                 {
                     continue;
                 }
@@ -284,6 +288,10 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 if (member.Parameter != null)
                 {
                     p.Print($", typeof({member.Parameter.Type.ToFullName()})");
+                }
+                else
+                {
+                    p.Print(", typeof(void)");
                 }
 
                 p.Print(")]").PrintEndLine();
@@ -401,10 +409,20 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 foreach (var member in BindingPropertyRefs)
                 {
                     var methodName = MethodName(member);
+                    var param = member.Parameter;
 
                     p.PrintLine($"this.{ListenerName(member)} = new global::ZBase.Foundation.Mvvm.ComponentModel.PropertyChangeEventListener<{ClassName}>(this)");
                     p.OpenScope();
-                    p.PrintLine($"OnEventAction = (instance, args) => instance.{methodName}(this.{ConverterName(member)}.Convert(args.NewValue))");
+
+                    if (param == null)
+                    {
+                        p.PrintLine($"OnEventAction = (instance, args) => instance.{methodName}()");
+                    }
+                    else
+                    {
+                        p.PrintLine($"OnEventAction = (instance, args) => instance.{methodName}(this.{ConverterName(member)}.Convert(args.NewValue))");
+                    }
+
                     p.CloseScope("};");
                     p.PrintEndLine();
                 }
@@ -667,6 +685,11 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                 {
                     foreach (var member in BindingPropertyRefs)
                     {
+                        if (member.Parameter == null)
+                        {
+                            continue;
+                        }
+
                         p.PrintLine($"case {ConstName(member)}:");
                         p.OpenScope();
                         {
@@ -696,7 +719,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
             foreach (var member in BindingPropertyRefs)
             {
-                if (member.IsParameterTypeNotUnion == false)
+                if (member.IsParameterTypeUnion || member.Parameter == null)
                 {
                     continue;
                 }
@@ -916,7 +939,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
         {
             var name = member.Symbol.Name;
 
-            if (member.IsParameterTypeNotUnion)
+            if (member.IsParameterTypeUnion == false)
             {
                 return $"{name}__Union";
             }

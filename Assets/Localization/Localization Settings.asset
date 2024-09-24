@@ -100,8 +100,8 @@ MonoBehaviour:
     - rid: 1267595575089692679
       type: {class: SmartSettings, ns: UnityEngine.Localization.SmartFormat.Core.Settings, asm: Unity.Localization}
       data:
-        m_FormatErrorAction: 0
-        m_ParseErrorAction: 0
+        m_FormatErrorAction: 1
+        m_ParseErrorAction: 1
         m_CaseSensitivity: 0
         m_ConvertCharacterStringLiterals: 1
     - rid: 1267595575089692680

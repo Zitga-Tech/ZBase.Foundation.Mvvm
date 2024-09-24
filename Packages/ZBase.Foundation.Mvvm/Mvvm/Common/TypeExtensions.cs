@@ -4,6 +4,8 @@ namespace ZBase.Foundation.Mvvm
 {
     public static class TypeExtensions
     {
+        public const string VOID_TYPE_NAME = "void";
+
         public static string GetName(this Type type)
         {
             if (type.IsEnum)
@@ -58,6 +60,11 @@ namespace ZBase.Foundation.Mvvm
 
         public static string GetFriendlyName(this Type type)
         {
+            if (type == typeof(void))
+            {
+                return VOID_TYPE_NAME;
+            }
+
             var friendlyName = type.GetName();
 
             if (type.IsGenericType)

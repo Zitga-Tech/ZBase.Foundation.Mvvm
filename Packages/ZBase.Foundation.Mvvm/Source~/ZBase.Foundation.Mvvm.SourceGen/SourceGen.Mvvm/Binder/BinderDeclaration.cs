@@ -145,34 +145,41 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                     var bindingPropAttribute = method.GetAttribute(BINDING_PROPERTY_ATTRIBUTE);
                     var bindingCommandAttribute = method.GetAttribute(BINDING_COMMAND_ATTRIBUTE);
 
-                    if (bindingPropAttribute != null && method.Parameters.Length == 1)
+                    if (bindingPropAttribute != null && method.Parameters.Length < 2)
                     {
-                        var parameter = method.Parameters[0];
+                        IParameterSymbol parameter = null;
+                        ITypeSymbol argumentType = null;
+                        var isUnion = true;
+                        string argTypeName = null;
 
-                        if (parameter.RefKind is not (RefKind.None or RefKind.In or RefKind.Ref))
+                        if (method.Parameters.Length == 1)
                         {
-                            continue;
-                        }
+                            parameter = method.Parameters[0];
 
-                        var argumentType = parameter.Type;
-                        var isNotUnion = argumentType.ToFullName() != UNION_TYPE;
+                            if (parameter.RefKind is not (RefKind.None or RefKind.In or RefKind.Ref))
+                            {
+                                continue;
+                            }
+
+                            argumentType = parameter.Type;
+                            argTypeName = argumentType.ToFullName();
+                            isUnion = argTypeName == UNION_TYPE;
+                        }
 
                         bindingPropertyRefs.Add(new BindingPropertyRef {
                             Symbol = method,
-                            IsParameterTypeNotUnion = isNotUnion,
+                            IsParameterTypeUnion = isUnion,
                             Parameter = parameter,
                         });
 
-                        if (isNotUnion == false)
+                        if (isUnion || argumentType == null)
                         {
                             continue;
                         }
 
-                        var typeName = argumentType.ToFullName();
-
-                        if (nonUnionTypeFilter.ContainsKey(typeName) == false)
+                        if (nonUnionTypeFilter.ContainsKey(argTypeName) == false)
                         {
-                            nonUnionTypeFilter[typeName] = argumentType;
+                            nonUnionTypeFilter[argTypeName] = argumentType;
                         }
                     }
                     else if (bindingCommandAttribute != null
@@ -181,18 +188,18 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
                         && method.Parameters.Length < 2
                     )
                     {
-                        IParameterSymbol param = null;
+                        IParameterSymbol parameter = null;
 
                         if (method.Parameters.Length == 1
                             && method.Parameters[0].RefKind is (RefKind.None or RefKind.In or RefKind.Ref)
                         )
                         {
-                            param = method.Parameters[0];
+                            parameter = method.Parameters[0];
                         }
 
                         bindingCommandRefs.Add(new BindingCommandRef {
                             Symbol = method,
-                            Parameter = param,
+                            Parameter = parameter,
                         });
                     }
 
@@ -270,7 +277,7 @@ namespace ZBase.Foundation.Mvvm.BinderSourceGen
 
             public IParameterSymbol Parameter { get; set; }
 
-            public bool IsParameterTypeNotUnion { get; set; }
+            public bool IsParameterTypeUnion { get; set; }
 
             public bool SkipBindingProperty { get; set; }
 

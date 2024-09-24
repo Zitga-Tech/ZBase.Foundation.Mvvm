@@ -18,9 +18,6 @@ namespace ZBase.Foundation.Mvvm.ViewBinding.SourceGen
 
         public Type ArgumentType { get; }
 
-        public GeneratedBindingCommandAttribute(string methodName) : this(methodName, null)
-        { }
-
         public GeneratedBindingCommandAttribute(string methodName, Type argumentType)
         {
             this.MethodName = methodName;

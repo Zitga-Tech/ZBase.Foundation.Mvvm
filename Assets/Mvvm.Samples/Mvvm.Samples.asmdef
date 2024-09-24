@@ -16,13 +16,13 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [
+    "defineConstraints": [],
+    "versionDefines": [
         {
             "name": "com.unity.localization",
             "expression": "",
             "define": "UNITY_LOCALIZATION"
         }
     ],
-    "versionDefines": [],
     "noEngineReferences": false
 }
