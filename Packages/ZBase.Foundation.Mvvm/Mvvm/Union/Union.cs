@@ -8,16 +8,20 @@ namespace ZBase.Foundation.Mvvm.Unions
     /// The union data structure provides a layout and mechanism
     /// to store several types within the same memory position.
     /// <br/>
-    /// By default, the capacity for storing the actual data is 8 bytes.
+    /// By default, the capacity for storing other data is 8 bytes.
     /// That means it can store any data whose native size is lesser than or
     /// equal to 8 bytes. To increase this capacity, follow the instruction
     /// at <see cref="UnionData"/>.
     /// </summary>
     /// <remarks>
-    /// 
+    /// The first 8-bytes block store the metadata.
+    /// <br/>
+    /// The second 8-byte block stores object reference.
+    /// <br/>
+    /// The rest stores other data.
     /// </remarks>
     /// <seealso cref="UnionBase" />
-    [StructLayout(LayoutKind.Explicit, Size = UnionData.SIZE)]
+    [StructLayout(LayoutKind.Explicit)]
     public readonly partial struct Union
     {
         public const int UNION_TYPE_KIND_SIZE = sizeof(UnionTypeKind);
@@ -28,6 +32,7 @@ namespace ZBase.Foundation.Mvvm.Unions
         [FieldOffset(UnionBase.META_OFFSET)] public readonly UnionBase Base;
         [FieldOffset(UnionBase.META_OFFSET)] public readonly UnionTypeKind TypeKind;
         [FieldOffset(UNION_TYPE_ID_OFFSET)]  public readonly UnionTypeId TypeId;
+        [FieldOffset(UnionBase.OBJECT_OFFSET)] public readonly object Object;
         [FieldOffset(UnionBase.DATA_OFFSET)] public readonly bool Bool;
         [FieldOffset(UnionBase.DATA_OFFSET)] public readonly byte Byte;
         [FieldOffset(UnionBase.DATA_OFFSET)] public readonly sbyte SByte;
@@ -40,7 +45,6 @@ namespace ZBase.Foundation.Mvvm.Unions
         [FieldOffset(UnionBase.DATA_OFFSET)] public readonly ulong ULong;
         [FieldOffset(UnionBase.DATA_OFFSET)] public readonly short Short;
         [FieldOffset(UnionBase.DATA_OFFSET)] public readonly ushort UShort;
-        [FieldOffset(UnionBase.DATA_OFFSET)] public readonly object Object;
 
         public Union(UnionBase @base, UnionTypeKind type, UnionTypeId typeId) : this()
         {
