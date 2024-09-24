@@ -2,7 +2,10 @@
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using System.Threading;
+
+#if UNITY_5_3_OR_NEWER
 using Unity.Collections.LowLevel.Unsafe;
+#endif
 
 namespace ZBase.Foundation.Mvvm.Unions
 {
@@ -126,7 +129,11 @@ namespace ZBase.Foundation.Mvvm.Unions
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private static void Increment(ref uint location)
+#if UNITY_5_3_OR_NEWER
                 => Interlocked.Add(ref UnsafeUtility.As<uint, int>(ref location), 1);
+#else
+                => Interlocked.Add(ref Unsafe.As<uint, int>(ref location), 1);
+#endif
         }
 
         private static class Id<T>
