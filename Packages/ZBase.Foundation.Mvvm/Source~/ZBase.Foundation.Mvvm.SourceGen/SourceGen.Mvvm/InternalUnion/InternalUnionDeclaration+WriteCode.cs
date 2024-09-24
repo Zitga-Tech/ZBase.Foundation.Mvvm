@@ -12,7 +12,7 @@ namespace ZBase.Foundation.Mvvm.InternalUnionSourceGen
         private const string AGGRESSIVE_INLINING = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]";
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.InternalUnionGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
-        public const string STRUCT_LAYOUT = "[global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Size = global::ZBase.Foundation.Mvvm.Unions.UnionData.SIZE)]";
+        public const string STRUCT_LAYOUT = "[global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit)]";
         public const string META_OFFSET = "[global::System.Runtime.InteropServices.FieldOffset(global::ZBase.Foundation.Mvvm.Unions.UnionBase.META_OFFSET)]";
         public const string DATA_OFFSET = "[global::System.Runtime.InteropServices.FieldOffset(global::ZBase.Foundation.Mvvm.Unions.UnionBase.DATA_OFFSET)]";
         public const string UNION_TYPE = "global::ZBase.Foundation.Mvvm.Unions.Union";

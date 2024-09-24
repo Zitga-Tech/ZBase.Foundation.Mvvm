@@ -10,7 +10,7 @@ namespace ZBase.Foundation.Mvvm.InternalStringAdapterSourceGen
     partial class InternalStringAdapterDeclaration
     {
         private const string AGGRESSIVE_INLINING = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]";
-        private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.InternalUnionGenerator\", \"1.0.0\")]";
+        private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.Mvvm.InternalStringAdapterGenerator\", \"1.0.0\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
         private const string IADAPTER = "global::ZBase.Foundation.Mvvm.ViewBinding.IAdapter";
         private const string ADAPTER_ATTRIBUTE = "[global::ZBase.Foundation.Mvvm.ViewBinding.Adapter(fromType: typeof({0}), toType: typeof(string), order: 1)]";
